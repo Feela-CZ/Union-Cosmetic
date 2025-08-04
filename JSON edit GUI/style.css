@@ -15,10 +15,6 @@ h4 {
     font-size: 1rem;
 }
 
-th {
-    cursor: pointer;
-}
-
 #upload-section {
     text-align: center;
     margin-bottom: 20px;
@@ -40,11 +36,15 @@ th {
 
 #product-table th {
     background-color: #007bff;
+    color: white;
+}
+#product-table th.sortable {
+    background-color: #007bff;
     cursor: pointer;
     color: white;
 }
 
-#product-table th:hover {
+#product-table th.sortable:hover {
     background-color: #0056b3;
 }
 
@@ -284,5 +284,4 @@ button.logistics-partial {
     #logistics-fields h4 {
         font-size: 1em;
     }
-
 }
