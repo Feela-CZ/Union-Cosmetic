@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>JSON Product Editor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>Product JSON Editor</h1>
+
+    <div id="upload-section">
+        <input type="file" id="file-input" accept=".json">
+        <button id="download-button" disabled>Download products.json</button>
+        <button id="download-logistics-button" disabled>Download logistics.json</button>
+        <button id="reset-filters" style="margin-left: 10px;">Reset Filters</button>
+    </div>
+
+    <div id="filter-section" style="text-align:center; margin-bottom:20px;">
+        <input type="text" id="search-input" placeholder="Search..." style="width: 200px; padding: 5px;">
+
+        <select id="brand-filter" style="padding:5px; margin-left:10px;">
+            <option value="">Filter by Brand</option>
+        </select>
+
+        <select id="type-filter" style="padding:5px; margin-left:10px;">
+            <option value="">Filter by Type</option>
+        </select>
+
+        <select id="logistics-key-filter" style="padding:5px; margin-left:10px; display:none;">
+            <option value="">Filter by Logistics Key</option>
+        </select>
+    </div>
+
+
+    <div id="product-table-section" style="display:none;">
+        <button id="add-product">Add New Product</button>
+        <table id="product-table">
+            <thead>
+                <tr>
+                    <th class="sortable" onclick="sortTable('brand')">Brand</th>
+                    <th class="sortable" onclick="sortTable('type')">Type</th>
+                    <th class="sortable" onclick="sortTable('id')">EAN</th>
+                    <th class="sortable" onclick="sortTable('HS')">HS Code</th>
+                    <th class="sortable" onclick="sortTable('name')">Name</th>
+                    <th class="sortable" onclick="sortTable('volume')">Volume</th>
+                    <th class="sortable" onclick="sortTable('price')">Price</th>
+                    <th class="sortable" onclick="sortTable('new')">New</th>
+                    <th class="sortable" onclick="sortTable('new_date')">Date_New</th>
+                    <th class="sortable" onclick="sortTable('discontinued')">Discontinued</th>
+                    <th class="sortable" onclick="sortTable('discontinued_date')">Date_Discontinued</th>
+                    <th style="min-width: 200px; text-align: center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Edit Product</h2>
+            <form id="product-form">
+                <label>Brand:
+                    <select id="brand">
+                        <option value="">-- select brand --</option>
+                        <option value="Lilien">Lilien</option>
+                        <option value="Naturalis">Naturalis</option>
+                        <option value="Twister">Twister</option>
+                        <option value="Natava">Natava</option>
+                    </select>
+                </label>
+                <label>Type:
+                    <select id="type">
+                        <option value="">-- select type --</option>
+                    </select>
+                </label>
+                <label>ID (EAN): <input type="text" id="id"></label>
+                <label>HS Code: <input type="text" id="hs"></label>
+                <label>Name: <input type="text" id="name"></label>
+                <label>Volume:
+                    <div id="volume-wrapper">
+                        <input type="number" id="volume-number">
+                        <select id="volume-unit">
+                            <option value="ml">ml</option>
+                            <option value="g">g</option>
+                            <option value="pc">pc</option>
+                        </select>
+                    </div>
+                </label>
+                <label>Price: <input type="number" id="price" step="any"></label>
+                <label>Pack: <input type="number" id="pack"></label>
+                <label>Boxes per Layer: <input type="number" id="boxes_per_layer"></label>
+                <label>Boxes per Pallet: <input type="number" id="boxes_per_pallet"></label>
+                <label>Logistics key:
+                    <select id="logistics-key">
+                        <option value="">-- select key --</option>
+                    </select>
+                </label>
+
+                <div style="display: flex; align-items: center; gap: 18px; margin-top: 10px; margin-bottom: 2px;">
+                    <label style="display: flex; align-items: center; gap: 6px; margin: 0;">
+                        <input type="checkbox" id="new"> New
+                    </label>
+                    <input type="date" id="new_date">
+
+                    <label style="display: flex; align-items: center; gap: 6px; margin: 0;">
+                        <input type="checkbox" id="discontinued"> Discontinued
+                    </label>
+                    <input type="date" id="discontinued_date">
+                </div>
+
+                <input type="hidden" id="product-index">
+                <button type="submit" style="margin-top: 10px;">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="confirm-delete-modal" class="modal">
+        <div class="modal-content">
+            <h2>Confirm Deletion</h2>
+            <p>Are you sure you want to delete this product?</p>
+            <div style="margin-top: 20px;">
+                <button id="confirm-delete-yes">Yes, delete</button>
+                <button id="confirm-delete-no">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="logistics-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="logistics-title">Logistics Information</h2>
+            <div id="logistics-content"></div>
+            <button id="edit-logistics-btn" style="margin-top: 12px;">Edit</button>
+        </div>
+    </div>
+
+    <div id="logistics-edit-modal" class="modal">
+        <div class="modal-content logistics-modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 id="logistics-edit-title">Edit Logistics Data</h3>
+            <form id="logistics-edit-form">
+                <div id="logistics-fields"></div>
+                <div style="margin-top:1rem;text-align:right;">
+                    <button type="button" id="choose-logistics-key-btn">Choose logistics key</button>
+                    <button type="button" id="cancel-logistics-edit">Cancel</button>
+                    <button type="submit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="validation-modal" class="modal">
+        <div class="modal-content">
+            <h2>Neúplná data</h2>
+            <p id="validation-message"></p>
+            <div style="margin-top: 20px;">
+                <button id="force-save-button">Uložit i tak</button>
+                <button id="cancel-save-button">Zrušit</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="logistics-confirm-modal" class="modal">
+        <div class="modal-content">
+            <h2>Confirm Change</h2>
+            <p id="logistics-confirm-message"></p>
+            <div style="margin-top: 20px;">
+                <button id="logistics-confirm-yes">Yes</button>
+                <button id="logistics-confirm-no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="choose-logistics-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Choose Logistics Key</h2>
+            <form id="choose-logistics-form">
+                <label>Brand:
+                    <select id="choose-brand"></select>
+                </label>
+                <label>Key:
+                    <select id="choose-key"></select>
+                </label>
+                <button type="submit">Apply</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="editor.js"></script>
+</body>
+
+</html>

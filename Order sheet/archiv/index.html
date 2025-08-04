@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Order sheet</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="cart-button" class="cart-button" onclick="openCartModal()">
+        🛒 <span id="cart-count">0</span>
+    </div>
+
+    <h1>Order sheet</h1>
+
+    <div id="brand-container" class="brand-container"></div>
+    <div id="type-container" class="type-container"></div>
+    <div id="product-container" class="product-container"></div>
+
+    <div id="lightbox" class="lightbox" onclick="this.style.display='none'">
+        <img id="lightbox-img" src="" alt="Large view">
+    </div>
+
+    <div id="cart-modal" class="cart-modal">
+        <div class="cart-modal-content">
+            <span class="close" onclick="closeCartModal()">&times;</span>
+            <h2>Your Order</h2>
+            <div id="cart-table-container"></div>
+            <div id="cart-summary"></div>
+            <button class="confirm-button" onclick="confirmOrder()">Confirm</button>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
