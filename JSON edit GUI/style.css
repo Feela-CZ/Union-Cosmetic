@@ -40,7 +40,12 @@ th {
 
 #product-table th {
     background-color: #007bff;
+    cursor: pointer;
     color: white;
+}
+
+#product-table th:hover {
+    background-color: #0056b3;
 }
 
 button {
@@ -279,4 +284,5 @@ button.logistics-partial {
     #logistics-fields h4 {
         font-size: 1em;
     }
+
 }
