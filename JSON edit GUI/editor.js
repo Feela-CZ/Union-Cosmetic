@@ -6,6 +6,7 @@ let logisticsData = {};
 let currentLogisticsBrand = null;
 let currentLogisticsKey = null;
 let currentLogisticsProductIndex = null;
+let currentLang = 'en';
 
 const attributeLabels = {
     nr_of_items: "Number of Items",
@@ -15,6 +16,175 @@ const attributeLabels = {
     width: "Width",
     height: "Height",
     weight: "Weight"
+};
+
+const translations = {
+    en: {
+        title: "Product JSON Editor",
+        download_products: "Download products.json",
+        download_logistics: "Download logistics.json",
+        reset_filters: "Reset Filters",
+        search_placeholder: "Search...",
+        brand_filter: "Filter by Brand",
+        type_filter: "Filter by Type",
+        logistics_key_filter: "Filter by Logistics Key",
+        add_product: "Add New Product",
+        table_brand: "Brand",
+        table_type: "Type",
+        table_ean: "EAN",
+        table_hs: "HS Code",
+        table_name: "Name",
+        table_volume: "Volume",
+        table_price: "Price (€)",
+        table_new: "New",
+        table_new_date: "Date_New",
+        table_discontinued: "Discontinued",
+        table_discontinued_date: "Date_Discontinued",
+        table_actions: "Actions",
+        edit_product_title: "Edit Product",
+        select_brand: "-- select brand --",
+        select_type: "-- select type --",
+        label_brand: "Brand:",
+        label_type: "Type:",
+        label_id: "ID (EAN):",
+        label_hs: "HS Code:",
+        label_name: "Name:",
+        label_volume: "Volume:",
+        label_price: "Price:",
+        label_pack: "Pack:",
+        label_boxes_per_layer: "Boxes per Layer:",
+        label_boxes_per_pallet: "Boxes per Pallet:",
+        label_logistics_key: "Logistics key:",
+        select_key: "-- select key --",
+        label_new: "New",
+        label_discontinued: "Discontinued",
+        save: "Save",
+        confirm_delete_title: "Confirm Deletion",
+        confirm_delete_message: "Are you sure you want to delete this product?",
+        confirm_delete_yes: "Yes, delete",
+        confirm_delete_no: "Cancel",
+        logistics_title: "Logistics Information",
+        logistics_edit: "Edit",
+        logistics_edit_title: "Edit Logistics Data",
+        choose_logistics_key: "Choose logistics key",
+        choose_logistics_key_title: "Choose Logistics Key",
+        choose_logistics_apply: "Apply",
+        cancel: "Cancel",
+        validation_title: "Incomplete Data",
+        validation_force_save: "Save Anyway",
+        validation_cancel_save: "Cancel",
+        logistics_confirm_title: "Confirm Change",
+        logistics_confirm_yes: "Yes",
+        logistics_confirm_no: "No",
+        label_key: "Key:",
+        edit: "Edit",
+        logistics: "Logistics",
+        delete: "Delete",
+        logistics_data_for: 'Logistics data for {brand} – "{key}" products',
+        no_logistics_data: "No logistics data available.",
+        logistics_change_confirm: 'This will change data for all "{brand}" ("{key}")! Do you really wish to proceed?',
+        section_ITEM: "Item",
+        section_CARTON: "Carton",
+        section_LAYER: "Layer",
+        section_PALLET: "Pallet",
+        nr_of_items: "Number of Items",
+        nr_of_cartons: "Number of Cartons",
+        nr_of_layers: "Number of Layers",
+        length: "Length",
+        width: "Width",
+        height: "Height",
+        weight: "Weight",
+        placeholder_search: "Search...",
+        filter_brand: "Filter by Brand",
+        filter_type: "Filter by Type",
+        filter_logistics_key: "Filter by Logistics Key",
+        edit: "Edit",
+        logistics: "Logistics",
+        delete: "Delete",
+    },
+    cs: {
+        title: "Editor produktů JSON",
+        download_products: "Stáhnout products.json",
+        download_logistics: "Stáhnout logistics.json",
+        reset_filters: "Resetovat filtry",
+        search_placeholder: "Hledat...",
+        brand_filter: "Filtrovat podle značky",
+        type_filter: "Filtrovat podle typu",
+        logistics_key_filter: "Filtrovat podle logistického klíče",
+        add_product: "Přidat nový produkt",
+        table_brand: "Značka",
+        table_type: "Typ",
+        table_ean: "EAN",
+        table_hs: "HS kód",
+        table_name: "Název",
+        table_volume: "Objem",
+        table_price: "Cena (€)",
+        table_new: "Novinka",
+        table_new_date: "Novinka od",
+        table_discontinued: "Ukončeno",
+        table_discontinued_date: "Ukončeno od",
+        table_actions: "Akce",
+        edit_product_title: "Upravit produkt",
+        select_brand: "-- vyber značku --",
+        select_type: "-- vyber typ --",
+        label_brand: "Značka:",
+        label_type: "Typ:",
+        label_id: "ID (EAN):",
+        label_hs: "HS kód:",
+        label_name: "Název:",
+        label_volume: "Objem:",
+        label_price: "Cena:",
+        label_pack: "Balení:",
+        label_boxes_per_layer: "Krabic na vrstvu:",
+        label_boxes_per_pallet: "Krabic na paletě:",
+        label_logistics_key: "Logistický klíč:",
+        select_key: "-- vyber klíč --",
+        label_new: "Novinka",
+        label_discontinued: "Ukončeno",
+        save: "Uložit",
+        confirm_delete_title: "Potvrdit smazání",
+        confirm_delete_message: "Opravdu chcete tento produkt smazat?",
+        confirm_delete_yes: "Ano, smazat",
+        confirm_delete_no: "Zrušit",
+        logistics_title: "Logistické informace",
+        logistics_edit: "Upravit",
+        logistics_edit_title: "Upravit logistická data",
+        choose_logistics_key: "Vybrat logistický klíč",
+        choose_logistics_key_title: "Vybrat logistický klíč",
+        choose_logistics_apply: "Použít",
+        cancel: "Zrušit",
+        validation_title: "Neúplná data",
+        validation_force_save: "Uložit i tak",
+        validation_cancel_save: "Zrušit",
+        logistics_confirm_title: "Potvrdit změnu",
+        logistics_confirm_yes: "Ano",
+        logistics_confirm_no: "Ne",
+        label_key: "Klíč:",
+        edit: "Upravit",
+        logistics: "Logistika",
+        delete: "Smazat",
+        logistics_data_for: 'Logistická data pro {brand} – "{key}" produkty',
+        no_logistics_data: "Logistická data nejsou dostupná.",
+        logistics_change_confirm: 'Tímto změníte data pro všechny "{brand}" ("{key}") produkty! Opravdu si přejete pokračovat?',
+        section_ITEM: "Kus",
+        section_CARTON: "Karton",
+        section_LAYER: "Vrstva",
+        section_PALLET: "Paleta",
+        nr_of_items: "Počet kusů",
+        nr_of_cartons: "Počet kartonů",
+        nr_of_layers: "Počet vrstev",
+        length: "Délka",
+        width: "Šířka",
+        height: "Výška",
+        weight: "Hmotnost",
+        placeholder_search: "Hledat...",
+        filter_brand: "Filtrovat podle značky",
+        filter_type: "Filtrovat podle typu",
+        filter_logistics_key: "Filtrovat podle log. klíče",
+        edit: "Upravit",
+        logistics: "Logistika",
+        delete: "Smazat",
+    }
 };
 
 fetch('logistics.json')
@@ -133,6 +303,40 @@ function initUI() {
     updateLogisticsKeyFilter();
 }
 
+function setLang(lang) {
+    currentLang = lang;
+    updateUITexts();
+    renderTable();
+    updateFilterPlaceholders();
+}
+
+function updateUITexts() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[currentLang] && translations[currentLang][key]) {
+            el.textContent = translations[currentLang][key];
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (translations[currentLang] && translations[currentLang][key]) {
+            el.placeholder = translations[currentLang][key];
+        }
+    });
+}
+
+function updateFilterPlaceholders() {
+    document.getElementById('search-input').placeholder = translations[currentLang].placeholder_search;
+    document.getElementById('brand-filter').options[0].textContent = translations[currentLang].filter_brand;
+    document.getElementById('type-filter').options[0].textContent = translations[currentLang].filter_type;
+    document.getElementById('logistics-key-filter').options[0].textContent = translations[currentLang].filter_logistics_key;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateUITexts();
+});
+
 function handleFileUpload(event) {
     const file = event.target.files[0];
     const reader = new FileReader();
@@ -208,9 +412,9 @@ function renderTable() {
         <td>${product.discontinued ? '🚫' : ''}</td>
         <td>${product.discontinued_date || ''}</td>
         <td>
-            <button onclick="editProduct(${originalIndex})">Edit</button>
-            <button class="${getLogisticsClass(product)}" onclick="showLogistics(${originalIndex})">Logistics</button>
-            <button id="delete-button" onclick="deleteProduct(${originalIndex})">Delete</button>
+            <button onclick="editProduct(${originalIndex})">${translations[currentLang].edit}</button>
+            <button onclick="showLogistics(${originalIndex})">${translations[currentLang].logistics}</button>
+            <button class="delete-button" onclick="deleteProduct(${originalIndex})">${translations[currentLang].delete}</button>
         </td>
     `;
         tbody.appendChild(row);
@@ -227,8 +431,10 @@ function populateDropdowns() {
     const brands = [...new Set(products.map(p => p.brand))].sort();
     const types = [...new Set(products.map(p => p.type))].sort();
 
-    brandFilter.innerHTML = '<option value="">Filter by Brand</option>' + brands.map(b => `<option value="${b}" ${b === selectedBrand ? 'selected' : ''}>${b}</option>`).join('');
-    typeFilter.innerHTML = '<option value="">Filter by Type</option>' + types.map(t => `<option value="${t}" ${t === selectedType ? 'selected' : ''}>${t}</option>`).join('');
+    brandFilter.innerHTML = `<option value="">${translations[currentLang].filter_brand}</option>` +
+        brands.map(b => `<option value="${b}" ${b === selectedBrand ? 'selected' : ''}>${b}</option>`).join('');
+    typeFilter.innerHTML = `<option value="">${translations[currentLang].filter_type}</option>` +
+        types.map(t => `<option value="${t}" ${t === selectedType ? 'selected' : ''}>${t}</option>`).join('');
 }
 
 function openAddModal() {
@@ -430,23 +636,34 @@ function showLogistics(index) {
     const hiddenKeys = ['boxes_per_layer', 'boxes_per_pallet', 'pack'];
 
     document.getElementById('logistics-title').textContent =
-        `Logistics data for ${product.brand} – "${product.key}" products`;
+        translations[currentLang].logistics_data_for
+            .replace('{brand}', product.brand)
+            .replace('{key}', product.key);
 
     if (!data) {
-        content.innerHTML = '<p>No logistics data available.</p>';
+        content.innerHTML = `<p>${translations[currentLang].no_logistics_data}</p>`;
     } else {
         for (const [section, values] of Object.entries(data)) {
             const visibleEntries = Object.entries(values).filter(([key]) => !hiddenKeys.includes(key));
             if (visibleEntries.length === 0) continue;
 
-            content.innerHTML += `<h4>${section}:</h4><ul>`;
+            const sectionName = translations[currentLang]['section_' + section] || section;
+            content.innerHTML += `<h4>${sectionName}:</h4><ul>`;
             for (const [key, value] of visibleEntries) {
-                content.innerHTML += `<li><strong>${attributeLabels[key] || key.replace(/_/g, ' ')}</strong>: ${value}</li>`;
+                const label = translations[currentLang][key] || attributeLabels[key] || key.replace(/_/g, ' ');
+                content.innerHTML += `<li><strong>${label}</strong>: ${value}</li>`;
             }
             content.innerHTML += '</ul>';
         }
     }
     modal.style.display = 'block';
+
+    document.querySelectorAll('.close-modal, .close-logistics-modal').forEach(el => {
+        el.onclick = function () {
+            const m = el.closest('.modal');
+            if (m) m.style.display = 'none';
+        };
+    });
 
     document.getElementById('edit-logistics-btn').onclick = function () {
         openLogisticsEditModal(product.brand, product.key, index);
@@ -516,12 +733,12 @@ function updateLogisticsKeyFilter() {
             return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
         });
 
-        logisticsKeyFilter.innerHTML = '<option value="">Filter by Logistics Key</option>' +
+        logisticsKeyFilter.innerHTML = `<option value="">${translations[currentLang].filter_logistics_key}</option>` +
             keys.map(key => `<option value="${key}">${key}</option>`).join('');
         logisticsKeyFilter.style.display = 'inline-block';
         logisticsKeyFilter.disabled = false;
     } else {
-        logisticsKeyFilter.innerHTML = '<option value="">Filter by Logistics Key</option>';
+        logisticsKeyFilter.innerHTML = `<option value="">${translations[currentLang].filter_logistics_key}</option>`;
         logisticsKeyFilter.style.display = 'none';
         logisticsKeyFilter.value = '';
         logisticsKeyFilter.disabled = true;
@@ -548,7 +765,9 @@ function openLogisticsEditModal(brand, key, index = null) {
     const data = logisticsData[brand][key];
 
     document.getElementById('logistics-edit-title').textContent =
-        `Logistics data for all ${brand} – "${key}" products`;
+        translations[currentLang].logistics_data_for
+            .replace('{brand}', brand)
+            .replace('{key}', key);
 
     fieldsContainer.innerHTML = '';
 
@@ -558,11 +777,13 @@ function openLogisticsEditModal(brand, key, index = null) {
         sections.forEach(section => {
             if (!data[section]) return;
             const group = data[section];
-            let html = `<div class="section-group"><h4>${section}</h4>`;
+            const sectionName = translations[currentLang]['section_' + section] || section;
+            let html = `<div class="section-group"><h4>${sectionName}</h4>`;
             for (const [keyName, value] of Object.entries(group)) {
+                const label = translations[currentLang][keyName] || attributeLabels[keyName] || keyName.replace(/_/g, ' ');
                 const inputId = `logistics-${section}-${keyName}`;
                 html += `
-                    <label>${attributeLabels[keyName] || keyName.replace(/_/g, ' ')}:
+                    <label>${label}:
                         <input type="text" id="${inputId}" value="${value !== null && value !== undefined ? value : ''}">
                     </label>
                 `;
@@ -603,7 +824,10 @@ function openLogisticsEditModal(brand, key, index = null) {
             || (currentLogisticsProductIndex !== null ? products[currentLogisticsProductIndex].key : key);
 
         document.getElementById('logistics-confirm-message').textContent =
-            `This will change data for all "${brand}" ("${actualKey}")! Do you really wish to proceed?`;
+            translations[currentLang].logistics_change_confirm
+                .replace('{brand}', brand)
+                .replace('{key}', actualKey);
+
         document.getElementById('logistics-confirm-modal').style.display = 'block';
 
         document.getElementById('logistics-confirm-yes').onclick = function () {
@@ -624,35 +848,20 @@ function openLogisticsEditModal(brand, key, index = null) {
             document.getElementById('logistics-confirm-modal').style.display = 'none';
         };
     };
-}
 
-document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.close-modal, .close-logistics-modal').forEach(el => {
-        el.addEventListener('click', function () {
-            const modal = el.closest('.modal');
-            if (modal) modal.style.display = 'none';
-        });
+        el.onclick = function () {
+            const m = el.closest('.modal');
+            if (m) m.style.display = 'none';
+        };
     });
 
     const cancelBtn = document.getElementById('cancel-logistics-edit');
     if (cancelBtn) {
-        cancelBtn.addEventListener('click', function () {
+        cancelBtn.onclick = function () {
             document.getElementById('logistics-edit-modal').style.display = 'none';
-        });
+        };
     }
-});
-
-document.getElementById('download-logistics-button').addEventListener('click', downloadLogistics);
-
-function downloadLogistics() {
-    const dataStr = JSON.stringify(logisticsData, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'logistics.json';
-    a.click();
-    URL.revokeObjectURL(url);
 }
 
 function updateLogisticsModalContent(brand, key) {

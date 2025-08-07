@@ -58,7 +58,7 @@ button {
     cursor: pointer;
 }
 
-#delete-button {
+.delete-button {
     margin: 2px;
     padding: 5px 10px;
     border: none;
@@ -68,6 +68,9 @@ button {
     cursor: pointer;
 }
 
+.delete-button:hover {
+    background-color: #c82333;
+}
 
 button:hover {
     background-color: #0056b3;
@@ -85,10 +88,6 @@ button:hover {
 
 .button:hover {
     background-color: #0056b3;
-}
-
-#delete-button:hover {
-    background-color: #c82333;
 }
 
 #add-product {
@@ -243,6 +242,15 @@ button.logistics-partial {
     border: 1px solid #b8b8b8;
     border-radius: 4px;
     background: #fff;
+}
+
+#czFlag {
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+#enFlag {
+    cursor: pointer;
 }
 
 /* Responsivita pro menší obrazovky */
