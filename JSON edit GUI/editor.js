@@ -20,7 +20,7 @@ const attributeLabels = {
 
 const translations = {
     en: {
-        title: "Product JSON Editor",
+        title: "Product Editor",
         download_products: "Download products.json",
         download_logistics: "Download logistics.json",
         reset_filters: "Reset Filters",
@@ -103,7 +103,7 @@ const translations = {
         delete: "Delete",
     },
     cs: {
-        title: "Editor produktů JSON",
+        title: "Editor produktů",
         download_products: "Stáhnout products.json",
         download_logistics: "Stáhnout logistics.json",
         reset_filters: "Resetovat filtry",
