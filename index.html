@@ -25,9 +25,11 @@
 
         .button-group {
             display: flex;
-            gap: 40px;
-            flex-wrap: wrap;
-            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-start;
+            width: 700px;
         }
 
         .app-btn {
@@ -41,6 +43,8 @@
             box-shadow: 0 4px 20px 0 #0002;
             transition: background 0.2s, transform 0.15s;
             margin: 1rem;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .app-btn:hover {
@@ -63,10 +67,11 @@
 </head>
 
 <body>
-    <h1>Choose app/Vyber apku</h1>
+    <h1>Choose app/Vyber apku:</h1>
     <div class="button-group">
         <button class="app-btn" onclick="window.open('./JSON%20edit%20GUI/', '_blank')">📝 "Jason" (Editor dat)</button>
-        <button class="app-btn" onclick="window.open('./Order%20sheet/', '_blank')">📊 "Fredy" (Objednávkový formulář)</button>
+        <button class="app-btn" onclick="window.open('./Order%20sheet/', '_blank')">📊 "Fredy" (Objednávkový
+            formulář)</button>
     </div>
 </body>
 
