@@ -7,6 +7,7 @@ let currentLogisticsBrand = null;
 let currentLogisticsKey = null;
 let currentLogisticsProductIndex = null;
 let currentLang = 'en';
+let showingAllKeys = false;
 
 const attributeLabels = {
     nr_of_items: "Number of Items",
@@ -101,6 +102,23 @@ const translations = {
         edit: "Edit",
         logistics: "Logistics",
         delete: "Delete",
+        export_logistics: "Export logistics data",
+        export_logistics_modal_title: "Export logistics data",
+        export_logistics_select_brand: "Brand:",
+        export_logistics_keys: "Select keys:",
+        export_logistics_export_btn: "Export",
+        export_logistics_modal_close: "Close",
+        export_logistics_success: "XML export successful.",
+        export_logistics_no_keys: "No valid keys for this brand.",
+        export_logistics_all_brands: "All brands",
+        export_logistics_show_empty: "Show empty",
+        export_logistics_hide_empty: "Hide empty",
+        add_logistics_key: "Add Logistics Key",
+        add_logistics_key_title: "Create New Logistics Key",
+        label_new_logistics_key: "New key:",
+        create: "Create",
+        key_already_exists: "This key already exists for the selected brand.",
+        key_required: "Please enter a key name.",
     },
     cs: {
         title: "Editor produktů",
@@ -184,6 +202,23 @@ const translations = {
         edit: "Upravit",
         logistics: "Logistika",
         delete: "Smazat",
+        export_logistics: "Exportovat logistická data",
+        export_logistics_modal_title: "Export logistických dat",
+        export_logistics_select_brand: "Značka:",
+        export_logistics_keys: "Vyberte klíče:",
+        export_logistics_export_btn: "Exportovat",
+        export_logistics_modal_close: "Zavřít",
+        export_logistics_success: "Export XML byl úspěšný.",
+        export_logistics_no_keys: "Pro tuto značku nejsou platné klíče.",
+        export_logistics_all_brands: "Všechny značky",
+        export_logistics_show_empty: "Zobrazit prázdné",
+        export_logistics_hide_empty: "Skrýt prázdné",
+        add_logistics_key: "Přidat logistický klíč",
+        add_logistics_key_title: "Vytvořit nový logistický klíč",
+        label_new_logistics_key: "Nový klíč:",
+        create: "Vytvořit",
+        key_already_exists: "Tenhle klíč už pro danou značku existuje.",
+        key_required: "Zadejte název klíče, prosím.",
     }
 };
 
@@ -244,6 +279,84 @@ function initUI() {
     document.getElementById('choose-brand').addEventListener('change', function () {
         fillKeysSelect(this.value);
     });
+
+    document.querySelectorAll('.close-modal').forEach(el => {
+        el.addEventListener('click', () => {
+            const m = el.closest('.modal');
+            if (m) m.style.display = 'none';
+        });
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        }
+    });
+
+    document.getElementById('add-logistics-key').addEventListener('click', function () {
+  const modal = document.getElementById('add-logistics-key-modal');
+  const brandSelect = document.getElementById('add-logistics-brand');
+  const keyInput = document.getElementById('add-logistics-key-name');
+
+  brandSelect.innerHTML = '';
+  Object.keys(logisticsData || {}).forEach(brand => {
+    const opt = document.createElement('option');
+    opt.value = brand;
+    opt.textContent = brand;
+    brandSelect.appendChild(opt);
+  });
+
+  keyInput.value = '';
+  modal.style.display = 'block';
+});
+
+document.getElementById('add-logistics-key-form').addEventListener('submit', function (e) {
+  e.preventDefault();
+  const brand = document.getElementById('add-logistics-brand').value.trim();
+  const newKey = document.getElementById('add-logistics-key-name').value.trim();
+
+  if (!newKey) {
+    alert(translations[currentLang].key_required);
+    return;
+  }
+  if (!logisticsData[brand]) logisticsData[brand] = {};
+  if (logisticsData[brand][newKey]) {
+    alert(translations[currentLang].key_already_exists);
+    return;
+  }
+
+  document.getElementById('add-logistics-key-modal').style.display = 'none';
+  openLogisticsEditModal(brand, newKey, null);
+
+  if (document.getElementById('brand')) {
+    document.getElementById('brand').value = brand;
+    populateLogisticsKeySelect();
+    const logSel = document.getElementById('logistics-key');
+    if (logSel) {
+      let exists = Array.from(logSel.options).some(o => o.value === newKey);
+      if (!exists) {
+        const opt = document.createElement('option');
+        opt.value = newKey;
+        opt.textContent = newKey;
+        logSel.appendChild(opt);
+      }
+      logSel.value = newKey;
+    }
+  }
+});
+
+// Zavírání toho malého modalu křížkem
+document.querySelectorAll('#add-logistics-key-modal .close-modal').forEach(el => {
+  el.addEventListener('click', () => {
+    document.getElementById('add-logistics-key-modal').style.display = 'none';
+  });
+});
 
     document.getElementById('choose-logistics-form').addEventListener('submit', function (e) {
         e.preventDefault();
@@ -419,6 +532,307 @@ function renderTable() {
     `;
         tbody.appendChild(row);
     });
+}
+
+
+function showExportLogisticsModal() {
+
+    const brandSelect = document.getElementById('export-brand-select');
+    brandSelect.innerHTML = '';
+    Object.keys(logisticsData).forEach(brand => {
+        const opt = document.createElement('option');
+        opt.value = brand;
+        opt.textContent = brand;
+        brandSelect.appendChild(opt);
+    });
+    brandSelect.selectedIndex = 0;
+    fillExportLogisticsKeys();
+    document.getElementById('export-logistics-success').style.display = 'none';
+    document.getElementById('export-logistics-error').style.display = 'none';
+    document.getElementById('export-logistics-modal').style.display = 'block';
+    updateExportLogisticsModalTexts();
+}
+
+function fillExportLogisticsKeys(showAll = false) {
+    const brand = document.getElementById('export-brand-select').value;
+    const keysDiv = document.getElementById('export-keys-checkboxes');
+    keysDiv.innerHTML = `<div style="margin-bottom:4px;font-weight:bold;" data-i18n="export_logistics_keys"></div>`;
+    if (!logisticsData[brand]) return;
+
+    let allKeys = Object.keys(logisticsData[brand]).filter(k => k);
+
+    let keysWithData = [];
+    let keysEmpty = [];
+    allKeys.forEach(key => {
+        let hasData = false;
+        ['ITEM', 'CARTON', 'LAYER', 'PALLET'].forEach(section => {
+            if (logisticsData[brand][key]?.[section]) {
+                for (let attr in logisticsData[brand][key][section]) {
+                    let val = logisticsData[brand][key][section][attr];
+                    if (typeof val === 'string' && val.trim() !== '') {
+                        let match = val.match(/^(-?\d+(\.\d+)?)/);
+                        if (match) val = Number(match[1]);
+                        else val = '';
+                    }
+                    if (typeof val === 'number') hasData = true;
+                }
+            }
+        });
+        if (hasData) keysWithData.push(key);
+        else keysEmpty.push(key);
+    });
+
+    const showEmptyBtn = document.getElementById('show-empty-keys-btn');
+    if (!showAll && keysEmpty.length > 0) {
+        showEmptyBtn.style.display = '';
+        showEmptyBtn.setAttribute('data-i18n', 'export_logistics_show_empty');
+    } else if (showAll) {
+        showEmptyBtn.style.display = '';
+        showEmptyBtn.setAttribute('data-i18n', 'export_logistics_hide_empty');
+    } else {
+        showEmptyBtn.style.display = 'none';
+    }
+
+    let keysToShow = showAll
+        ? keysWithData.concat(keysEmpty)
+        : keysWithData;
+
+    if (keysToShow.length === 0) {
+        keysDiv.innerHTML += `<div data-i18n="export_logistics_no_keys"></div>`;
+        return;
+    }
+
+    keysToShow.forEach(k => {
+        const cbId = 'export-key-cb-' + k;
+        keysDiv.innerHTML += `
+      <div style="margin-bottom:4px;">
+        <label>
+          <input type="checkbox" id="${cbId}" value="${k}" checked>
+          ${k}
+        </label>
+      </div>`;
+    });
+
+    updateExportLogisticsModalTexts();
+}
+
+function updateExportLogisticsModalTexts() {
+    document.querySelectorAll('#export-logistics-modal [data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[currentLang] && translations[currentLang][key]) {
+            el.textContent = translations[currentLang][key];
+        }
+    });
+}
+
+document.getElementById('export-logistics-btn').addEventListener('click', showExportLogisticsModal);
+document.getElementById('close-export-logistics-modal').addEventListener('click', () => {
+    document.getElementById('export-logistics-modal').style.display = 'none';
+});
+document.getElementById('export-brand-select').addEventListener('change', function () {
+    showingAllKeys = false;
+    fillExportLogisticsKeys();
+});
+
+document.getElementById('export-logistics-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const brand = document.getElementById('export-brand-select').value;
+    const keys = Array.from(document.querySelectorAll('#export-keys-checkboxes input[type="checkbox"]:checked')).map(cb => cb.value);
+    if (!brand || !keys.length) {
+        document.getElementById('export-logistics-error').style.display = 'block';
+        document.getElementById('export-logistics-error').textContent = 'Vyberte značku a aspoň jeden klíč!';
+        return;
+    }
+    downloadXLSX(brand, keys);
+    document.getElementById('export-logistics-success').style.display = 'block';
+    document.getElementById('export-logistics-success').textContent = translations[currentLang].export_logistics_success;
+});
+
+document.getElementById('show-empty-keys-btn').addEventListener('click', function () {
+    showingAllKeys = !showingAllKeys;
+    fillExportLogisticsKeys(showingAllKeys);
+});
+
+async function downloadXLSX(brand, keys) {
+    const sectionOrder = ['ITEM', 'CARTON', 'LAYER', 'PALLET'];
+    const attributeOrder = {
+        ITEM: ['length', 'width', 'height', 'weight'],
+        CARTON: ['length', 'width', 'height', 'weight', 'nr_of_items'],
+        LAYER: ['nr_of_items', 'nr_of_cartons'],
+        PALLET: ['length', 'width', 'height', 'weight', 'nr_of_cartons', 'nr_of_items', 'nr_of_layers']
+    };
+    const attributeUnits = {
+        length: 'cm',
+        width: 'cm',
+        height: 'cm',
+        weight: 'kg',
+        nr_of_items: '',
+        nr_of_cartons: '',
+        nr_of_layers: ''
+    };
+
+    let dataByKey = {};
+    keys.forEach(key => {
+        dataByKey[key] = [];
+        sectionOrder.forEach(section => {
+            attributeOrder[section].forEach(attr => {
+                let val = logisticsData[brand]?.[key]?.[section]?.[attr];
+                if (typeof val === 'string' && val.trim() !== '') {
+                    let match = val.match(/^(-?\d+(\.\d+)?)/);
+                    if (match) val = Number(match[1]);
+                    else val = '';
+                }
+                if (typeof val === 'number') dataByKey[key].push(val);
+                else dataByKey[key].push('');
+            });
+        });
+    });
+
+    const totalCols = 2 + keys.length;
+    const totalAttrs = sectionOrder.reduce((sum, section) => sum + attributeOrder[section].length, 0);
+
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet(brand);
+
+    ws.mergeCells(1, 1, 1, totalCols);
+    ws.getCell(1, 1).value = `LOGISTICS DATA – ${brand}`;
+    ws.getCell(1, 1).alignment = { vertical: 'middle', horizontal: 'center' };
+    ws.getCell(1, 1).font = { bold: true, size: 16 };
+    ws.getCell(1, 1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2EFDA' } };
+    ws.getCell(1, 1).border = {
+        top: { style: 'thick' },
+        left: { style: 'thick' },
+        bottom: { style: 'thick' },
+        right: { style: 'thick' }
+    };
+
+    let headerRow = ['Section', 'Attribute'].concat(keys);
+    ws.addRow(headerRow);
+    for (let col = 1; col <= totalCols; ++col) {
+        const cell = ws.getRow(2).getCell(col);
+        cell.font = { bold: true };
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFB7DEE8' } };
+        cell.border = {
+            top: { style: 'thick' },
+            left: { style: 'thick' },
+            bottom: { style: 'thick' },
+            right: { style: 'thick' }
+        };
+    }
+
+    let attrRows = [];
+    sectionOrder.forEach(section => {
+        attributeOrder[section].forEach(attr => {
+            const unit = attributeUnits[attr] ? ` (${attributeUnits[attr]})` : '';
+            const rowLabel = attr.charAt(0).toUpperCase() + attr.slice(1) + unit;
+            attrRows.push({ section, attr, row: [section, rowLabel] });
+        });
+    });
+
+    attrRows.forEach((obj, rowIdx) => {
+        keys.forEach(key => {
+            let val = dataByKey[key][rowIdx];
+            obj.row.push(typeof val === 'number' ? val : '');
+        });
+        ws.addRow(obj.row);
+    });
+
+    let rowPointer = 3;
+    sectionOrder.forEach(section => {
+        const cnt = attributeOrder[section].length;
+        if (cnt > 1) {
+            ws.mergeCells(rowPointer, 1, rowPointer + cnt - 1, 1);
+            const cell = ws.getCell(rowPointer, 1);
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.font = { bold: true };
+        } else {
+            ws.getCell(rowPointer, 1).font = { bold: true };
+            ws.getCell(rowPointer, 1).alignment = { vertical: 'middle', horizontal: 'center' };
+        }
+        rowPointer += cnt;
+    });
+
+    const totalRows = ws.rowCount;
+
+    for (let row = 1; row <= totalRows; ++row) {
+        for (let col = 1; col <= totalCols; ++col) {
+            const cell = ws.getCell(row, col);
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+            if (row === 1) cell.border.top = { style: 'thick' };
+            if (row === 2) cell.border.top = { style: 'thick' };
+            if (row === totalRows) cell.border.bottom = { style: 'thick' };
+            if (col === 1) cell.border.left = { style: 'thick' };
+            if (col === totalCols) cell.border.right = { style: 'thick' };
+        }
+    }
+
+    let sectionStart = 3;
+    sectionOrder.forEach(section => {
+        const cnt = attributeOrder[section].length;
+        for (let col = 1; col <= totalCols; ++col) {
+            ws.getCell(sectionStart, col).border.top = { style: 'thick' };
+        }
+        if (sectionStart + cnt - 1 < totalRows) {
+            for (let col = 1; col <= totalCols; ++col) {
+                ws.getCell(sectionStart + cnt - 1, col).border.bottom = { style: 'thick' };
+            }
+        }
+        for (let row = sectionStart; row < sectionStart + cnt; ++row) {
+            ws.getCell(row, 1).border.left = { style: 'thick' };
+            ws.getCell(row, totalCols).border.right = { style: 'thick' };
+        }
+        sectionStart += cnt;
+    });
+
+    ws.getColumn(1).width = 12;
+    ws.getColumn(2).width = 18;
+    for (let c = 3; c <= totalCols; ++c) ws.getColumn(c).width = 7.5;
+
+    const buf = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `logistics_${brand}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }, 100);
+}
+
+function escapeXML(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function downloadXML(xmlStr, fileName) {
+    const blob = new Blob([xmlStr], { type: 'application/xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, 100);
+}
+
+if (typeof setLang === 'function') {
+    const origSetLang = setLang;
+    setLang = function (lang) {
+        origSetLang(lang);
+        updateExportLogisticsModalTexts();
+    }
 }
 
 function populateDropdowns() {

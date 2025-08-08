@@ -19,7 +19,7 @@
         <input type="file" id="file-input" accept=".json">
         <button id="download-button" disabled data-i18n="download_products"></button>
         <button id="download-logistics-button" disabled data-i18n="download_logistics"></button>
-        <button id="reset-filters" data-i18n="reset_filters"></button>
+        <button id="export-logistics-btn" data-i18n="export_logistics"></button>
     </div>
 
     <div id="filter-section" style="text-align:center; margin-bottom:20px;">
@@ -37,10 +37,12 @@
         <select id="logistics-key-filter" style="padding:5px; margin-left:10px; display:none;">
             <option value="" data-i18n="logistics_key_filter"></option>
         </select>
+        <button id="reset-filters" data-i18n="reset_filters"></button>
     </div>
 
     <div id="product-table-section" style="display:none;">
         <button id="add-product" data-i18n="add_product"></button>
+        <button id="add-logistics-key" data-i18n="add_logistics_key"></button>
         <table id="product-table">
             <thead>
                 <tr>
@@ -191,6 +193,40 @@
         </div>
     </div>
 
+    <div id="export-logistics-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-export-logistics-modal">&times;</span>
+            <h2 data-i18n="export_logistics_modal_title"></h2>
+            <form id="export-logistics-form">
+                <label for="export-brand-select" data-i18n="export_logistics_select_brand"></label>
+                <select id="export-brand-select" style="margin-bottom: 10px;"></select>
+                <div id="export-keys-checkboxes" style="margin:12px 0;"></div>
+                <button type="submit" id="export-logistics-export-btn" data-i18n="export_logistics_export_btn"></button>
+                <button type="button" id="show-empty-keys-btn" data-i18n="export_logistics_show_empty"></button>
+            </form>
+            <div id="export-logistics-success" style="display:none; color:green; margin-top:12px;"></div>
+            <div id="export-logistics-error" style="display:none; color:red; margin-top:12px;"></div>
+        </div>
+    </div>
+
+    <div id="add-logistics-key-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 data-i18n="add_logistics_key_title"></h2>
+            <form id="add-logistics-key-form">
+                <label data-i18n="label_brand"></label>
+                <select id="add-logistics-brand"></select>
+                <label data-i18n="label_new_logistics_key"></label>
+                <input type="text" id="add-logistics-key-name" placeholder="e.g. 500A">
+                <div style="margin-top:12px;">
+                    <button type="submit" data-i18n="create"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
     <script src="editor.js"></script>
 </body>
 

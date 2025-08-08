@@ -560,34 +560,6 @@
         "nr_of_layers": 13
       }
     },
-    "None": {
-      "ITEM": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null
-      },
-      "CARTON": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_items": null
-      },
-      "LAYER": {
-        "nr_of_items": null,
-        "nr_of_cartons": null
-      },
-      "PALLET": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_cartons": null,
-        "nr_of_items": null,
-        "nr_of_layers": null
-      }
-    },
     "250B": {
       "ITEM": {
         "length": "5.9 cm",
@@ -755,34 +727,6 @@
         "nr_of_items": 960,
         "nr_of_layers": 8
       }
-    },
-    "null": {
-      "ITEM": {
-        "length": "15.0 cm",
-        "width": "8.0 cm",
-        "height": "27.0 cm",
-        "weight": "1.32 kg"
-      },
-      "CARTON": {
-        "length": "36.7 cm",
-        "width": "21.5 cm",
-        "height": "31.0 cm",
-        "weight": "13.35 kg",
-        "nr_of_items": 10
-      },
-      "LAYER": {
-        "nr_of_items": 100,
-        "nr_of_cartons": 10
-      },
-      "PALLET": {
-        "length": "120.0 cm",
-        "width": "80.0 cm",
-        "height": "140.0 cm",
-        "weight": "615.0 kg",
-        "nr_of_cartons": 40,
-        "nr_of_items": 400,
-        "nr_of_layers": 4
-      }
     }
   },
   "Naturalis": {
@@ -924,34 +868,6 @@
         "nr_of_cartons": 40,
         "nr_of_items": 600,
         "nr_of_layers": 4
-      }
-    },
-    "None": {
-      "ITEM": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null
-      },
-      "CARTON": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_items": null
-      },
-      "LAYER": {
-        "nr_of_items": null,
-        "nr_of_cartons": null
-      },
-      "PALLET": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_cartons": null,
-        "nr_of_items": null,
-        "nr_of_layers": null
       }
     },
     "200g": {
@@ -1796,34 +1712,6 @@
         "nr_of_cartons": 168,
         "nr_of_items": 2016,
         "nr_of_layers": 6
-      }
-    },
-    "None": {
-      "ITEM": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null
-      },
-      "CARTON": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_items": null
-      },
-      "LAYER": {
-        "nr_of_items": null,
-        "nr_of_cartons": null
-      },
-      "PALLET": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_cartons": null,
-        "nr_of_items": null,
-        "nr_of_layers": null
       }
     },
     "220g": {

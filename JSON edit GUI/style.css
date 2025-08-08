@@ -166,6 +166,10 @@ button.logistics-partial {
     color: white;
 }
 
+#add-logistics-key {
+    margin-left: 8px;
+}
+
 #validation-modal button {
     margin-right: 10px;
 }
@@ -173,6 +177,10 @@ button.logistics-partial {
 #validation-modal h2 {
     color: #c82333;
     margin-top: 0;
+}
+
+#reset-filters {
+    margin-left: 10px;
 }
 
 #logistics-edit-modal .modal-content {
