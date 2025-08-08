@@ -300,63 +300,63 @@ function initUI() {
     });
 
     document.getElementById('add-logistics-key').addEventListener('click', function () {
-  const modal = document.getElementById('add-logistics-key-modal');
-  const brandSelect = document.getElementById('add-logistics-brand');
-  const keyInput = document.getElementById('add-logistics-key-name');
+        const modal = document.getElementById('add-logistics-key-modal');
+        const brandSelect = document.getElementById('add-logistics-brand');
+        const keyInput = document.getElementById('add-logistics-key-name');
 
-  brandSelect.innerHTML = '';
-  Object.keys(logisticsData || {}).forEach(brand => {
-    const opt = document.createElement('option');
-    opt.value = brand;
-    opt.textContent = brand;
-    brandSelect.appendChild(opt);
-  });
+        brandSelect.innerHTML = '';
+        Object.keys(logisticsData || {}).forEach(brand => {
+            const opt = document.createElement('option');
+            opt.value = brand;
+            opt.textContent = brand;
+            brandSelect.appendChild(opt);
+        });
 
-  keyInput.value = '';
-  modal.style.display = 'block';
-});
+        keyInput.value = '';
+        modal.style.display = 'block';
+    });
 
-document.getElementById('add-logistics-key-form').addEventListener('submit', function (e) {
-  e.preventDefault();
-  const brand = document.getElementById('add-logistics-brand').value.trim();
-  const newKey = document.getElementById('add-logistics-key-name').value.trim();
+    document.getElementById('add-logistics-key-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const brand = document.getElementById('add-logistics-brand').value.trim();
+        const newKey = document.getElementById('add-logistics-key-name').value.trim();
 
-  if (!newKey) {
-    alert(translations[currentLang].key_required);
-    return;
-  }
-  if (!logisticsData[brand]) logisticsData[brand] = {};
-  if (logisticsData[brand][newKey]) {
-    alert(translations[currentLang].key_already_exists);
-    return;
-  }
+        if (!newKey) {
+            alert(translations[currentLang].key_required);
+            return;
+        }
+        if (!logisticsData[brand]) logisticsData[brand] = {};
+        if (logisticsData[brand][newKey]) {
+            alert(translations[currentLang].key_already_exists);
+            return;
+        }
 
-  document.getElementById('add-logistics-key-modal').style.display = 'none';
-  openLogisticsEditModal(brand, newKey, null);
+        document.getElementById('add-logistics-key-modal').style.display = 'none';
+        openLogisticsEditModal(brand, newKey, null);
 
-  if (document.getElementById('brand')) {
-    document.getElementById('brand').value = brand;
-    populateLogisticsKeySelect();
-    const logSel = document.getElementById('logistics-key');
-    if (logSel) {
-      let exists = Array.from(logSel.options).some(o => o.value === newKey);
-      if (!exists) {
-        const opt = document.createElement('option');
-        opt.value = newKey;
-        opt.textContent = newKey;
-        logSel.appendChild(opt);
-      }
-      logSel.value = newKey;
-    }
-  }
-});
+        if (document.getElementById('brand')) {
+            document.getElementById('brand').value = brand;
+            populateLogisticsKeySelect();
+            const logSel = document.getElementById('logistics-key');
+            if (logSel) {
+                let exists = Array.from(logSel.options).some(o => o.value === newKey);
+                if (!exists) {
+                    const opt = document.createElement('option');
+                    opt.value = newKey;
+                    opt.textContent = newKey;
+                    logSel.appendChild(opt);
+                }
+                logSel.value = newKey;
+            }
+        }
+    });
 
-// Zavírání toho malého modalu křížkem
-document.querySelectorAll('#add-logistics-key-modal .close-modal').forEach(el => {
-  el.addEventListener('click', () => {
-    document.getElementById('add-logistics-key-modal').style.display = 'none';
-  });
-});
+    // Zavírání toho malého modalu křížkem
+    document.querySelectorAll('#add-logistics-key-modal .close-modal').forEach(el => {
+        el.addEventListener('click', () => {
+            document.getElementById('add-logistics-key-modal').style.display = 'none';
+        });
+    });
 
     document.getElementById('choose-logistics-form').addEventListener('submit', function (e) {
         e.preventDefault();
@@ -526,7 +526,9 @@ function renderTable() {
         <td>${product.discontinued_date || ''}</td>
         <td>
             <button onclick="editProduct(${originalIndex})">${translations[currentLang].edit}</button>
-            <button onclick="showLogistics(${originalIndex})">${translations[currentLang].logistics}</button>
+            <button class="${getLogisticsClass(product)}" onclick="showLogistics(${originalIndex})">
+                ${translations[currentLang].logistics}
+            </button>
             <button class="delete-button" onclick="deleteProduct(${originalIndex})">${translations[currentLang].delete}</button>
         </td>
     `;

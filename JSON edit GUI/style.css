@@ -261,6 +261,10 @@ button.logistics-partial {
     cursor: pointer;
 }
 
+#lang-switcher {
+   text-align: right;
+}
+
 /* Responsivita pro menší obrazovky */
 @media (max-width: 900px) {
     #logistics-fields {
