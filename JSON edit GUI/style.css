@@ -191,7 +191,7 @@ button.logistics-partial {
     width: 800px;
     max-width: 98vw;
     box-sizing: border-box;
-    max-height: 90vh;
+    max-height: 95vh;
     overflow-y: auto;
 }
 
@@ -207,9 +207,10 @@ button.logistics-partial {
 
 #logistics-fields {
     display: flex;
-    gap: 36px;
-    margin-bottom: 8px;
     flex-wrap: wrap;
+    align-items: flex-start;
+    column-gap: 32px;   /* místo gap: zachová „funkčnost do všech směrů“ kromě spodního */
+    row-gap: 0;         /* žádný svislý gap mezi řádky sloupců */
 }
 
 #logistics-fields .logistics-fields-col {
@@ -218,8 +219,39 @@ button.logistics-partial {
 }
 
 #logistics-fields .section-group {
-    margin-bottom: 2rem;
-    padding-right: 6px;
+    margin: 0 0 12px 0;
+}
+
+#logistics-fields .ean-block {
+    order: 99;
+    flex: 0 0 100%;
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 0;
+    padding-right: 0;
+}
+
+#logistics-fields .ean-block h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 1.08em;
+    font-weight: bold;
+    color: #007bff;
+    border-bottom: 1px solid #e3e3e3;
+    padding-bottom: 2px;
+}
+
+#logistics-fields .ean-block label {
+    display: block;
+}
+
+#logistics-fields .ean-block input[type="text"] {
+    margin-top: 4px;
+}
+
+.carton-ean-line {
+    margin-top: 25px;
+    font-size: 1rem;
 }
 
 #logistics-fields h4 {
@@ -227,7 +259,7 @@ button.logistics-partial {
     margin-bottom: 5px;
     font-size: 1.08em;
     font-weight: bold;
-    color: #007bff;         /* stejná modrá jako th v tabulce */
+    color: #007bff;    
     border-bottom: 1px solid #e3e3e3;
     padding-bottom: 2px;
 }
@@ -265,11 +297,20 @@ button.logistics-partial {
    text-align: right;
 }
 
+#product-table.hide-discontinued-cols th.col-discontinued,
+#product-table.hide-discontinued-cols td.col-discontinued {
+    display: none;
+}
+
+#edit-logistics-btn {
+    margin-top: 25px
+}
+
 /* Responsivita pro menší obrazovky */
 @media (max-width: 900px) {
     #logistics-fields {
         flex-direction: column;
-        gap: 0;
+        column-gap: 0;
     }
     #logistics-fields .logistics-fields-col {
         min-width: unset;

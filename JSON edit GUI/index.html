@@ -38,6 +38,7 @@
             <option value="" data-i18n="logistics_key_filter"></option>
         </select>
         <button id="reset-filters" data-i18n="reset_filters"></button>
+        <button id="toggle-discontinued" data-i18n="show_discontinued"></button>
     </div>
 
     <div id="product-table-section" style="display:none;">
@@ -49,15 +50,15 @@
                     <th title="Sort" class="sortable" onclick="sortTable('brand')" data-i18n="table_brand"></th>
                     <th title="Sort" class="sortable" onclick="sortTable('type')" data-i18n="table_type"></th>
                     <th title="Sort" class="sortable" onclick="sortTable('id')" data-i18n="table_ean"></th>
-                    <th title="Sort" class="sortable" onclick="sortTable('HS')" data-i18n="table_hs"></th>
+                    <th title="Sort" class="sortable" onclick="sortTable('hs')" data-i18n="table_hs"></th>
                     <th title="Sort" class="sortable" onclick="sortTable('name')" data-i18n="table_name"></th>
                     <th title="Sort" class="sortable" onclick="sortTable('volume')" data-i18n="table_volume"></th>
                     <th title="Sort" class="sortable" onclick="sortTable('price')" data-i18n="table_price"></th>
                     <th title="Sort" class="sortable" onclick="sortTable('new')" data-i18n="table_new"></th>
                     <th title="Sort" class="sortable" onclick="sortTable('new_date')" data-i18n="table_new_date"></th>
-                    <th title="Sort" class="sortable" onclick="sortTable('discontinued')"
+                    <th title="Sort" class="sortable col-discontinued" onclick="sortTable('discontinued')"
                         data-i18n="table_discontinued"></th>
-                    <th title="Sort" class="sortable" onclick="sortTable('discontinued_date')"
+                    <th title="Sort" class="sortable col-discontinued" onclick="sortTable('discontinued_date')"
                         data-i18n="table_discontinued_date"></th>
                     <th style="min-width: 200px; text-align: center;" data-i18n="table_actions"></th>
                 </tr>
@@ -138,7 +139,7 @@
             <span class="close-modal">&times;</span>
             <h2 id="logistics-title" data-i18n="logistics_title"></h2>
             <div id="logistics-content"></div>
-            <button id="edit-logistics-btn" style="margin-top: 12px;" data-i18n="logistics_edit"></button>
+            <button id="edit-logistics-btn" data-i18n="logistics_edit"></button>
         </div>
     </div>
 

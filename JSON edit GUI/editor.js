@@ -8,6 +8,7 @@ let currentLogisticsKey = null;
 let currentLogisticsProductIndex = null;
 let currentLang = 'en';
 let showingAllKeys = false;
+let showDiscontinued = false;
 
 const attributeLabels = {
     nr_of_items: "Number of Items",
@@ -16,7 +17,8 @@ const attributeLabels = {
     length: "Length",
     width: "Width",
     height: "Height",
-    weight: "Weight"
+    weight: "Weight",
+    carton_ean: "Carton EAN",
 };
 
 const translations = {
@@ -119,6 +121,9 @@ const translations = {
         create: "Create",
         key_already_exists: "This key already exists for the selected brand.",
         key_required: "Please enter a key name.",
+        show_discontinued: "Show discontinued",
+        hide_discontinued: "Hide discontinued",
+        carton_ean: "Carton EAN",
     },
     cs: {
         title: "Editor produktů",
@@ -219,6 +224,9 @@ const translations = {
         create: "Vytvořit",
         key_already_exists: "Tenhle klíč už pro danou značku existuje.",
         key_required: "Zadejte název klíče, prosím.",
+        show_discontinued: "Zobrazit ukončené",
+        hide_discontinued: "Skrýt ukončené",
+        carton_ean: "EAN kartonu",
     }
 };
 
@@ -414,11 +422,19 @@ function initUI() {
         });
 
     updateLogisticsKeyFilter();
+
+    document.getElementById('toggle-discontinued').addEventListener('click', () => {
+        showDiscontinued = !showDiscontinued;
+        updateToggleDiscontinuedText();
+        renderTable();
+    });
+    updateToggleDiscontinuedText();
 }
 
 function setLang(lang) {
     currentLang = lang;
     updateUITexts();
+    updateToggleDiscontinuedText();
     renderTable();
     updateFilterPlaceholders();
 }
@@ -437,6 +453,14 @@ function updateUITexts() {
             el.placeholder = translations[currentLang][key];
         }
     });
+}
+
+function updateToggleDiscontinuedText() {
+    const btn = document.getElementById('toggle-discontinued');
+    if (!btn) return;
+    const key = showDiscontinued ? 'hide_discontinued' : 'show_discontinued';
+    btn.setAttribute('data-i18n', key);
+    btn.textContent = translations[currentLang][key];
 }
 
 function updateFilterPlaceholders() {
@@ -481,13 +505,25 @@ function renderTable() {
         const matchesBrand = brandFilter ? product.brand === brandFilter : true;
         const matchesType = typeFilter ? product.type === typeFilter : true;
 
+        const isDiscontinued =
+            product.discontinued === true ||
+            product.discontinued === 'true' ||
+            product.discontinued === 1;
+
+        const includeByDiscontinued = showDiscontinued ? true : !isDiscontinued;
+
         let matchesLogisticsKey = true;
         if (brandFilter && logisticsKeyFilter) {
             matchesLogisticsKey = (product.key != null && String(product.key) === logisticsKeyFilter);
         }
 
-        return matchesSearch && matchesBrand && matchesType && matchesLogisticsKey;
+        return matchesSearch && matchesBrand && matchesType && matchesLogisticsKey && includeByDiscontinued;
     });
+
+    const tableEl = document.getElementById('product-table');
+    if (tableEl) {
+        tableEl.classList.toggle('hide-discontinued-cols', !showDiscontinued);
+    }
 
     if (currentSortField) {
         filteredProducts.sort((a, b) => {
@@ -522,8 +558,8 @@ function renderTable() {
         <td>${product.price}</td>
         <td>${product.new ? '✅' : ''}</td>
         <td>${product.new_date || ''}</td>
-        <td>${product.discontinued ? '🚫' : ''}</td>
-        <td>${product.discontinued_date || ''}</td>
+        <td class="col-discontinued">${product.discontinued ? '🚫' : ''}</td>
+        <td class="col-discontinued">${product.discontinued_date || ''}</td>
         <td>
             <button onclick="editProduct(${originalIndex})">${translations[currentLang].edit}</button>
             <button class="${getLogisticsClass(product)}" onclick="showLogistics(${originalIndex})">
@@ -881,7 +917,7 @@ function saveProduct(event) {
     const brand = document.getElementById('brand').value.trim();
     const type = document.getElementById('type').value.trim();
     const id = document.getElementById('id').value.trim();
-    hs: document.getElementById('hs').value.trim();
+    const hs = document.getElementById('hs').value.trim();
     const name = document.getElementById('name').value.trim();
     const volumeNumber = document.getElementById('volume-number').value.trim();
     const volumeUnit = document.getElementById('volume-unit').value.trim();
@@ -906,6 +942,7 @@ function saveProduct(event) {
         brand,
         type,
         id,
+        hs,
         name,
         volume: volumeNumber + ' ' + volumeUnit,
         price: parseFloat(price),
@@ -1045,6 +1082,13 @@ function showLogistics(index) {
     const product = products[index];
     const data = logisticsData?.[product.brand]?.[product.key];
 
+    if (data && data.PALLET) {
+        const hasCarton = data.PALLET.carton_ean !== undefined && data.PALLET.carton_ean !== null && data.PALLET.carton_ean !== '';
+        const prodCarton = product.carton_ean !== undefined && product.carton_ean !== null && product.carton_ean !== '';
+        if (!hasCarton && prodCarton) {
+            data.PALLET.carton_ean = product.carton_ean;
+        }
+    }
     const modal = document.getElementById('logistics-modal');
     const content = document.getElementById('logistics-content');
     content.innerHTML = '';
@@ -1059,17 +1103,31 @@ function showLogistics(index) {
     if (!data) {
         content.innerHTML = `<p>${translations[currentLang].no_logistics_data}</p>`;
     } else {
+        let palletCartonEAN = null;
+
         for (const [section, values] of Object.entries(data)) {
-            const visibleEntries = Object.entries(values).filter(([key]) => !hiddenKeys.includes(key));
-            if (visibleEntries.length === 0) continue;
+            const entries = Object.entries(values).filter(([k]) => {
+                if (section === 'PALLET' && k === 'carton_ean') {
+                    palletCartonEAN = values[k];
+                    return false;
+                }
+                return !['boxes_per_layer', 'boxes_per_pallet', 'pack'].includes(k);
+            });
+
+            if (entries.length === 0) continue;
 
             const sectionName = translations[currentLang]['section_' + section] || section;
             content.innerHTML += `<h4>${sectionName}:</h4><ul>`;
-            for (const [key, value] of visibleEntries) {
+            for (const [key, value] of entries) {
                 const label = translations[currentLang][key] || attributeLabels[key] || key.replace(/_/g, ' ');
                 content.innerHTML += `<li><strong>${label}</strong>: ${value}</li>`;
             }
-            content.innerHTML += '</ul>';
+            content.innerHTML += `</ul>`;
+        }
+
+        if (palletCartonEAN !== null && palletCartonEAN !== '') {
+            const label = translations[currentLang]['carton_ean'] || attributeLabels['carton_ean'] || 'Carton EAN';
+            content.innerHTML += `<div class="carton-ean-line"><strong>${label}</strong>: ${palletCartonEAN}</div>`;
         }
     }
     modal.style.display = 'block';
@@ -1173,7 +1231,10 @@ function openLogisticsEditModal(brand, key, index = null) {
         ITEM: { length: '', width: '', height: '', weight: '' },
         CARTON: { length: '', width: '', height: '', weight: '', nr_of_items: '' },
         LAYER: { nr_of_items: '', nr_of_cartons: '' },
-        PALLET: { length: '', width: '', height: '', weight: '', nr_of_cartons: '', nr_of_items: '', nr_of_layers: '' }
+        PALLET: {
+            length: '', width: '', height: '', weight: '', nr_of_cartons: '', nr_of_items: '', nr_of_layers: '',
+            carton_ean: ''
+        }
     };
 
     if (!logisticsData[brand]) logisticsData[brand] = {};
@@ -1196,13 +1257,14 @@ function openLogisticsEditModal(brand, key, index = null) {
             const sectionName = translations[currentLang]['section_' + section] || section;
             let html = `<div class="section-group"><h4>${sectionName}</h4>`;
             for (const [keyName, value] of Object.entries(group)) {
+                if (keyName === 'carton_ean') continue;
                 const label = translations[currentLang][keyName] || attributeLabels[keyName] || keyName.replace(/_/g, ' ');
                 const inputId = `logistics-${section}-${keyName}`;
                 html += `
-                    <label>${label}:
-                        <input type="text" id="${inputId}" value="${value !== null && value !== undefined ? value : ''}">
-                    </label>
-                `;
+        <label>${label}:
+          <input type="text" id="${inputId}" value="${value !== null && value !== undefined ? value : ''}">
+        </label>
+      `;
             }
             html += `</div>`;
             colDiv.innerHTML += html;
@@ -1212,6 +1274,19 @@ function openLogisticsEditModal(brand, key, index = null) {
 
     fieldsContainer.appendChild(makeCol(['ITEM', 'CARTON']));
     fieldsContainer.appendChild(makeCol(['LAYER', 'PALLET']));
+
+    const prod = currentLogisticsProductIndex !== null ? products[currentLogisticsProductIndex] : null;
+    const productCartonEAN = prod && prod.carton_ean != null ? String(prod.carton_ean) : '';
+
+    const eanBlock = document.createElement('div');
+    eanBlock.className = 'ean-block';
+    eanBlock.innerHTML = `
+  <h4>${translations[currentLang]['carton_ean'] || attributeLabels['carton_ean'] || 'Carton EAN'}</h4>
+  <div>
+    <input type="text" id="product-carton-ean" value="${productCartonEAN}">
+  </div>
+`;
+    fieldsContainer.appendChild(eanBlock);
 
     modal.style.display = 'block';
 
@@ -1236,33 +1311,79 @@ function openLogisticsEditModal(brand, key, index = null) {
             }
         }
 
-        let actualKey = document.getElementById('logistics-key').value
-            || (currentLogisticsProductIndex !== null ? products[currentLogisticsProductIndex].key : key);
-
-        document.getElementById('logistics-confirm-message').textContent =
-            translations[currentLang].logistics_change_confirm
-                .replace('{brand}', brand)
-                .replace('{key}', actualKey);
-
-        document.getElementById('logistics-confirm-modal').style.display = 'block';
-
-        document.getElementById('logistics-confirm-yes').onclick = function () {
-            for (const [section, values] of Object.entries(newData)) {
-                for (const keyName of Object.keys(values)) {
-                    data[section][keyName] = values[keyName];
+        function logisticsChanged(orig, upd) {
+            const secs = ['ITEM', 'CARTON', 'LAYER', 'PALLET'];
+            for (const s of secs) {
+                const go = orig[s] || {};
+                const gu = upd[s] || {};
+                const keys = new Set([...Object.keys(go), ...Object.keys(gu)]);
+                for (const k of keys) {
+                    const vo = (go[k] === undefined ? null : go[k]);
+                    const vu = (gu[k] === undefined ? null : gu[k]);
+                    if (vo !== vu) return true;
                 }
             }
-            document.getElementById('logistics-confirm-modal').style.display = 'none';
-            modal.style.display = 'none';
+            return false;
+        }
 
-            if (currentLogisticsProductIndex !== null) {
-                showLogistics(currentLogisticsProductIndex);
+        const inp = document.getElementById('product-carton-ean');
+        let eanNew = null;
+        if (inp) {
+            let v = inp.value.trim();
+            if (v === '') v = null;
+            else if (v.toLowerCase() === 'can') v = 'can';
+            else if (/^\d+$/.test(v)) v = v;
+            eanNew = v;
+        }
+
+        const prodIdx = currentLogisticsProductIndex;
+        const eanOld = (prodIdx !== null) ? (products[prodIdx].carton_ean ?? null) : null;
+
+        const hasLogisticsChanges = logisticsChanged(data, newData);
+        const onlyEANChanged = !hasLogisticsChanges && (prodIdx !== null) && (eanNew !== eanOld);
+
+        if (hasLogisticsChanges) {
+            let actualKey = document.getElementById('logistics-key').value
+                || (prodIdx !== null ? products[prodIdx].key : key);
+
+            document.getElementById('logistics-confirm-message').textContent =
+                translations[currentLang].logistics_change_confirm
+                    .replace('{brand}', brand)
+                    .replace('{key}', actualKey);
+
+            document.getElementById('logistics-confirm-modal').style.display = 'block';
+
+            document.getElementById('logistics-confirm-yes').onclick = function () {
+                for (const [section, values] of Object.entries(newData)) {
+                    for (const keyName of Object.keys(values)) {
+                        data[section][keyName] = values[keyName];
+                    }
+                }
+
+                if (prodIdx !== null && inp) {
+                    products[prodIdx].carton_ean = eanNew;
+                }
+
+                document.getElementById('logistics-confirm-modal').style.display = 'none';
+                modal.style.display = 'none';
+
+                if (prodIdx !== null) {
+                    showLogistics(prodIdx);
+                }
+            };
+
+            document.getElementById('logistics-confirm-no').onclick = function () {
+                document.getElementById('logistics-confirm-modal').style.display = 'none';
+            };
+        } else {
+            if (onlyEANChanged && prodIdx !== null) {
+                products[prodIdx].carton_ean = eanNew;
             }
-        };
-
-        document.getElementById('logistics-confirm-no').onclick = function () {
-            document.getElementById('logistics-confirm-modal').style.display = 'none';
-        };
+            modal.style.display = 'none';
+            if (prodIdx !== null) {
+                showLogistics(prodIdx);
+            }
+        }
     };
 
     document.querySelectorAll('.close-modal, .close-logistics-modal').forEach(el => {
