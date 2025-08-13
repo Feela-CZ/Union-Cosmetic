@@ -12,7 +12,8 @@
     "boxes_per_pallet": 147,
     "new": false,
     "new_date": "",
-    "key": 350
+    "key": 350,
+    "carton_ean": 8596048007122
   },
   {
     "brand": "Lilien",
@@ -27,7 +28,8 @@
     "boxes_per_pallet": 147,
     "new": false,
     "new_date": "",
-    "key": 350
+    "key": 350,
+    "carton_ean": 8596048007139
   },
   {
     "brand": "Lilien",
@@ -42,7 +44,8 @@
     "boxes_per_pallet": 147,
     "new": false,
     "new_date": "",
-    "key": 350
+    "key": 350,
+    "carton_ean": 8596048007146
   },
   {
     "brand": "Lilien",
@@ -57,7 +60,8 @@
     "boxes_per_pallet": 147,
     "new": false,
     "new_date": "",
-    "key": 350
+    "key": 350,
+    "carton_ean": 8596048007153
   },
   {
     "brand": "Lilien",
@@ -72,7 +76,8 @@
     "boxes_per_pallet": 147,
     "new": false,
     "new_date": "",
-    "key": 350
+    "key": 350,
+    "carton_ean": 8596048007160
   },
   {
     "brand": "Lilien",
@@ -87,7 +92,8 @@
     "boxes_per_pallet": 147,
     "new": false,
     "new_date": "",
-    "key": 350
+    "key": 350,
+    "carton_ean": 8596048007184
   },
   {
     "brand": "Lilien",
@@ -102,7 +108,8 @@
     "boxes_per_pallet": 147,
     "new": false,
     "new_date": "",
-    "key": 350
+    "key": 350,
+    "carton_ean": 8596048007191
   },
   {
     "brand": "Lilien",
@@ -117,7 +124,8 @@
     "boxes_per_pallet": 147,
     "new": false,
     "new_date": "",
-    "key": 350
+    "key": 350,
+    "carton_ean": 8596048007207
   },
   {
     "brand": "Lilien",
@@ -132,7 +140,8 @@
     "boxes_per_pallet": 50,
     "new": false,
     "new_date": "",
-    "key": "1000A"
+    "key": "1000A",
+    "carton_ean": 8596048007429
   },
   {
     "brand": "Lilien",
@@ -147,7 +156,8 @@
     "boxes_per_pallet": 50,
     "new": false,
     "new_date": "",
-    "key": "1000A"
+    "key": "1000A",
+    "carton_ean": 8596048007436
   },
   {
     "brand": "Lilien",
@@ -162,7 +172,8 @@
     "boxes_per_pallet": 50,
     "new": false,
     "new_date": "",
-    "key": "1000A"
+    "key": "1000A",
+    "carton_ean": 8596048007443
   },
   {
     "brand": "Lilien",
@@ -177,7 +188,8 @@
     "boxes_per_pallet": 50,
     "new": false,
     "new_date": "",
-    "key": "1000A"
+    "key": "1000A",
+    "carton_ean": 8596048007450
   },
   {
     "brand": "Lilien",
@@ -192,7 +204,8 @@
     "boxes_per_pallet": 50,
     "new": false,
     "new_date": "",
-    "key": "1000A"
+    "key": "1000A",
+    "carton_ean": 8596048007467
   },
   {
     "brand": "Lilien",
@@ -209,7 +222,8 @@
     "new_date": "2025-06-24",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 400
+    "key": 400,
+    "carton_ean": 8596048012027
   },
   {
     "brand": "Lilien",
@@ -226,7 +240,8 @@
     "new_date": "2025-06-24",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 400
+    "key": 400,
+    "carton_ean": null
   },
   {
     "brand": "Lilien",
@@ -243,7 +258,8 @@
     "new_date": "2025-06-24",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 400
+    "key": 400,
+    "carton_ean": 8596048012034
   },
   {
     "brand": "Lilien",
@@ -260,7 +276,8 @@
     "new_date": "2025-06-24",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 400
+    "key": 400,
+    "carton_ean": 8596048012041
   },
   {
     "brand": "Lilien",
@@ -277,7 +294,8 @@
     "new": false,
     "new_date": "",
     "discontinued": true,
-    "discontinued_date": "2025-07-30"
+    "discontinued_date": "2025-07-30",
+    "carton_ean": 8596048005197
   },
   {
     "brand": "Lilien",
@@ -292,7 +310,8 @@
     "boxes_per_pallet": 65,
     "new": false,
     "new_date": "",
-    "key": 750
+    "key": 750,
+    "carton_ean": 8596048005180
   },
   {
     "brand": "Lilien",
@@ -307,7 +326,8 @@
     "boxes_per_pallet": 65,
     "new": false,
     "new_date": "",
-    "key": 750
+    "key": 750,
+    "carton_ean": 8595196908749
   },
   {
     "brand": "Lilien",
@@ -322,7 +342,8 @@
     "boxes_per_pallet": 65,
     "new": false,
     "new_date": "",
-    "key": 750
+    "key": 750,
+    "carton_ean": 8596048005197
   },
   {
     "brand": "Lilien",
@@ -337,7 +358,8 @@
     "boxes_per_pallet": 65,
     "new": false,
     "new_date": "",
-    "key": 750
+    "key": 750,
+    "carton_ean": 8596048005203
   },
   {
     "brand": "Lilien",
@@ -354,7 +376,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "350A"
+    "key": "350A",
+    "carton_ean": 8596048008495
   },
   {
     "brand": "Lilien",
@@ -369,7 +392,8 @@
     "boxes_per_pallet": 147,
     "new": false,
     "new_date": "",
-    "key": 350
+    "key": 350,
+    "carton_ean": 8596048011785
   },
   {
     "brand": "Lilien",
@@ -384,7 +408,8 @@
     "boxes_per_pallet": 147,
     "new": false,
     "new_date": "",
-    "key": 350
+    "key": 350,
+    "carton_ean": 8596048011792
   },
   {
     "brand": "Lilien",
@@ -399,7 +424,8 @@
     "boxes_per_pallet": 147,
     "new": false,
     "new_date": "",
-    "key": 350
+    "key": 350,
+    "carton_ean": 8596048011655
   },
   {
     "brand": "Lilien",
@@ -414,7 +440,8 @@
     "boxes_per_pallet": 147,
     "new": false,
     "new_date": "",
-    "key": 350
+    "key": 350,
+    "carton_ean": 8596048011662
   },
   {
     "brand": "Lilien",
@@ -429,7 +456,8 @@
     "boxes_per_pallet": 147,
     "new": false,
     "new_date": "",
-    "key": 350
+    "key": 350,
+    "carton_ean": 8596048011679
   },
   {
     "brand": "Lilien",
@@ -444,7 +472,8 @@
     "boxes_per_pallet": 120,
     "new": false,
     "new_date": "",
-    "key": 400
+    "key": 400,
+    "carton_ean": 8595196906561
   },
   {
     "brand": "Lilien",
@@ -459,7 +488,8 @@
     "boxes_per_pallet": 120,
     "new": false,
     "new_date": "",
-    "key": 400
+    "key": 400,
+    "carton_ean": 8595196906578
   },
   {
     "brand": "Lilien",
@@ -474,7 +504,8 @@
     "boxes_per_pallet": 120,
     "new": false,
     "new_date": "",
-    "key": 400
+    "key": 400,
+    "carton_ean": 8595196901825
   },
   {
     "brand": "Lilien",
@@ -489,7 +520,8 @@
     "boxes_per_pallet": 144,
     "new": false,
     "new_date": "",
-    "key": 300
+    "key": 300,
+    "carton_ean": 8596048004598
   },
   {
     "brand": "Lilien",
@@ -504,7 +536,8 @@
     "boxes_per_pallet": 120,
     "new": false,
     "new_date": "",
-    "key": 110
+    "key": 110,
+    "carton_ean": 8595196904413
   },
   {
     "brand": "Lilien",
@@ -519,7 +552,8 @@
     "boxes_per_pallet": 210,
     "new": false,
     "new_date": "",
-    "key": 75
+    "key": 75,
+    "carton_ean": 8596048003940
   },
   {
     "brand": "Lilien",
@@ -534,7 +568,8 @@
     "boxes_per_pallet": 96,
     "new": false,
     "new_date": "",
-    "key": 200
+    "key": 200,
+    "carton_ean": 8595196905144
   },
   {
     "brand": "Lilien",
@@ -549,7 +584,8 @@
     "boxes_per_pallet": 144,
     "new": false,
     "new_date": "",
-    "key": "200A"
+    "key": "200A",
+    "carton_ean": 8595196902822
   },
   {
     "brand": "Lilien",
@@ -564,7 +600,8 @@
     "boxes_per_pallet": 144,
     "new": false,
     "new_date": "",
-    "key": "200A"
+    "key": "200A",
+    "carton_ean": 8595196902839
   },
   {
     "brand": "Lilien",
@@ -579,7 +616,8 @@
     "boxes_per_pallet": 410,
     "new": false,
     "new_date": "",
-    "key": "4g"
+    "key": "4g",
+    "carton_ean": 8596048011556
   },
   {
     "brand": "Lilien",
@@ -594,7 +632,8 @@
     "boxes_per_pallet": 120,
     "new": false,
     "new_date": "",
-    "key": 400
+    "key": 400,
+    "carton_ean": 8596048002356
   },
   {
     "brand": "Lilien",
@@ -609,7 +648,8 @@
     "boxes_per_pallet": 120,
     "new": false,
     "new_date": "",
-    "key": 400
+    "key": 400,
+    "carton_ean": 8596048002370
   },
   {
     "brand": "Lilien",
@@ -624,7 +664,8 @@
     "boxes_per_pallet": 120,
     "new": false,
     "new_date": "",
-    "key": 400
+    "key": 400,
+    "carton_ean": 8596048002363
   },
   {
     "brand": "Lilien",
@@ -639,7 +680,8 @@
     "boxes_per_pallet": 120,
     "new": false,
     "new_date": "",
-    "key": 400
+    "key": 400,
+    "carton_ean": 8596048002387
   },
   {
     "brand": "Lilien",
@@ -654,7 +696,8 @@
     "boxes_per_pallet": 195,
     "new": false,
     "new_date": "",
-    "key": "140g"
+    "key": "140g",
+    "carton_ean": 8596048006828
   },
   {
     "brand": "Lilien",
@@ -669,7 +712,8 @@
     "boxes_per_pallet": 90,
     "new": false,
     "new_date": "",
-    "key": 500
+    "key": 500,
+    "carton_ean": 8596048004497
   },
   {
     "brand": "Lilien",
@@ -684,7 +728,8 @@
     "boxes_per_pallet": 90,
     "new": false,
     "new_date": "",
-    "key": 500
+    "key": 500,
+    "carton_ean": 8596048004510
   },
   {
     "brand": "Lilien",
@@ -699,7 +744,8 @@
     "boxes_per_pallet": 90,
     "new": false,
     "new_date": "",
-    "key": 500
+    "key": 500,
+    "carton_ean": 8596048004503
   },
   {
     "brand": "Lilien",
@@ -714,7 +760,8 @@
     "boxes_per_pallet": 90,
     "new": false,
     "new_date": "",
-    "key": 500
+    "key": 500,
+    "carton_ean": 8596048004480
   },
   {
     "brand": "Lilien",
@@ -729,7 +776,8 @@
     "boxes_per_pallet": 90,
     "new": false,
     "new_date": "",
-    "key": 500
+    "key": 500,
+    "carton_ean": 8596048004534
   },
   {
     "brand": "Lilien",
@@ -744,7 +792,8 @@
     "boxes_per_pallet": 90,
     "new": false,
     "new_date": "",
-    "key": 500
+    "key": 500,
+    "carton_ean": 8596048004527
   },
   {
     "brand": "Lilien",
@@ -759,7 +808,8 @@
     "boxes_per_pallet": 90,
     "new": false,
     "new_date": "",
-    "key": 500
+    "key": 500,
+    "carton_ean": 8596048004541
   },
   {
     "brand": "Lilien",
@@ -774,7 +824,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8596048004640
   },
   {
     "brand": "Lilien",
@@ -789,7 +840,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8596048004657
   },
   {
     "brand": "Lilien",
@@ -804,7 +856,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8596048004633
   },
   {
     "brand": "Lilien",
@@ -819,7 +872,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8596048004626
   },
   {
     "brand": "Lilien",
@@ -834,7 +888,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8596048004671
   },
   {
     "brand": "Lilien",
@@ -849,7 +904,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8596048004664
   },
   {
     "brand": "Lilien",
@@ -865,7 +921,8 @@
     "new": false,
     "new_date": "",
     "discontinued": true,
-    "discontinued_date": "2025-07-16"
+    "discontinued_date": "2025-07-16",
+    "carton_ean": 8596048004688
   },
   {
     "brand": "Lilien",
@@ -880,7 +937,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": "1250"
+    "key": "1250",
+    "carton_ean": 8596048012393
   },
   {
     "brand": "Lilien",
@@ -895,7 +953,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": 1250
+    "key": 1250,
+    "carton_ean": 8596048010511
   },
   {
     "brand": "Lilien",
@@ -910,7 +969,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": 1250
+    "key": 1250,
+    "carton_ean": 8596048011518
   },
   {
     "brand": "Lilien",
@@ -925,7 +985,8 @@
     "boxes_per_pallet": 96,
     "new": false,
     "new_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Lilien",
@@ -940,7 +1001,8 @@
     "boxes_per_pallet": 96,
     "new": false,
     "new_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Lilien",
@@ -955,7 +1017,8 @@
     "boxes_per_pallet": 96,
     "new": false,
     "new_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Lilien",
@@ -970,7 +1033,8 @@
     "boxes_per_pallet": 96,
     "new": false,
     "new_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Lilien",
@@ -987,7 +1051,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "250B"
+    "key": "250B",
+    "carton_ean": 8596048008501
   },
   {
     "brand": "Lilien",
@@ -1004,7 +1069,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "250B"
+    "key": "250B",
+    "carton_ean": 8596048008525
   },
   {
     "brand": "Lilien",
@@ -1021,7 +1087,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "250B"
+    "key": "250B",
+    "carton_ean": 8596048008518
   },
   {
     "brand": "Lilien",
@@ -1038,7 +1105,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "250B"
+    "key": "250B",
+    "carton_ean": 8596048008532
   },
   {
     "brand": "Lilien",
@@ -1055,7 +1123,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "250B"
+    "key": "250B",
+    "carton_ean": 8596048008549
   },
   {
     "brand": "Lilien",
@@ -1072,7 +1141,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "4g"
+    "key": "4g",
+    "carton_ean": 8596048001984
   },
   {
     "brand": "Lilien",
@@ -1089,7 +1159,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "4g"
+    "key": "4g",
+    "carton_ean": 8596048002011
   },
   {
     "brand": "Lilien",
@@ -1106,7 +1177,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "4g"
+    "key": "4g",
+    "carton_ean": 8596048002004
   },
   {
     "brand": "Lilien",
@@ -1121,7 +1193,8 @@
     "boxes_per_pallet": 96,
     "new": false,
     "new_date": "",
-    "key": "50A"
+    "key": "50A",
+    "carton_ean": null
   },
   {
     "brand": "Lilien",
@@ -1136,7 +1209,8 @@
     "boxes_per_pallet": 96,
     "new": false,
     "new_date": "",
-    "key": "50A"
+    "key": "50A",
+    "carton_ean": null
   },
   {
     "brand": "Lilien",
@@ -1151,7 +1225,8 @@
     "boxes_per_pallet": 189,
     "new": false,
     "new_date": "",
-    "key": "250A"
+    "key": "250A",
+    "carton_ean": 8596048007238
   },
   {
     "brand": "Lilien",
@@ -1166,7 +1241,8 @@
     "boxes_per_pallet": 189,
     "new": false,
     "new_date": "",
-    "key": "250A"
+    "key": "250A",
+    "carton_ean": 8596048007245
   },
   {
     "brand": "Lilien",
@@ -1181,7 +1257,8 @@
     "boxes_per_pallet": 410,
     "new": false,
     "new_date": "",
-    "key": 30
+    "key": 30,
+    "carton_ean": 8596048007252
   },
   {
     "brand": "Lilien",
@@ -1196,7 +1273,8 @@
     "boxes_per_pallet": 410,
     "new": false,
     "new_date": "",
-    "key": 30
+    "key": 30,
+    "carton_ean": 8596048007269
   },
   {
     "brand": "Lilien",
@@ -1211,7 +1289,8 @@
     "boxes_per_pallet": null,
     "new": false,
     "new_date": "",
-    "key": 45
+    "key": 45,
+    "carton_ean": 8596048007273
   },
   {
     "brand": "Lilien",
@@ -1226,7 +1305,8 @@
     "boxes_per_pallet": null,
     "new": false,
     "new_date": "",
-    "key": 45
+    "key": 45,
+    "carton_ean": 8596048007283
   },
   {
     "brand": "Lilien",
@@ -1241,7 +1321,8 @@
     "boxes_per_pallet": 350,
     "new": false,
     "new_date": "",
-    "key": 50
+    "key": 50,
+    "carton_ean": 8596048003995
   },
   {
     "brand": "Lilien",
@@ -1256,7 +1337,8 @@
     "boxes_per_pallet": 350,
     "new": false,
     "new_date": "",
-    "key": 50
+    "key": 50,
+    "carton_ean": 8594008297538
   },
   {
     "brand": "Lilien",
@@ -1271,7 +1353,8 @@
     "boxes_per_pallet": 350,
     "new": false,
     "new_date": "",
-    "key": 50
+    "key": 50,
+    "carton_ean": 8594008297637
   },
   {
     "brand": "Lilien",
@@ -1286,7 +1369,8 @@
     "boxes_per_pallet": 350,
     "new": false,
     "new_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": 8594008297545
   },
   {
     "brand": "Lilien",
@@ -1301,7 +1385,8 @@
     "boxes_per_pallet": 250,
     "new": false,
     "new_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": 8596048011082
   },
   {
     "brand": "Lilien",
@@ -1316,7 +1401,8 @@
     "boxes_per_pallet": 250,
     "new": false,
     "new_date": "",
-    "key": "100C"
+    "key": "100C",
+    "carton_ean": 8596048011075
   },
   {
     "brand": "Lilien",
@@ -1331,7 +1417,8 @@
     "boxes_per_pallet": 250,
     "new": false,
     "new_date": "",
-    "key": 100
+    "key": 100,
+    "carton_ean": 8596048011167
   },
   {
     "brand": "Lilien",
@@ -1346,7 +1433,8 @@
     "boxes_per_pallet": 144,
     "new": false,
     "new_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": 8596048011129
   },
   {
     "brand": "Lilien",
@@ -1363,7 +1451,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 180
+    "key": 180,
+    "carton_ean": 8596048004404
   },
   {
     "brand": "Lilien",
@@ -1378,7 +1467,8 @@
     "boxes_per_pallet": 350,
     "new": false,
     "new_date": "",
-    "key": 50
+    "key": 50,
+    "carton_ean": 8595196907476
   },
   {
     "brand": "Lilien",
@@ -1393,22 +1483,26 @@
     "boxes_per_pallet": 200,
     "new": false,
     "new_date": "",
-    "key": "100B"
+    "key": "100B",
+    "carton_ean": 8596048007610
   },
   {
     "brand": "Lilien",
-    "type": "Liquid Soap",
-    "id": 8596048005531,
-    "hs": 34029010,
-    "name": "Lilien hand with pump",
+    "type": "Hand Gel",
+    "id": "8596048005531",
+    "hs": "34029010",
+    "name": "Lilien hand gel with pump",
     "volume": "500 ml",
     "price": 1.64,
     "pack": 12,
     "boxes_per_layer": 10,
     "boxes_per_pallet": 80,
+    "key": "500A",
     "new": false,
     "new_date": "",
-    "key": "500A"
+    "discontinued": false,
+    "discontinued_date": "",
+    "carton_ean": 8596048005548
   },
   {
     "brand": "Naturalis",
@@ -1424,7 +1518,8 @@
     "new": false,
     "new_date": "",
     "discontinued": true,
-    "discontinued_date": "2025-08-01"
+    "discontinued_date": "2025-08-01",
+    "carton_ean": null
   },
   {
     "brand": "Naturalis",
@@ -1439,7 +1534,8 @@
     "boxes_per_pallet": 108,
     "new": false,
     "new_date": "",
-    "key": 500
+    "key": 500,
+    "carton_ean": 8595196904185
   },
   {
     "brand": "Naturalis",
@@ -1454,7 +1550,8 @@
     "boxes_per_pallet": 108,
     "new": false,
     "new_date": "",
-    "key": 500
+    "key": 500,
+    "carton_ean": 8595196904192
   },
   {
     "brand": "Naturalis",
@@ -1469,7 +1566,8 @@
     "boxes_per_pallet": 108,
     "new": false,
     "new_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Naturalis",
@@ -1484,7 +1582,8 @@
     "boxes_per_pallet": 108,
     "new": false,
     "new_date": "",
-    "key": 500
+    "key": 500,
+    "carton_ean": 8596048006378
   },
   {
     "brand": "Naturalis",
@@ -1500,7 +1599,8 @@
     "new": false,
     "new_date": "",
     "discontinued": true,
-    "discontinued_date": "2025-08-01"
+    "discontinued_date": "2025-08-01",
+    "carton_ean": null
   },
   {
     "brand": "Naturalis",
@@ -1517,7 +1617,8 @@
     "new_date": "",
     "discontinued": true,
     "discontinued_date": "2025-07-18",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Naturalis",
@@ -1534,7 +1635,8 @@
     "new_date": "",
     "discontinued": true,
     "discontinued_date": "2025-07-18",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Naturalis",
@@ -1549,7 +1651,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8596048012607
   },
   {
     "brand": "Naturalis",
@@ -1564,7 +1667,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8596048012591
   },
   {
     "brand": "Naturalis",
@@ -1579,7 +1683,8 @@
     "boxes_per_pallet": 200,
     "new": false,
     "new_date": "",
-    "key": 125
+    "key": 125,
+    "carton_ean": 8595196907384
   },
   {
     "brand": "Naturalis",
@@ -1594,7 +1699,8 @@
     "boxes_per_pallet": 200,
     "new": false,
     "new_date": "",
-    "key": 125
+    "key": 125,
+    "carton_ean": 8595196907407
   },
   {
     "brand": "Naturalis",
@@ -1609,7 +1715,8 @@
     "boxes_per_pallet": 200,
     "new": false,
     "new_date": "",
-    "key": 125
+    "key": 125,
+    "carton_ean": 8595196907414
   },
   {
     "brand": "Naturalis",
@@ -1624,7 +1731,8 @@
     "boxes_per_pallet": 200,
     "new": false,
     "new_date": "",
-    "key": 125
+    "key": 125,
+    "carton_ean": 8595196907421
   },
   {
     "brand": "Naturalis",
@@ -1639,7 +1747,8 @@
     "boxes_per_pallet": 200,
     "new": false,
     "new_date": "",
-    "key": 125
+    "key": 125,
+    "carton_ean": 8595196907438
   },
   {
     "brand": "Naturalis",
@@ -1654,7 +1763,8 @@
     "boxes_per_pallet": 200,
     "new": false,
     "new_date": "",
-    "key": 125
+    "key": 125,
+    "carton_ean": 8595196907391
   },
   {
     "brand": "Naturalis",
@@ -1669,7 +1779,8 @@
     "boxes_per_pallet": 126,
     "new": false,
     "new_date": "",
-    "key": "200g"
+    "key": "200g",
+    "carton_ean": 8596048002110
   },
   {
     "brand": "Naturalis",
@@ -1684,7 +1795,8 @@
     "boxes_per_pallet": 126,
     "new": false,
     "new_date": "",
-    "key": "200g"
+    "key": "200g",
+    "carton_ean": 8596048002127
   },
   {
     "brand": "Naturalis",
@@ -1699,7 +1811,8 @@
     "boxes_per_pallet": 96,
     "new": false,
     "new_date": "",
-    "key": "500A"
+    "key": "500A",
+    "carton_ean": 8595196900897
   },
   {
     "brand": "Naturalis",
@@ -1714,7 +1827,8 @@
     "boxes_per_pallet": 96,
     "new": false,
     "new_date": "",
-    "key": "500A"
+    "key": "500A",
+    "carton_ean": 8596048006163
   },
   {
     "brand": "Naturalis",
@@ -1731,7 +1845,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "500A"
+    "key": "500A",
+    "carton_ean": 8595196904086
   },
   {
     "brand": "Naturalis",
@@ -1748,7 +1863,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "500A"
+    "key": "500A",
+    "carton_ean": 8596048000857
   },
   {
     "brand": "Naturalis",
@@ -1763,7 +1879,8 @@
     "boxes_per_pallet": 120,
     "new": false,
     "new_date": "",
-    "key": "300g"
+    "key": "300g",
+    "carton_ean": 8596048000789
   },
   {
     "brand": "Naturalis",
@@ -1778,7 +1895,8 @@
     "boxes_per_pallet": 120,
     "new": false,
     "new_date": "",
-    "key": "300g"
+    "key": "300g",
+    "carton_ean": 8596048000796
   },
   {
     "brand": "Naturalis",
@@ -1793,7 +1911,8 @@
     "boxes_per_pallet": 120,
     "new": false,
     "new_date": "",
-    "key": "300g"
+    "key": "300g",
+    "carton_ean": 8596048011228
   },
   {
     "brand": "Naturalis",
@@ -1808,7 +1927,8 @@
     "boxes_per_pallet": 240,
     "new": false,
     "new_date": "",
-    "key": "100g"
+    "key": "100g",
+    "carton_ean": 8596048000697
   },
   {
     "brand": "Naturalis",
@@ -1823,7 +1943,8 @@
     "boxes_per_pallet": 240,
     "new": false,
     "new_date": "",
-    "key": "100g"
+    "key": "100g",
+    "carton_ean": 8596048000703
   },
   {
     "brand": "Naturalis",
@@ -1840,7 +1961,8 @@
     "new_date": "2025-06-01",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "250g"
+    "key": "250g",
+    "carton_ean": 8596048012461
   },
   {
     "brand": "Naturalis",
@@ -1857,7 +1979,8 @@
     "new_date": "2025-06-01",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "250g"
+    "key": "250g",
+    "carton_ean": 8596048012478
   },
   {
     "brand": "Naturalis",
@@ -1872,7 +1995,8 @@
     "boxes_per_pallet": 70,
     "new": false,
     "new_date": "",
-    "key": "1000g"
+    "key": "1000g",
+    "carton_ean": 8596048000611
   },
   {
     "brand": "Naturalis",
@@ -1887,7 +2011,8 @@
     "boxes_per_pallet": 70,
     "new": false,
     "new_date": "",
-    "key": "1000g"
+    "key": "1000g",
+    "carton_ean": 8596048000642
   },
   {
     "brand": "Naturalis",
@@ -1902,7 +2027,8 @@
     "boxes_per_pallet": 70,
     "new": false,
     "new_date": "",
-    "key": "1000g"
+    "key": "1000g",
+    "carton_ean": 8596048012065
   },
   {
     "brand": "Naturalis",
@@ -1917,7 +2043,8 @@
     "boxes_per_pallet": 70,
     "new": false,
     "new_date": "",
-    "key": "1000g"
+    "key": "1000g",
+    "carton_ean": 8595196908824
   },
   {
     "brand": "Naturalis",
@@ -1932,7 +2059,8 @@
     "boxes_per_pallet": 70,
     "new": false,
     "new_date": "",
-    "key": "1000g"
+    "key": "1000g",
+    "carton_ean": 8596048012072
   },
   {
     "brand": "Naturalis",
@@ -1947,7 +2075,8 @@
     "boxes_per_pallet": 70,
     "new": false,
     "new_date": "",
-    "key": "1000g"
+    "key": "1000g",
+    "carton_ean": 8596048012089
   },
   {
     "brand": "Naturalis",
@@ -1962,7 +2091,8 @@
     "boxes_per_pallet": 70,
     "new": false,
     "new_date": "",
-    "key": "1000g"
+    "key": "1000g",
+    "carton_ean": 8596048012096
   },
   {
     "brand": "Naturalis",
@@ -1977,7 +2107,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8595196904314
   },
   {
     "brand": "Naturalis",
@@ -1992,7 +2123,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8595196903058
   },
   {
     "brand": "Naturalis",
@@ -2007,7 +2139,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8595196904321
   },
   {
     "brand": "Naturalis",
@@ -2022,7 +2155,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8595196903041
   },
   {
     "brand": "Naturalis",
@@ -2037,7 +2171,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Naturalis",
@@ -2052,7 +2187,8 @@
     "boxes_per_pallet": 40,
     "new": false,
     "new_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8595196903034
   },
   {
     "brand": "Naturalis",
@@ -2069,7 +2205,8 @@
     "new_date": "2025-07-18",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8596048012614
   },
   {
     "brand": "Naturalis",
@@ -2086,7 +2223,8 @@
     "new_date": "2025-07-18",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8596048012621
   },
   {
     "brand": "Naturalis",
@@ -2103,7 +2241,8 @@
     "new_date": "2025-07-18",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8596048012638
   },
   {
     "brand": "Naturalis",
@@ -2120,7 +2259,8 @@
     "new_date": "2025-07-18",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8596048012645
   },
   {
     "brand": "Naturalis",
@@ -2137,7 +2277,8 @@
     "new_date": "2025-07-18",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8596048012652
   },
   {
     "brand": "Naturalis",
@@ -2154,7 +2295,8 @@
     "new_date": "2025-07-18",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8596048012669
   },
   {
     "brand": "Naturalis",
@@ -2171,7 +2313,8 @@
     "new_date": "",
     "discontinued": true,
     "discontinued_date": "2025-07-14",
-    "key": 800
+    "key": 800,
+    "carton_ean": 8595196909227
   },
   {
     "brand": "Naturalis",
@@ -2188,7 +2331,8 @@
     "new_date": "2025-07-14",
     "discontinued": false,
     "discontinued_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Naturalis",
@@ -2205,7 +2349,8 @@
     "new_date": "2025-07-14",
     "discontinued": false,
     "discontinued_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Naturalis",
@@ -2222,7 +2367,8 @@
     "new_date": "2025-07-14",
     "discontinued": false,
     "discontinued_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Naturalis",
@@ -2239,7 +2385,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 200
+    "key": 200,
+    "carton_ean": 8596048011716
   },
   {
     "brand": "Naturalis",
@@ -2256,7 +2403,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 200
+    "key": 200,
+    "carton_ean": 8596048011723
   },
   {
     "brand": "Naturalis",
@@ -2273,7 +2421,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 200
+    "key": 200,
+    "carton_ean": 8596048011730
   },
   {
     "brand": "Twister",
@@ -2288,7 +2437,8 @@
     "boxes_per_pallet": 60,
     "new": false,
     "new_date": "",
-    "key": 2000
+    "key": 2000,
+    "carton_ean": 8595196905984
   },
   {
     "brand": "Twister",
@@ -2303,7 +2453,8 @@
     "boxes_per_pallet": 60,
     "new": false,
     "new_date": "",
-    "key": 2000
+    "key": 2000,
+    "carton_ean": 8595196905991
   },
   {
     "brand": "Twister",
@@ -2318,7 +2469,8 @@
     "boxes_per_pallet": 60,
     "new": false,
     "new_date": "",
-    "key": 2000
+    "key": 2000,
+    "carton_ean": 8595196906011
   },
   {
     "brand": "Twister",
@@ -2333,7 +2485,8 @@
     "boxes_per_pallet": 60,
     "new": false,
     "new_date": "",
-    "key": 2000
+    "key": 2000,
+    "carton_ean": 8595196906196
   },
   {
     "brand": "Twister",
@@ -2348,7 +2501,8 @@
     "boxes_per_pallet": 60,
     "new": false,
     "new_date": "",
-    "key": 2000
+    "key": 2000,
+    "carton_ean": 8595196906028
   },
   {
     "brand": "Twister",
@@ -2363,7 +2517,8 @@
     "boxes_per_pallet": 50,
     "new": false,
     "new_date": "",
-    "key": 1500
+    "key": 1500,
+    "carton_ean": 8596048004893
   },
   {
     "brand": "Twister",
@@ -2378,7 +2533,8 @@
     "boxes_per_pallet": 50,
     "new": false,
     "new_date": "",
-    "key": 1500
+    "key": 1500,
+    "carton_ean": 8596048004923
   },
   {
     "brand": "Twister",
@@ -2393,7 +2549,8 @@
     "boxes_per_pallet": 50,
     "new": false,
     "new_date": "",
-    "key": 1500
+    "key": 1500,
+    "carton_ean": 8596048004916
   },
   {
     "brand": "Twister",
@@ -2410,7 +2567,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048012836
   },
   {
     "brand": "Twister",
@@ -2427,7 +2585,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048012843
   },
   {
     "brand": "Twister",
@@ -2444,7 +2603,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048012850
   },
   {
     "brand": "Twister",
@@ -2459,7 +2619,8 @@
     "boxes_per_pallet": 72,
     "new": false,
     "new_date": "",
-    "key": 500
+    "key": 500,
+    "carton_ean": 8596048012355
   },
   {
     "brand": "Twister",
@@ -2474,7 +2635,8 @@
     "boxes_per_pallet": 72,
     "new": false,
     "new_date": "",
-    "key": 500
+    "key": 500,
+    "carton_ean": 8595196901542
   },
   {
     "brand": "Twister",
@@ -2489,7 +2651,8 @@
     "boxes_per_pallet": 50,
     "new": false,
     "new_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8595196901146
   },
   {
     "brand": "Twister",
@@ -2504,7 +2667,8 @@
     "boxes_per_pallet": 50,
     "new": false,
     "new_date": "",
-    "key": 1000
+    "key": 1000,
+    "carton_ean": 8595196901177
   },
   {
     "brand": "Twister",
@@ -2519,7 +2683,8 @@
     "boxes_per_pallet": 60,
     "new": false,
     "new_date": "",
-    "key": "1000A"
+    "key": "1000A",
+    "carton_ean": 8596048011020
   },
   {
     "brand": "Twister",
@@ -2534,7 +2699,8 @@
     "boxes_per_pallet": 60,
     "new": false,
     "new_date": "",
-    "key": "1000A"
+    "key": "1000A",
+    "carton_ean": 8596048011037
   },
   {
     "brand": "Twister",
@@ -2549,7 +2715,8 @@
     "boxes_per_pallet": 60,
     "new": false,
     "new_date": "",
-    "key": "1000A"
+    "key": "1000A",
+    "carton_ean": 8596048011044
   },
   {
     "brand": "Twister",
@@ -2564,7 +2731,8 @@
     "boxes_per_pallet": 60,
     "new": false,
     "new_date": "",
-    "key": "1000A"
+    "key": "1000A",
+    "carton_ean": 8596048011051
   },
   {
     "brand": "Lilien",
@@ -2581,7 +2749,8 @@
     "new_date": "",
     "discontinued": true,
     "discontinued_date": "2025-06-24",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Lilien",
@@ -2598,7 +2767,8 @@
     "new_date": "",
     "discontinued": true,
     "discontinued_date": "2025-06-24",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Lilien",
@@ -2615,7 +2785,8 @@
     "new_date": "",
     "discontinued": true,
     "discontinued_date": "2025-06-24",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Lilien",
@@ -2632,7 +2803,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Lilien",
@@ -2647,7 +2819,8 @@
     "boxes_per_pallet": 189,
     "new": false,
     "new_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Lilien",
@@ -2662,7 +2835,8 @@
     "boxes_per_pallet": 189,
     "new": false,
     "new_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Lilien",
@@ -2677,7 +2851,8 @@
     "boxes_per_pallet": 189,
     "new": false,
     "new_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Natava",
@@ -2694,7 +2869,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "85g"
+    "key": "85g",
+    "carton_ean": 8596048009706
   },
   {
     "brand": "Natava",
@@ -2711,7 +2887,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "85g"
+    "key": "85g",
+    "carton_ean": 8596048009713
   },
   {
     "brand": "Natava",
@@ -2728,7 +2905,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "85g"
+    "key": "85g",
+    "carton_ean": 8596048009720
   },
   {
     "brand": "Natava",
@@ -2745,7 +2923,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "85g"
+    "key": "85g",
+    "carton_ean": 8596048009737
   },
   {
     "brand": "Natava",
@@ -2762,7 +2941,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "85g"
+    "key": "85g",
+    "carton_ean": 8596048009744
   },
   {
     "brand": "Natava",
@@ -2779,7 +2959,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "85g"
+    "key": "85g",
+    "carton_ean": 8596048009751
   },
   {
     "brand": "Natava",
@@ -2796,7 +2977,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "95g"
+    "key": "95g",
+    "carton_ean": 8596048009768
   },
   {
     "brand": "Natava",
@@ -2813,7 +2995,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "75g"
+    "key": "75g",
+    "carton_ean": 8596048009775
   },
   {
     "brand": "Natava",
@@ -2830,7 +3013,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "75g"
+    "key": "75g",
+    "carton_ean": 8596048009782
   },
   {
     "brand": "Natava",
@@ -2847,7 +3031,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "75g"
+    "key": "75g",
+    "carton_ean": 8596048009799
   },
   {
     "brand": "Natava",
@@ -2864,7 +3049,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "75g"
+    "key": "75g",
+    "carton_ean": 8596048009805
   },
   {
     "brand": "Natava",
@@ -2881,7 +3067,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "75g"
+    "key": "75g",
+    "carton_ean": 8596048009812
   },
   {
     "brand": "Natava",
@@ -2898,7 +3085,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100g"
+    "key": "100g",
+    "carton_ean": 8596048009829
   },
   {
     "brand": "Natava",
@@ -2915,7 +3103,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100g"
+    "key": "100g",
+    "carton_ean": 8596048009836
   },
   {
     "brand": "Natava",
@@ -2932,7 +3121,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100g"
+    "key": "100g",
+    "carton_ean": 8596048009843
   },
   {
     "brand": "Natava",
@@ -2949,7 +3139,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "alu jar round"
+    "key": "alu jar round",
+    "carton_ean": 8596048009850
   },
   {
     "brand": "Natava",
@@ -2966,7 +3157,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100g A"
+    "key": "100g A",
+    "carton_ean": 8596048009867
   },
   {
     "brand": "Natava",
@@ -2983,7 +3175,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100g A"
+    "key": "100g A",
+    "carton_ean": 8596048009874
   },
   {
     "brand": "Natava",
@@ -3000,7 +3193,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "10g"
+    "key": "10g",
+    "carton_ean": 8596048011525
   },
   {
     "brand": "Natava",
@@ -3017,7 +3211,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "10g"
+    "key": "10g",
+    "carton_ean": 8596048011532
   },
   {
     "brand": "Natava",
@@ -3034,7 +3229,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "10g"
+    "key": "10g",
+    "carton_ean": 8596048011549
   },
   {
     "brand": "Natava",
@@ -3051,7 +3247,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "80g"
+    "key": "80g",
+    "carton_ean": null
   },
   {
     "brand": "Natava",
@@ -3068,7 +3265,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "80g"
+    "key": "80g",
+    "carton_ean": null
   },
   {
     "brand": "Natava",
@@ -3085,7 +3283,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100g A"
+    "key": "100g A",
+    "carton_ean": 8596048009881
   },
   {
     "brand": "Natava",
@@ -3102,7 +3301,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100g A"
+    "key": "100g A",
+    "carton_ean": 8596048009898
   },
   {
     "brand": "Natava",
@@ -3119,7 +3319,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100g A"
+    "key": "100g A",
+    "carton_ean": 8596048009904
   },
   {
     "brand": "Natava",
@@ -3136,7 +3337,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100g A"
+    "key": "100g A",
+    "carton_ean": 8596048009911
   },
   {
     "brand": "Natava",
@@ -3153,7 +3355,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100g A"
+    "key": "100g A",
+    "carton_ean": 8596048009928
   },
   {
     "brand": "Natava",
@@ -3170,7 +3373,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100g A"
+    "key": "100g A",
+    "carton_ean": 8596048009935
   },
   {
     "brand": "Natava",
@@ -3187,7 +3391,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "alu jar square"
+    "key": "alu jar square",
+    "carton_ean": 8596048009942
   },
   {
     "brand": "Natava",
@@ -3204,7 +3409,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "soap dispenser and metal pad"
+    "key": "soap dispenser and metal pad",
+    "carton_ean": 8596048009959
   },
   {
     "brand": "Natava",
@@ -3221,7 +3427,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "soap dispenser and bamboo pad"
+    "key": "soap dispenser and bamboo pad",
+    "carton_ean": 8596048009966
   },
   {
     "brand": "Natava",
@@ -3238,7 +3445,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "ear buds"
+    "key": "ear buds",
+    "carton_ean": 8596048009973
   },
   {
     "brand": "Natava",
@@ -3255,7 +3463,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "massage sisal"
+    "key": "massage sisal",
+    "carton_ean": 8596048009980
   },
   {
     "brand": "Natava",
@@ -3272,7 +3481,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "60g"
+    "key": "60g",
+    "carton_ean": 8596048009997
   },
   {
     "brand": "Natava",
@@ -3289,7 +3499,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "60g"
+    "key": "60g",
+    "carton_ean": 8596048010009
   },
   {
     "brand": "Natava",
@@ -3306,7 +3517,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "60g"
+    "key": "60g",
+    "carton_ean": 8596048010016
   },
   {
     "brand": "Natava",
@@ -3323,7 +3535,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "60g"
+    "key": "60g",
+    "carton_ean": 8596048010023
   },
   {
     "brand": "Natava",
@@ -3340,7 +3553,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "30ml"
+    "key": "30ml",
+    "carton_ean": 8596048010030
   },
   {
     "brand": "Natava",
@@ -3357,7 +3571,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "30ml"
+    "key": "30ml",
+    "carton_ean": 8596048010047
   },
   {
     "brand": "Natava",
@@ -3374,7 +3589,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "30ml"
+    "key": "30ml",
+    "carton_ean": 8596048010054
   },
   {
     "brand": "Natava",
@@ -3391,7 +3607,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "30ml"
+    "key": "30ml",
+    "carton_ean": 8596048010061
   },
   {
     "brand": "Natava",
@@ -3408,7 +3625,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "30ml"
+    "key": "30ml",
+    "carton_ean": 8596048010078
   },
   {
     "brand": "Natava",
@@ -3425,7 +3643,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50ml"
+    "key": "50ml",
+    "carton_ean": 8596048010085
   },
   {
     "brand": "Natava",
@@ -3442,7 +3661,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50ml"
+    "key": "50ml",
+    "carton_ean": 8596048010092
   },
   {
     "brand": "Natava",
@@ -3459,7 +3679,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50ml"
+    "key": "50ml",
+    "carton_ean": 8596048010108
   },
   {
     "brand": "Natava",
@@ -3476,7 +3697,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100ml"
+    "key": "100ml",
+    "carton_ean": 8596048010115
   },
   {
     "brand": "Natava",
@@ -3493,7 +3715,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100ml"
+    "key": "100ml",
+    "carton_ean": 8596048010122
   },
   {
     "brand": "Natava",
@@ -3510,7 +3733,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100ml"
+    "key": "100ml",
+    "carton_ean": 8596048010139
   },
   {
     "brand": "Natava",
@@ -3527,7 +3751,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50ml"
+    "key": "50ml",
+    "carton_ean": 8596048010146
   },
   {
     "brand": "Natava",
@@ -3544,7 +3769,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50ml"
+    "key": "50ml",
+    "carton_ean": 8596048010153
   },
   {
     "brand": "Natava",
@@ -3561,7 +3787,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50ml"
+    "key": "50ml",
+    "carton_ean": 8596048010160
   },
   {
     "brand": "Natava",
@@ -3578,7 +3805,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50ml"
+    "key": "50ml",
+    "carton_ean": 8596048010177
   },
   {
     "brand": "Natava",
@@ -3595,7 +3823,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100ml"
+    "key": "100ml",
+    "carton_ean": 8596048010184
   },
   {
     "brand": "Natava",
@@ -3612,7 +3841,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100ml"
+    "key": "100ml",
+    "carton_ean": 8596048010191
   },
   {
     "brand": "Natava",
@@ -3629,7 +3859,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100ml"
+    "key": "100ml",
+    "carton_ean": 8596048010207
   },
   {
     "brand": "Natava",
@@ -3646,7 +3877,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100ml"
+    "key": "100ml",
+    "carton_ean": 8596048010214
   },
   {
     "brand": "Natava",
@@ -3663,7 +3895,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50ml"
+    "key": "50ml",
+    "carton_ean": 8596048010221
   },
   {
     "brand": "Natava",
@@ -3680,7 +3913,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50ml"
+    "key": "50ml",
+    "carton_ean": 8596048010238
   },
   {
     "brand": "Natava",
@@ -3697,7 +3931,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50ml"
+    "key": "50ml",
+    "carton_ean": 8596048010245
   },
   {
     "brand": "Natava",
@@ -3714,7 +3949,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50ml"
+    "key": "50ml",
+    "carton_ean": 8596048010252
   },
   {
     "brand": "Natava",
@@ -3731,7 +3967,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100ml"
+    "key": "100ml",
+    "carton_ean": 8596048010269
   },
   {
     "brand": "Natava",
@@ -3748,7 +3985,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100ml"
+    "key": "100ml",
+    "carton_ean": 8596048010276
   },
   {
     "brand": "Natava",
@@ -3765,7 +4003,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100ml"
+    "key": "100ml",
+    "carton_ean": 8596048010283
   },
   {
     "brand": "Natava",
@@ -3782,7 +4021,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "100ml"
+    "key": "100ml",
+    "carton_ean": 8596048010290
   },
   {
     "brand": "Natava",
@@ -3799,7 +4039,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "60g A"
+    "key": "60g A",
+    "carton_ean": 8596048010306
   },
   {
     "brand": "Natava",
@@ -3816,7 +4057,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "60g A"
+    "key": "60g A",
+    "carton_ean": 8596048010313
   },
   {
     "brand": "Natava",
@@ -3833,7 +4075,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "60g A"
+    "key": "60g A",
+    "carton_ean": 8596048010320
   },
   {
     "brand": "Natava",
@@ -3850,7 +4093,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Natava",
@@ -3867,7 +4111,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "220g"
+    "key": "220g",
+    "carton_ean": 8596048010337
   },
   {
     "brand": "Natava",
@@ -3884,7 +4129,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "220g"
+    "key": "220g",
+    "carton_ean": 8596048010344
   },
   {
     "brand": "Natava",
@@ -3901,7 +4147,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "220g"
+    "key": "220g",
+    "carton_ean": 8596048010351
   },
   {
     "brand": "Natava",
@@ -3918,7 +4165,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "220g"
+    "key": "220g",
+    "carton_ean": 8596048010368
   },
   {
     "brand": "Natava",
@@ -3935,7 +4183,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "220g"
+    "key": "220g",
+    "carton_ean": 8596048010375
   },
   {
     "brand": "Natava",
@@ -3952,7 +4201,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "220g"
+    "key": "220g",
+    "carton_ean": 8596048010382
   },
   {
     "brand": "Natava",
@@ -3969,7 +4219,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "220g"
+    "key": "220g",
+    "carton_ean": 8596048010399
   },
   {
     "brand": "Natava",
@@ -3986,7 +4237,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "220g"
+    "key": "220g",
+    "carton_ean": 8596048011570
   },
   {
     "brand": "Natava",
@@ -4003,7 +4255,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "220g"
+    "key": "220g",
+    "carton_ean": 8596048011563
   },
   {
     "brand": "Natava",
@@ -4020,7 +4273,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "220g"
+    "key": "220g",
+    "carton_ean": 8596048011815
   },
   {
     "brand": "Natava",
@@ -4037,7 +4291,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048006835
   },
   {
     "brand": "Natava",
@@ -4054,7 +4309,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048006842
   },
   {
     "brand": "Natava",
@@ -4071,7 +4327,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048006859
   },
   {
     "brand": "Natava",
@@ -4088,7 +4345,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048006866
   },
   {
     "brand": "Natava",
@@ -4105,7 +4363,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048006873
   },
   {
     "brand": "Natava",
@@ -4122,7 +4381,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048006880
   },
   {
     "brand": "Natava",
@@ -4139,7 +4399,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048006897
   },
   {
     "brand": "Natava",
@@ -4156,7 +4417,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048006903
   },
   {
     "brand": "Natava",
@@ -4173,7 +4435,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048006910
   },
   {
     "brand": "Natava",
@@ -4190,7 +4453,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048006927
   },
   {
     "brand": "Natava",
@@ -4207,7 +4471,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048006934
   },
   {
     "brand": "Natava",
@@ -4224,7 +4489,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048006941
   },
   {
     "brand": "Natava",
@@ -4241,7 +4507,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "500 ml"
+    "key": "500 ml",
+    "carton_ean": 8596048011860
   },
   {
     "brand": "Natava",
@@ -4258,7 +4525,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "500 ml"
+    "key": "500 ml",
+    "carton_ean": 8596048011877
   },
   {
     "brand": "Natava",
@@ -4275,7 +4543,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "500 ml"
+    "key": "500 ml",
+    "carton_ean": 8596048011884
   },
   {
     "brand": "Natava",
@@ -4292,7 +4561,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "500 ml"
+    "key": "500 ml",
+    "carton_ean": 8596048011891
   },
   {
     "brand": "Natava",
@@ -4309,7 +4579,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048012911
   },
   {
     "brand": "Natava",
@@ -4326,7 +4597,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048012928
   },
   {
     "brand": "Natava",
@@ -4343,7 +4615,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048012935
   },
   {
     "brand": "Natava",
@@ -4360,7 +4633,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": 250
+    "key": 250,
+    "carton_ean": 8596048012942
   },
   {
     "brand": "Natava",
@@ -4377,7 +4651,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Natava",
@@ -4394,7 +4669,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Natava",
@@ -4411,7 +4687,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Natava",
@@ -4428,7 +4705,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   },
   {
     "brand": "Natava",
@@ -4445,7 +4723,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50g"
+    "key": "50g",
+    "carton_ean": 8596048005692
   },
   {
     "brand": "Natava",
@@ -4462,7 +4741,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50g"
+    "key": "50g",
+    "carton_ean": 8596048005708
   },
   {
     "brand": "Natava",
@@ -4479,7 +4759,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50g"
+    "key": "50g",
+    "carton_ean": 8596048005715
   },
   {
     "brand": "Natava",
@@ -4496,7 +4777,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50g"
+    "key": "50g",
+    "carton_ean": 8596048010467
   },
   {
     "brand": "Natava",
@@ -4513,7 +4795,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": 8596048010450
   },
   {
     "brand": "Natava",
@@ -4530,7 +4813,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": "50g"
+    "key": "50g",
+    "carton_ean": 8596048010948
   },
   {
     "brand": "Natava",
@@ -4547,6 +4831,7 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "key": null
+    "key": null,
+    "carton_ean": null
   }
 ]
