@@ -115,6 +115,8 @@ button:hover {
     max-height: 90vh;
     overflow-y: auto;
     box-sizing: border-box;
+    box-shadow: 3px 3px 8px #222;
+    border-radius: 10px;
 }
 
 .close-modal {
