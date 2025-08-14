@@ -15,13 +15,6 @@
     </div>
     <h1 data-i18n="title"></h1>
 
-    <div id="upload-section">
-        <input type="file" id="file-input" accept=".json">
-        <button id="download-button" disabled data-i18n="download_products"></button>
-        <button id="download-logistics-button" disabled data-i18n="download_logistics"></button>
-        <button id="export-logistics-btn" data-i18n="export_logistics"></button>
-    </div>
-
     <div id="filter-section" style="text-align:center; margin-bottom:20px;">
         <input type="text" id="search-input" data-i18n-placeholder="search_placeholder"
             style="width: 200px; padding: 5px;">
@@ -39,6 +32,7 @@
         </select>
         <button id="reset-filters" data-i18n="reset_filters"></button>
         <button id="toggle-discontinued" data-i18n="show_discontinued"></button>
+        <button id="export-logistics-btn" data-i18n="export_logistics"></button>
     </div>
 
     <div id="product-table-section" style="display:none;">
@@ -231,7 +225,6 @@
     <script src="editor.js"></script>
     <script src="xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
-    <script src="editor.js"></script>
 </body>
 
 </html>

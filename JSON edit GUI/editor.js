@@ -237,9 +237,8 @@ async function apiPut(name, data) {
 async function saveProductsToRepo() {
     try {
         await apiPut('products', products);
-        // po uložení načti čerstvá data
+        // po uložení stáhni čerstvá data, ať je UI v syncu
         products = await fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`).then(r => r.json());
-        alert('products.json uložen');
     } catch (e) {
         alert('Uložení products.json selhalo: ' + e.message);
     }
@@ -249,7 +248,6 @@ async function saveLogisticsToRepo() {
     try {
         await apiPut('logistics', logisticsData);
         logisticsData = await fetch(`${window.API_BASE}/api/logistics?ts=${Date.now()}`).then(r => r.json());
-        alert('logistics.json uložen');
     } catch (e) {
         alert('Uložení logistics.json selhalo: ' + e.message);
     }
@@ -276,18 +274,7 @@ function fillKeysSelect(brand, selectedKey = null) {
 }
 
 function initUI() {
-    // --- Save tlačítka: zapnout a připojit správné handlery ---
-    const btnLog = document.getElementById('download-logistics-button');
-    if (btnLog) {
-        btnLog.disabled = false;
-        btnLog.onclick = saveLogisticsToRepo; // uloží logistics.json přes API
-    }
-    const btnProd = document.getElementById('download-button');
-    if (btnProd) {
-        btnProd.onclick = saveProductsToRepo; // uloží products.json přes API
-    }
 
-    document.getElementById('file-input').addEventListener('change', handleFileUpload);
     document.getElementById('add-product').addEventListener('click', openAddModal);
     document.getElementById('product-form').addEventListener('submit', saveProduct);
     document.getElementById('search-input').addEventListener('input', renderTable);
@@ -448,7 +435,6 @@ function initUI() {
             products = data;
             renderTable();
             document.getElementById('product-table-section').style.display = 'block';
-            if (btnProd) btnProd.disabled = false; // povol tlačítko až po načtení
         });
 
     updateLogisticsKeyFilter();
@@ -503,18 +489,6 @@ function updateFilterPlaceholders() {
 document.addEventListener('DOMContentLoaded', () => {
     updateUITexts();
 });
-
-function handleFileUpload(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        products = JSON.parse(e.target.result);
-        renderTable();
-        document.getElementById('product-table-section').style.display = 'block';
-        document.getElementById('download-button').disabled = false;
-    };
-    reader.readAsText(file);
-}
 
 function renderTable() {
     const tbody = document.querySelector('#product-table tbody');
@@ -1327,18 +1301,18 @@ function openLogisticsEditModal(brand, key, index = null) {
     modal.style.display = 'block';
 
     document.querySelectorAll('.close-modal, .close-logistics-modal').forEach(el => {
-            el.onclick = function () {
-                const m = el.closest('.modal');
-                if (m) m.style.display = 'none';
-            };
-        });
+        el.onclick = function () {
+            const m = el.closest('.modal');
+            if (m) m.style.display = 'none';
+        };
+    });
 
-        const cancelBtn = document.getElementById('cancel-logistics-edit');
-        if (cancelBtn) {
-            cancelBtn.onclick = function () {
-                document.getElementById('logistics-edit-modal').style.display = 'none';
-            };
-        }
+    const cancelBtn = document.getElementById('cancel-logistics-edit');
+    if (cancelBtn) {
+        cancelBtn.onclick = function () {
+            document.getElementById('logistics-edit-modal').style.display = 'none';
+        };
+    }
 
     const oldForm = document.getElementById('logistics-edit-form');
     oldForm.onsubmit = null;
