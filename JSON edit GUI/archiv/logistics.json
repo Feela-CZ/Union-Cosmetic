@@ -560,34 +560,6 @@
         "nr_of_layers": 13
       }
     },
-    "None": {
-      "ITEM": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null
-      },
-      "CARTON": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_items": null
-      },
-      "LAYER": {
-        "nr_of_items": null,
-        "nr_of_cartons": null
-      },
-      "PALLET": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_cartons": null,
-        "nr_of_items": null,
-        "nr_of_layers": null
-      }
-    },
     "250B": {
       "ITEM": {
         "length": "5.9 cm",
@@ -898,34 +870,6 @@
         "nr_of_layers": 4
       }
     },
-    "None": {
-      "ITEM": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null
-      },
-      "CARTON": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_items": null
-      },
-      "LAYER": {
-        "nr_of_items": null,
-        "nr_of_cartons": null
-      },
-      "PALLET": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_cartons": null,
-        "nr_of_items": null,
-        "nr_of_layers": null
-      }
-    },
     "200g": {
       "ITEM": {
         "length": "4.9 cm",
@@ -1087,7 +1031,7 @@
       "PALLET": {
         "length": "120.0 cm",
         "width": "80.0 cm",
-        "height": "112.5 cm",
+        "height": "113.0 cm",
         "weight": "776.0 kg",
         "nr_of_cartons": 70,
         "nr_of_items": 700,
@@ -1174,7 +1118,7 @@
         "length": "120.0 cm",
         "width": "80.0 cm",
         "height": "148.0 cm",
-        "weight": "587.5 kg",
+        "weight": "588.0 kg",
         "nr_of_cartons": 50,
         "nr_of_items": 500,
         "nr_of_layers": 5
@@ -1268,30 +1212,30 @@
   "Natava": {
     "250": {
       "ITEM": {
-        "length": "5.5 cm",
-        "width": "5.5 cm",
-        "height": "14.5 cm",
-        "weight": "0.28 kg"
+        "length": "7.3 cm",
+        "width": "3.4 cm",
+        "height": "17.4 cm",
+        "weight": "0.275 kg"
       },
       "CARTON": {
-        "length": "35.5 cm",
-        "width": "12.1 cm",
-        "height": "15.0 cm",
-        "weight": "3.6 kg",
+        "length": "25.0 cm",
+        "width": "13.0 cm",
+        "height": "18.0 cm",
+        "weight": "3.5 kg",
         "nr_of_items": 12
       },
       "LAYER": {
-        "nr_of_items": 240,
-        "nr_of_cartons": 20
+        "nr_of_items": 324,
+        "nr_of_cartons": 27
       },
       "PALLET": {
         "length": "120.0 cm",
         "width": "80.0 cm",
-        "height": "155.0 cm",
-        "weight": "671.0 kg",
-        "nr_of_cartons": 180,
-        "nr_of_items": 2160,
-        "nr_of_layers": 9
+        "height": "143.0 cm",
+        "weight": "667.0 kg",
+        "nr_of_cartons": 189,
+        "nr_of_items": 2268,
+        "nr_of_layers": 7
       }
     },
     "85g": {
@@ -1462,40 +1406,12 @@
         "nr_of_layers": 10
       }
     },
-    "10g": {
-      "ITEM": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null
-      },
-      "CARTON": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_items": null
-      },
-      "LAYER": {
-        "nr_of_items": null,
-        "nr_of_cartons": null
-      },
-      "PALLET": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_cartons": null,
-        "nr_of_items": null,
-        "nr_of_layers": null
-      }
-    },
     "80g": {
       "ITEM": {
         "length": "4.1 cm",
         "width": "4.1 cm",
         "height": "13.5 cm",
-        "weight": "O,103 kg"
+        "weight": "0,103 kg"
       },
       "CARTON": {
         "length": "22.5 cm",
@@ -1546,7 +1462,7 @@
         "nr_of_layers": 10
       }
     },
-    "soap dispencer and metal pad": {
+    "soap dispenser and metal pad": {
       "ITEM": {
         "length": "14.5 cm",
         "width": "3.6 cm",
@@ -1574,7 +1490,7 @@
         "nr_of_layers": 10
       }
     },
-    "soap dispencer and bamboo pad": {
+    "soap dispenser and bamboo pad": {
       "ITEM": {
         "length": "14.5 cm",
         "width": "3.6 cm",
@@ -1798,34 +1714,6 @@
         "nr_of_layers": 6
       }
     },
-    "None": {
-      "ITEM": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null
-      },
-      "CARTON": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_items": null
-      },
-      "LAYER": {
-        "nr_of_items": null,
-        "nr_of_cartons": null
-      },
-      "PALLET": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_cartons": null,
-        "nr_of_items": null,
-        "nr_of_layers": null
-      }
-    },
     "220g": {
       "ITEM": {
         "length": "8.7 cm",
@@ -1880,6 +1768,34 @@
         "nr_of_cartons": 60,
         "nr_of_items": 480,
         "nr_of_layers": 5
+      }
+    },
+    "500g": {
+      "ITEM": {
+        "length": "11.8 cm",
+        "width": "11.8 cm",
+        "height": "11.6 cm",
+        "weight": "0.540 kg"
+      },
+      "CARTON": {
+        "length": "35.5 cm",
+        "width": "12.1 cm",
+        "height": "14.5 cm",
+        "weight": "1.730 kg",
+        "nr_of_items": 3
+      },
+      "LAYER": {
+        "nr_of_items": 60,
+        "nr_of_cartons": 20
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "150.0 cm",
+        "weight": "330.0 kg",
+        "nr_of_cartons": 180,
+        "nr_of_items": 540,
+        "nr_of_layers": 9
       }
     },
     "50g": {

@@ -10,6 +10,11 @@ h1 {
     margin-bottom: 20px;
 }
 
+h4 {
+    text-decoration: underline;
+    font-size: 1rem;
+}
+
 #upload-section {
     text-align: center;
     margin-bottom: 20px;
@@ -33,6 +38,15 @@ h1 {
     background-color: #007bff;
     color: white;
 }
+#product-table th.sortable {
+    background-color: #007bff;
+    cursor: pointer;
+    color: white;
+}
+
+#product-table th.sortable:hover {
+    background-color: #0056b3;
+}
 
 button {
     margin: 2px;
@@ -44,7 +58,7 @@ button {
     cursor: pointer;
 }
 
-#delete-button {
+.delete-button {
     margin: 2px;
     padding: 5px 10px;
     border: none;
@@ -54,13 +68,26 @@ button {
     cursor: pointer;
 }
 
+.delete-button:hover {
+    background-color: #c82333;
+}
 
 button:hover {
     background-color: #0056b3;
 }
 
-#delete-button:hover {
-    background-color: #c82333;
+.button {
+    margin: 2px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #0056b3;
 }
 
 #add-product {
@@ -90,16 +117,21 @@ button:hover {
     box-sizing: border-box;
 }
 
-#close-modal {
+.close-modal {
     float: right;
+    cursor: pointer;
     font-size: 28px;
     font-weight: bold;
-    cursor: pointer;
+    color: #888;
+    transition: color 0.15s;
+}
+.close-modal:hover {
+    color: #333;
 }
 
 #product-form label {
     display: block;
-    margin-top: 12px;
+    margin-top: 8px;
 }
 
 #product-form select,
@@ -134,6 +166,10 @@ button.logistics-partial {
     color: white;
 }
 
+#add-logistics-key {
+    margin-left: 8px;
+}
+
 #validation-modal button {
     margin-right: 10px;
 }
@@ -141,4 +177,131 @@ button.logistics-partial {
 #validation-modal h2 {
     color: #c82333;
     margin-top: 0;
+}
+
+#reset-filters {
+    margin-left: 10px;
+}
+
+#logistics-edit-modal .modal-content {
+    background-color: #fff;
+    margin: 5vh auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 800px;
+    max-width: 98vw;
+    box-sizing: border-box;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+#logistics-edit-modal h3 {
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-size: 1.35em;
+    color: #000;
+    font-weight: bold;
+    text-align: left;
+    letter-spacing: 0;
+}
+
+#logistics-fields {
+    display: flex;
+    gap: 36px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+#logistics-fields .logistics-fields-col {
+    flex: 1 1 0;
+    min-width: 210px;
+}
+
+#logistics-fields .section-group {
+    margin-bottom: 2rem;
+    padding-right: 6px;
+}
+
+#logistics-fields h4 {
+    margin-top: 18px;
+    margin-bottom: 5px;
+    font-size: 1.08em;
+    font-weight: bold;
+    color: #007bff;         /* stejná modrá jako th v tabulce */
+    border-bottom: 1px solid #e3e3e3;
+    padding-bottom: 2px;
+}
+
+#logistics-fields label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 5px;
+    font-size: 1em;
+    color: #222;
+    font-weight: bold;
+}
+
+#logistics-fields input[type="text"],
+#logistics-fields input[type="number"] {
+    padding: 6px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #b8b8b8;
+    border-radius: 4px;
+    background: #fff;
+}
+
+#czFlag {
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+#enFlag {
+    cursor: pointer;
+}
+
+#lang-switcher {
+   text-align: right;
+}
+
+/* Responsivita pro menší obrazovky */
+@media (max-width: 900px) {
+    #logistics-fields {
+        flex-direction: column;
+        gap: 0;
+    }
+    #logistics-fields .logistics-fields-col {
+        min-width: unset;
+    }
+}
+
+#logistics-edit-modal .modal-content .btn {
+    margin-top: 10px;
+}
+
+.close-logistics-modal {
+    float: right;
+    cursor: pointer;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+@media (max-width: 900px) {
+    #logistics-edit-modal .modal-content {
+        width: 98vw;
+        min-width: unset;
+        max-width: unset;
+        padding: 10vw 2vw;
+    }
+    #logistics-fields .logistics-fields-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    #logistics-fields .logistics-fields-col {
+        min-width: unset;
+    }
+    #logistics-fields h4 {
+        font-size: 1em;
+    }
 }
