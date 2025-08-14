@@ -38,6 +38,15 @@ h4 {
     background-color: #007bff;
     color: white;
 }
+#product-table th.sortable {
+    background-color: #007bff;
+    cursor: pointer;
+    color: white;
+}
+
+#product-table th.sortable:hover {
+    background-color: #0056b3;
+}
 
 button {
     margin: 2px;
@@ -49,7 +58,7 @@ button {
     cursor: pointer;
 }
 
-#delete-button {
+.delete-button {
     margin: 2px;
     padding: 5px 10px;
     border: none;
@@ -59,6 +68,9 @@ button {
     cursor: pointer;
 }
 
+.delete-button:hover {
+    background-color: #c82333;
+}
 
 button:hover {
     background-color: #0056b3;
@@ -76,10 +88,6 @@ button:hover {
 
 .button:hover {
     background-color: #0056b3;
-}
-
-#delete-button:hover {
-    background-color: #c82333;
 }
 
 #add-product {
@@ -107,6 +115,8 @@ button:hover {
     max-height: 90vh;
     overflow-y: auto;
     box-sizing: border-box;
+    box-shadow: 3px 3px 8px #222;
+    border-radius: 10px;
 }
 
 .close-modal {
@@ -158,6 +168,10 @@ button.logistics-partial {
     color: white;
 }
 
+#add-logistics-key {
+    margin-left: 8px;
+}
+
 #validation-modal button {
     margin-right: 10px;
 }
@@ -165,6 +179,10 @@ button.logistics-partial {
 #validation-modal h2 {
     color: #c82333;
     margin-top: 0;
+}
+
+#reset-filters {
+    margin-left: 10px;
 }
 
 #logistics-edit-modal .modal-content {
@@ -175,7 +193,7 @@ button.logistics-partial {
     width: 800px;
     max-width: 98vw;
     box-sizing: border-box;
-    max-height: 90vh;
+    max-height: 95vh;
     overflow-y: auto;
 }
 
@@ -191,9 +209,10 @@ button.logistics-partial {
 
 #logistics-fields {
     display: flex;
-    gap: 36px;
-    margin-bottom: 8px;
     flex-wrap: wrap;
+    align-items: flex-start;
+    column-gap: 32px;   /* místo gap: zachová „funkčnost do všech směrů“ kromě spodního */
+    row-gap: 0;         /* žádný svislý gap mezi řádky sloupců */
 }
 
 #logistics-fields .logistics-fields-col {
@@ -202,8 +221,39 @@ button.logistics-partial {
 }
 
 #logistics-fields .section-group {
-    margin-bottom: 2rem;
-    padding-right: 6px;
+    margin: 0 0 12px 0;
+}
+
+#logistics-fields .ean-block {
+    order: 99;
+    flex: 0 0 100%;
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 0;
+    padding-right: 0;
+}
+
+#logistics-fields .ean-block h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 1.08em;
+    font-weight: bold;
+    color: #007bff;
+    border-bottom: 1px solid #e3e3e3;
+    padding-bottom: 2px;
+}
+
+#logistics-fields .ean-block label {
+    display: block;
+}
+
+#logistics-fields .ean-block input[type="text"] {
+    margin-top: 4px;
+}
+
+.carton-ean-line {
+    margin-top: 25px;
+    font-size: 1rem;
 }
 
 #logistics-fields h4 {
@@ -211,7 +261,7 @@ button.logistics-partial {
     margin-bottom: 5px;
     font-size: 1.08em;
     font-weight: bold;
-    color: #007bff;         /* stejná modrá jako th v tabulce */
+    color: #007bff;    
     border-bottom: 1px solid #e3e3e3;
     padding-bottom: 2px;
 }
@@ -236,11 +286,33 @@ button.logistics-partial {
     background: #fff;
 }
 
+#czFlag {
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+#enFlag {
+    cursor: pointer;
+}
+
+#lang-switcher {
+   text-align: right;
+}
+
+#product-table.hide-discontinued-cols th.col-discontinued,
+#product-table.hide-discontinued-cols td.col-discontinued {
+    display: none;
+}
+
+#edit-logistics-btn {
+    margin-top: 25px
+}
+
 /* Responsivita pro menší obrazovky */
 @media (max-width: 900px) {
     #logistics-fields {
         flex-direction: column;
-        gap: 0;
+        column-gap: 0;
     }
     #logistics-fields .logistics-fields-col {
         min-width: unset;

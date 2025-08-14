@@ -6,10 +6,10 @@ const lightboxImg = document.getElementById('lightbox-img');
 
 let logisticsData = {};
 fetch('logistics.json')
-  .then(res => res.json())
-  .then(data => {
-      logisticsData = data;
-  });
+    .then(res => res.json())
+    .then(data => {
+        logisticsData = data;
+    });
 
 let allProducts = [];
 let currentBrand = null;
@@ -304,7 +304,6 @@ function renderProducts() {
             if (e.key === 'Enter') validateAndRound();
         });
 
-        // --- Eventy: boxy ---
         boxMinus.addEventListener('click', () => {
             let boxes = Math.floor((parseInt(pieceInput.value) || 0) / product.pack);
             boxes = Math.max(0, boxes - 1);
@@ -408,12 +407,28 @@ lightbox.addEventListener('click', () => {
     }, 300);
 });
 
-document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") {
+document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+
+    if (lightbox) {
         lightbox.classList.remove('show');
-        setTimeout(() => {
-            lightbox.style.display = 'none';
-        }, 300);
+        setTimeout(() => { lightbox.style.display = 'none'; }, 300);
+    }
+
+    // Všechny modaly
+    try { closeCartModal(); } catch {}
+    try { closeConfirmModal(); } catch {}
+    try { closeClearModal(); } catch {}
+    try { closeInfoModal(); } catch {}
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target && e.target.id === 'cart-modal') {
+        closeCartModal();
+    }
+
+    if (e.target && e.target.classList && e.target.classList.contains('small-modal')) {
+        e.target.style.display = 'none';
     }
 });
 
