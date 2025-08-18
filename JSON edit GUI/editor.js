@@ -6,7 +6,7 @@ let logisticsData = {};
 let currentLogisticsBrand = null;
 let currentLogisticsKey = null;
 let currentLogisticsProductIndex = null;
-let currentLang = 'en';
+let currentLang = 'cs';
 let showingAllKeys = false;
 let showDiscontinued = false;
 
