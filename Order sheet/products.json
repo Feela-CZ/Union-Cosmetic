@@ -3,17 +3,18 @@
     "brand": "Lilien",
     "type": "Shampoo",
     "id": "8596048006965",
-    "hs": 33051000,
+    "hs": "33051000",
     "name": "Lilien shampoo normal hair Olive Oil",
     "volume": "350 ml",
     "price": 0.79,
     "pack": 12,
     "boxes_per_layer": 21,
     "boxes_per_pallet": 147,
+    "key": "350",
     "new": false,
     "new_date": "",
-    "key": 350,
-    "carton_ean": 8596048007122
+    "discontinued": false,
+    "discontinued_date": ""
   },
   {
     "brand": "Lilien",
