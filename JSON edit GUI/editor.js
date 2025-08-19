@@ -1185,38 +1185,27 @@ function showLogistics(index) {
     const product = products[index];
     const data = logisticsData?.[product.brand]?.[product.key];
 
-    if (data && data.PALLET) {
-        const hasCarton = data.PALLET.carton_ean !== undefined && data.PALLET.carton_ean !== null && data.PALLET.carton_ean !== '';
-        const prodCarton = product.carton_ean !== undefined && product.carton_ean !== null && product.carton_ean !== '';
-        if (!hasCarton && prodCarton) {
-            data.PALLET.carton_ean = product.carton_ean;
-        }
-    }
     const modal = document.getElementById('logistics-modal');
     const content = document.getElementById('logistics-content');
     content.innerHTML = '';
-
-    const hiddenKeys = ['boxes_per_layer', 'boxes_per_pallet', 'pack'];
 
     document.getElementById('logistics-title').textContent =
         translations[currentLang].logistics_data_for
             .replace('{brand}', product.brand)
             .replace('{key}', product.key);
 
+    // Carton EAN pouze pro zobrazení – primárně z produktu, fallback z historických dat (nepíšeme do logisticsData!)
+    const palletCartonEANForDisplay =
+        (product.carton_ean != null && product.carton_ean !== '')
+            ? product.carton_ean
+            : (data?.PALLET?.carton_ean ?? null);
+
     if (!data) {
         content.innerHTML = `<p>${translations[currentLang].no_logistics_data}</p>`;
     } else {
-        let palletCartonEAN = null;
-
         for (const [section, values] of Object.entries(data)) {
-            const entries = Object.entries(values).filter(([k]) => {
-                if (section === 'PALLET' && k === 'carton_ean') {
-                    palletCartonEAN = values[k];
-                    return false;
-                }
-                return !['boxes_per_layer', 'boxes_per_pallet', 'pack'].includes(k);
-            });
-
+            // Vynecháme případný historický PALLET.carton_ean, jinak zobrazíme vše
+            const entries = Object.entries(values).filter(([k]) => !(section === 'PALLET' && k === 'carton_ean'));
             if (entries.length === 0) continue;
 
             const sectionName = translations[currentLang]['section_' + section] || section;
@@ -1228,11 +1217,12 @@ function showLogistics(index) {
             content.innerHTML += `</ul>`;
         }
 
-        if (palletCartonEAN !== null && palletCartonEAN !== '') {
+        if (palletCartonEANForDisplay != null && palletCartonEANForDisplay !== '') {
             const label = translations[currentLang]['carton_ean'] || attributeLabels['carton_ean'] || 'Carton EAN';
-            content.innerHTML += `<div class="carton-ean-line"><strong>${label}</strong>: ${palletCartonEAN}</div>`;
+            content.innerHTML += `<div class="carton-ean-line"><strong>${label}</strong>: ${palletCartonEANForDisplay}</div>`;
         }
     }
+
     modal.style.display = 'block';
 
     document.querySelectorAll('.close-modal, .close-logistics-modal').forEach(el => {
@@ -1336,7 +1326,6 @@ function openLogisticsEditModal(brand, key, index = null) {
         LAYER: { nr_of_items: '', nr_of_cartons: '' },
         PALLET: {
             length: '', width: '', height: '', weight: '', nr_of_cartons: '', nr_of_items: '', nr_of_layers: '',
-            carton_ean: ''
         }
     };
 
@@ -1385,9 +1374,7 @@ function openLogisticsEditModal(brand, key, index = null) {
     eanBlock.className = 'ean-block';
     eanBlock.innerHTML = `
   <h4>${translations[currentLang]['carton_ean'] || attributeLabels['carton_ean'] || 'Carton EAN'}</h4>
-  <div>
-    <input type="text" id="product-carton-ean" value="${productCartonEAN}">
-  </div>
+  <div><input type="text" id="product-carton-ean" value="${productCartonEAN}"></div>
 `;
     fieldsContainer.appendChild(eanBlock);
 
@@ -1414,6 +1401,11 @@ function openLogisticsEditModal(brand, key, index = null) {
         e.preventDefault();
 
         const newData = JSON.parse(JSON.stringify(data));
+
+        if (newData.PALLET && 'carton_ean' in newData.PALLET) {
+            delete newData.PALLET.carton_ean;
+        }
+
         for (const [section, values] of Object.entries(newData)) {
             for (const keyName of Object.keys(values)) {
                 const inputId = `logistics-${section}-${keyName}`;
@@ -1435,8 +1427,9 @@ function openLogisticsEditModal(brand, key, index = null) {
                 const gu = upd[s] || {};
                 const keys = new Set([...Object.keys(go), ...Object.keys(gu)]);
                 for (const k of keys) {
-                    const vo = (go[k] === undefined ? null : go[k]);
-                    const vu = (gu[k] === undefined ? null : gu[k]);
+                    if (s === 'PALLET' && k === 'carton_ean') continue;
+                    const vo = go[k] ?? null;
+                    const vu = gu[k] ?? null;
                     if (vo !== vu) return true;
                 }
             }
@@ -1533,6 +1526,7 @@ function updateLogisticsModalContent(brand, key) {
             const group = data[section];
             let html = `<div class="section-group"><h4>${section}</h4>`;
             for (const [keyName, value] of Object.entries(group)) {
+                if (keyName === 'carton_ean') continue;
                 const inputId = `logistics-${section}-${keyName}`;
                 html += `
                     <label>${attributeLabels[keyName] || keyName.replace(/_/g, ' ')}:
