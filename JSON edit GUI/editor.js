@@ -121,6 +121,7 @@ const translations = {
         show_discontinued: "Show discontinued",
         hide_discontinued: "Hide discontinued",
         carton_ean: "Carton EAN",
+        
     },
     cs: {
         title: "Editor produktů",
@@ -221,6 +222,7 @@ const translations = {
         show_discontinued: "Zobrazit ukončené",
         hide_discontinued: "Skrýt ukončené",
         carton_ean: "EAN kartonu",
+        
     }
 };
 
