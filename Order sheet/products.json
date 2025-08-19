@@ -11,8 +11,8 @@
     "boxes_per_layer": 21,
     "boxes_per_pallet": 147,
     "key": "350",
-    "new": true,
-    "new_date": "2025-08-19",
+    "new": false,
+    "new_date": "",
     "discontinued": false,
     "discontinued_date": ""
   },
