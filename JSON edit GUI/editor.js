@@ -341,6 +341,12 @@ async function saveLogisticsToRepo() {
     try {
         await apiPut('logistics', logisticsData);
         logisticsData = await fetch(`${window.API_BASE}/api/logistics?ts=${Date.now()}`).then(r => r.json());
+        Object.keys(logisticsData || {}).forEach(br => {
+            Object.keys(logisticsData[br] || {}).forEach(k => {
+                const pal = logisticsData[br][k]?.PALLET;
+                if (pal && 'carton_ean' in pal) delete pal.carton_ean;
+            });
+        });
     } catch (e) {
         alert('Uložení logistics.json selhalo: ' + e.message);
     }
@@ -348,7 +354,16 @@ async function saveLogisticsToRepo() {
 
 fetch(`${window.API_BASE}/api/logistics?ts=${Date.now()}`)
     .then(r => r.json())
-    .then(data => { logisticsData = data; initUI(); });
+    .then(data => {
+        logisticsData = data;
+        Object.keys(logisticsData || {}).forEach(br => {
+            Object.keys(logisticsData[br] || {}).forEach(k => {
+                const pal = logisticsData[br][k]?.PALLET;
+                if (pal && 'carton_ean' in pal) delete pal.carton_ean;
+            });
+        });
+        initUI();
+    });
 
 function fillKeysSelect(brand, selectedKey = null) {
     const chooseKey = document.getElementById('choose-key');
@@ -485,9 +500,14 @@ function initUI() {
 
         if (sourceLogistics) {
             if (!logisticsData[selectedBrand]) logisticsData[selectedBrand] = {};
-            logisticsData[selectedBrand][selectedKey] = JSON.parse(JSON.stringify(sourceLogistics));
+
+            // deep copy + odstranění případného PALLET.carton_ean
+            const copy = JSON.parse(JSON.stringify(sourceLogistics));
+            if (copy.PALLET && 'carton_ean' in copy.PALLET) delete copy.PALLET.carton_ean;
+            logisticsData[selectedBrand][selectedKey] = copy;
 
             document.getElementById('logistics-key').value = selectedKey;
+
             if (sourceLogistics.ITEM) {
                 Object.keys(sourceLogistics.ITEM).forEach(k => {
                     const input = document.getElementById('logistics-ITEM-' + k);
@@ -508,13 +528,16 @@ function initUI() {
             }
             if (sourceLogistics.PALLET) {
                 Object.keys(sourceLogistics.PALLET).forEach(k => {
+                    if (k === 'carton_ean') return; // nepropagovat historický EAN do inputů
                     const input = document.getElementById('logistics-PALLET-' + k);
                     if (input) input.value = sourceLogistics.PALLET[k] || '';
                 });
             }
+
             if (currentLogisticsProductIndex !== null) {
                 products[currentLogisticsProductIndex].key = selectedKey;
             }
+
             updateLogisticsModalContent(selectedBrand, selectedKey);
         }
         currentLogisticsKey = selectedKey;
@@ -1196,9 +1219,7 @@ function showLogistics(index) {
 
     // Carton EAN pouze pro zobrazení – primárně z produktu, fallback z historických dat (nepíšeme do logisticsData!)
     const palletCartonEANForDisplay =
-        (product.carton_ean != null && product.carton_ean !== '')
-            ? product.carton_ean
-            : (data?.PALLET?.carton_ean ?? null);
+        (product.carton_ean != null && product.carton_ean !== '') ? product.carton_ean : null;
 
     if (!data) {
         content.innerHTML = `<p>${translations[currentLang].no_logistics_data}</p>`;
@@ -1464,6 +1485,9 @@ function openLogisticsEditModal(brand, key, index = null) {
             document.getElementById('logistics-confirm-modal').style.display = 'block';
 
             document.getElementById('logistics-confirm-yes').onclick = async function () {
+                if (data.PALLET && 'carton_ean' in data.PALLET) {
+                    delete data.PALLET.carton_ean;
+                }
                 // propsat nové hodnoty z newData do data (logisticsData)
                 for (const [section, values] of Object.entries(newData)) {
                     for (const keyName of Object.keys(values)) {
