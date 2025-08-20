@@ -541,6 +541,7 @@ function initUI() {
             updateLogisticsModalContent(selectedBrand, selectedKey);
         }
         currentLogisticsKey = selectedKey;
+        currentLogisticsBrand = selectedBrand;
         document.getElementById('choose-logistics-modal').style.display = 'none';
         renderTable();
     });
@@ -1548,7 +1549,8 @@ function updateLogisticsModalContent(brand, key) {
         sections.forEach(section => {
             if (!data[section]) return;
             const group = data[section];
-            let html = `<div class="section-group"><h4>${section}</h4>`;
+            const sectionName = translations[currentLang]['section_' + section] || section;
+            let html = `<div class="section-group"><h4>${sectionName}</h4>`;
             for (const [keyName, value] of Object.entries(group)) {
                 if (keyName === 'carton_ean') continue;
                 const inputId = `logistics-${section}-${keyName}`;
