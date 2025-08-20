@@ -451,15 +451,23 @@ function initUI() {
 
     document.getElementById('add-logistics-key-form').addEventListener('submit', function (e) {
         e.preventDefault();
+
         const brand = document.getElementById('add-logistics-brand').value.trim();
-        const newKey = document.getElementById('add-logistics-key-name').value.trim();
+        const newKeyRaw = document.getElementById('add-logistics-key-name').value;
+        const newKey = newKeyRaw.trim();
 
         if (!newKey) {
             alert(translations[currentLang].key_required);
             return;
         }
+
         if (!logisticsData[brand]) logisticsData[brand] = {};
-        if (logisticsData[brand][newKey]) {
+
+        const exists = Object.keys(logisticsData[brand]).some(
+            k => k.trim().toLowerCase() === newKey.toLowerCase()
+        );
+
+        if (exists) {
             alert(translations[currentLang].key_already_exists);
             return;
         }
@@ -472,8 +480,8 @@ function initUI() {
             populateLogisticsKeySelect();
             const logSel = document.getElementById('logistics-key');
             if (logSel) {
-                let exists = Array.from(logSel.options).some(o => o.value === newKey);
-                if (!exists) {
+                let existsInSelect = Array.from(logSel.options).some(o => o.value.trim().toLowerCase() === newKey.toLowerCase());
+                if (!existsInSelect) {
                     const opt = document.createElement('option');
                     opt.value = newKey;
                     opt.textContent = newKey;
