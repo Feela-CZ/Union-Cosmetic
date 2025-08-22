@@ -49,7 +49,7 @@ function renderBrands() {
     Object.keys(logoMap).forEach(brand => {
         const card = document.createElement('div');
         card.className = 'brand-card' + (currentBrand === brand ? ' active' : '');
-        card.innerHTML = `<img src="${logoMap[brand]}" alt="${brand}"><div>${brand}</div>`;
+        card.innerHTML = `<img src="${logoMap[brand]}" alt="${brand}" width="200" height="80" decoding="async" loading="eager"><div>${brand}</div>`;
         card.onclick = () => selectBrand(brand);
         brandContainer.appendChild(card);
     });
@@ -145,6 +145,11 @@ function renderProducts() {
 
         const imgPath = `img/${product.id}.jpg`;
         const img = document.createElement('img');
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.fetchPriority = 'low';
+        img.width = 270;
+        img.height = 170;
         img.src = imgPath;
         img.onerror = function () { this.src = 'img/no-image.jpg'; };
         card.appendChild(img);
