@@ -2131,18 +2131,19 @@
   {
     "brand": "Naturalis",
     "type": "Bath Foam",
-    "id": 8595196902730,
-    "hs": 33073000,
+    "id": "8595196902730",
+    "hs": "33073000",
     "name": "Naturalis foam bath Green Garden (Eucalyptus)",
     "volume": "1000 ml",
     "price": 0.99,
     "pack": 15,
     "boxes_per_layer": 10,
     "boxes_per_pallet": 40,
+    "key": "1000",
     "new": false,
     "new_date": "",
-    "key": 1000,
-    "carton_ean": 8595196904321
+    "discontinued": true,
+    "discontinued_date": "2025-08-25"
   },
   {
     "brand": "Naturalis",
