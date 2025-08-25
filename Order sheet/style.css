@@ -94,6 +94,15 @@ h1 {
     font-weight: bold;
 }
 
+img.blur-up {
+    filter: blur(12px);
+    transform: scale(1.02);
+}
+
+img.blur-up:not([src^="data:"]) {
+    transition: filter .25s ease, transform .25s ease;
+}
+
 .product-container {
     display: flex;
     flex-wrap: wrap;

@@ -4,6 +4,66 @@ const productContainer = document.getElementById('product-container');
 const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightbox-img');
 
+const __IMG_MAX_ACTIVE = 8;
+let __imgLoadQueue = [];
+let __imgActive = 0;
+
+function __pumpImgQueue() {
+    while (__imgActive < __IMG_MAX_ACTIVE && __imgLoadQueue.length) {
+        const img = __imgLoadQueue.shift();
+        __imgActive++;
+        const realSrc = img.dataset.src;
+        const realSrcset = img.dataset.srcset;
+        if (realSrcset) img.srcset = realSrcset;
+        img.src = realSrc;
+        img.onload = img.onerror = () => { __imgActive--; img.classList.remove('blur-up'); __pumpImgQueue(); };
+    }
+}
+
+function __enqueueImg(img) {
+    __imgLoadQueue.push(img);
+    __pumpImgQueue();
+}
+
+const __imgObserver = new IntersectionObserver((entries, obs) => {
+    entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        obs.unobserve(e.target);
+        __enqueueImg(e.target);
+    });
+}, { rootMargin: '400px 0px' });
+
+let __kickStarted = false;
+function __isNearViewport(el, marginPx = 600) {
+    const r = el.getBoundingClientRect();
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    const vw = window.innerWidth || document.documentElement.clientWidth;
+    const m = marginPx;
+    return !(r.bottom < -m || r.right < -m || r.top > vh + m || r.left > vw + m);
+}
+function __scanAndKick() {
+    const imgs = document.querySelectorAll('img[data-src]');
+    imgs.forEach(img => {
+        // když IO ještě nespustil načítání a je u viewportu, zařadíme ručně do fronty
+        if (!img.src || img.src.startsWith('data:')) {
+            if (__isNearViewport(img, 600)) __enqueueImg(img);
+        }
+    });
+}
+function __startKickersOnce() {
+    if (__kickStarted) return; __kickStarted = true;
+    const kick = () => __scanAndKick();
+    ['focus', 'visibilitychange', 'pageshow', 'load', 'resize', 'scroll']
+        .forEach(ev => window.addEventListener(ev, kick, { passive: true }));
+    // jemné popostrčení po prvních renderech
+    requestAnimationFrame(kick);
+    setTimeout(kick, 250);
+    setTimeout(kick, 1000);
+    // 30s „pojištění“ při pomalém připojení
+    let ticks = 0;
+    const id = setInterval(() => { __scanAndKick(); if (++ticks > 30) clearInterval(id); }, 1000);
+}
+
 let logisticsData = {};
 fetch(`${window.API_BASE}/api/logistics?ts=${Date.now()}`)
     .then(r => r.json())
@@ -145,14 +205,18 @@ function renderProducts() {
 
         const imgPath = `img/${product.id}.jpg`;
         const img = document.createElement('img');
-        img.loading = 'lazy';
-        img.decoding = 'async';
-        img.fetchPriority = 'low';
         img.width = 270;
         img.height = 170;
-        img.src = imgPath;
-        img.onerror = function () { this.src = 'img/no-image.jpg'; };
+        img.decoding = 'async';
+        img.loading = 'lazy';
+        img.classList.add('blur-up');
+        // rychlý placeholder, aby neskočil layout
+        img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="270" height="170"></svg>';
+        // skutečné URL až přes IO/frontu
+        img.dataset.src = imgPath;
+        img.onerror = function () { this.src = 'img/no-image.jpg'; this.classList.remove('blur-up'); };
         card.appendChild(img);
+        __imgObserver.observe(img);
 
         const name = document.createElement('h3');
         name.textContent = product.name;
@@ -381,6 +445,9 @@ function renderProducts() {
 
         productContainer.appendChild(card);
     });
+
+    requestAnimationFrame(() => { window.dispatchEvent(new Event('scroll')); });
+    __startKickersOnce();
 
     updateCartCount();
 }
