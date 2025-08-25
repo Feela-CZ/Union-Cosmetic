@@ -2142,8 +2142,8 @@
     "key": "1000",
     "new": false,
     "new_date": "",
-    "discontinued": true,
-    "discontinued_date": "2025-08-25"
+    "discontinued": false,
+    "discontinued_date": ""
   },
   {
     "brand": "Naturalis",
