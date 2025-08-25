@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title data-i18n="title"></title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="../favicon.png">
+</head>
+
+<body>
+    <div id="lang-switcher">
+        <img id="czFlag" src="https://flagcdn.com/24x18/cz.png" alt="Čeština" width="30" onclick="setLang('cs')">
+        <img id="enFlag" src="https://flagcdn.com/24x18/gb.png" alt="English" width="30" onclick="setLang('en')">
+    </div>
+    <h1 data-i18n="title"></h1>
+
+    <div id="upload-section">
+        <input type="file" id="file-input" accept=".json">
+        <button id="download-button" disabled data-i18n="download_products"></button>
+        <button id="download-logistics-button" disabled data-i18n="download_logistics"></button>
+        <button id="export-logistics-btn" data-i18n="export_logistics"></button>
+    </div>
+
+    <div id="filter-section" style="text-align:center; margin-bottom:20px;">
+        <input type="text" id="search-input" data-i18n-placeholder="search_placeholder"
+            style="width: 200px; padding: 5px;">
+
+        <select id="brand-filter" style="padding:5px; margin-left:10px;">
+            <option value="" data-i18n="brand_filter"></option>
+        </select>
+
+        <select id="type-filter" style="padding:5px; margin-left:10px;">
+            <option value="" data-i18n="type_filter"></option>
+        </select>
+
+        <select id="logistics-key-filter" style="padding:5px; margin-left:10px; display:none;">
+            <option value="" data-i18n="logistics_key_filter"></option>
+        </select>
+        <button id="reset-filters" data-i18n="reset_filters"></button>
+    </div>
+
+    <div id="product-table-section" style="display:none;">
+        <button id="add-product" data-i18n="add_product"></button>
+        <button id="add-logistics-key" data-i18n="add_logistics_key"></button>
+        <table id="product-table">
+            <thead>
+                <tr>
+                    <th title="Sort" class="sortable" onclick="sortTable('brand')" data-i18n="table_brand"></th>
+                    <th title="Sort" class="sortable" onclick="sortTable('type')" data-i18n="table_type"></th>
+                    <th title="Sort" class="sortable" onclick="sortTable('id')" data-i18n="table_ean"></th>
+                    <th title="Sort" class="sortable" onclick="sortTable('HS')" data-i18n="table_hs"></th>
+                    <th title="Sort" class="sortable" onclick="sortTable('name')" data-i18n="table_name"></th>
+                    <th title="Sort" class="sortable" onclick="sortTable('volume')" data-i18n="table_volume"></th>
+                    <th title="Sort" class="sortable" onclick="sortTable('price')" data-i18n="table_price"></th>
+                    <th title="Sort" class="sortable" onclick="sortTable('new')" data-i18n="table_new"></th>
+                    <th title="Sort" class="sortable" onclick="sortTable('new_date')" data-i18n="table_new_date"></th>
+                    <th title="Sort" class="sortable" onclick="sortTable('discontinued')"
+                        data-i18n="table_discontinued"></th>
+                    <th title="Sort" class="sortable" onclick="sortTable('discontinued_date')"
+                        data-i18n="table_discontinued_date"></th>
+                    <th style="min-width: 200px; text-align: center;" data-i18n="table_actions"></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 data-i18n="edit_product_title"></h2>
+            <form id="product-form">
+                <label data-i18n="label_brand"></label>
+                <select id="brand">
+                    <option value="" data-i18n="select_brand"></option>
+                    <option value="Lilien">Lilien</option>
+                    <option value="Naturalis">Naturalis</option>
+                    <option value="Twister">Twister</option>
+                    <option value="Natava">Natava</option>
+                </select>
+                <label data-i18n="label_type"></label>
+                <select id="type">
+                    <option value="" data-i18n="select_type"></option>
+                </select>
+                <label data-i18n="label_id"></label> <input type="text" id="id">
+                <label data-i18n="label_hs"></label> <input type="text" id="hs">
+                <label data-i18n="label_name"></label> <input type="text" id="name">
+                <label data-i18n="label_volume"></label>
+                <div id="volume-wrapper">
+                    <input type="number" id="volume-number">
+                    <select id="volume-unit">
+                        <option value="ml">ml</option>
+                        <option value="g">g</option>
+                        <option value="pc">pc</option>
+                    </select>
+                </div>
+                <label data-i18n="label_price"></label> <input type="number" id="price" step="any">
+                <label data-i18n="label_pack"></label> <input type="number" id="pack">
+                <label data-i18n="label_boxes_per_layer"></label> <input type="number" id="boxes_per_layer">
+                <label data-i18n="label_boxes_per_pallet"></label> <input type="number" id="boxes_per_pallet">
+                <label data-i18n="label_logistics_key"></label>
+                <select id="logistics-key">
+                    <option value="" data-i18n="select_key"></option>
+                </select>
+
+                <div style="display: flex; align-items: center; gap: 18px; margin-top: 10px; margin-bottom: 2px;">
+                    <label style="display: flex; align-items: center; gap: 6px; margin: 0;">
+                        <input type="checkbox" id="new"> <span data-i18n="label_new"></span>
+                    </label>
+                    <input type="date" id="new_date">
+
+                    <label style="display: flex; align-items: center; gap: 6px; margin: 0;">
+                        <input type="checkbox" id="discontinued"> <span data-i18n="label_discontinued"></span>
+                    </label>
+                    <input type="date" id="discontinued_date">
+                </div>
+
+                <input type="hidden" id="product-index">
+                <button type="submit" style="margin-top: 10px;" data-i18n="save"></button>
+            </form>
+        </div>
+    </div>
+
+    <div id="confirm-delete-modal" class="modal">
+        <div class="modal-content">
+            <h2 data-i18n="confirm_delete_title"></h2>
+            <p data-i18n="confirm_delete_message"></p>
+            <div style="margin-top: 20px;">
+                <button id="confirm-delete-yes" data-i18n="confirm_delete_yes"></button>
+                <button id="confirm-delete-no" data-i18n="confirm_delete_no"></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="logistics-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="logistics-title" data-i18n="logistics_title"></h2>
+            <div id="logistics-content"></div>
+            <button id="edit-logistics-btn" style="margin-top: 12px;" data-i18n="logistics_edit"></button>
+        </div>
+    </div>
+
+    <div id="logistics-edit-modal" class="modal">
+        <div class="modal-content logistics-modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 id="logistics-edit-title" data-i18n="logistics_edit_title"></h3>
+            <form id="logistics-edit-form">
+                <div id="logistics-fields"></div>
+                <div style="margin-top:1rem;text-align:right;">
+                    <button type="button" id="choose-logistics-key-btn" data-i18n="choose_logistics_key"></button>
+                    <button type="button" id="cancel-logistics-edit" data-i18n="cancel"></button>
+                    <button type="submit" data-i18n="save"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="validation-modal" class="modal">
+        <div class="modal-content">
+            <h2 data-i18n="validation_title"></h2>
+            <p id="validation-message"></p>
+            <div style="margin-top: 20px;">
+                <button id="force-save-button" data-i18n="validation_force_save"></button>
+                <button id="cancel-save-button" data-i18n="validation_cancel_save"></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="logistics-confirm-modal" class="modal">
+        <div class="modal-content">
+            <h2 data-i18n="logistics_confirm_title"></h2>
+            <p id="logistics-confirm-message"></p>
+            <div style="margin-top: 20px;">
+                <button id="logistics-confirm-yes" data-i18n="logistics_confirm_yes"></button>
+                <button id="logistics-confirm-no" data-i18n="logistics_confirm_no"></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="choose-logistics-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 data-i18n="choose_logistics_key_title"></h2>
+            <form id="choose-logistics-form">
+                <label data-i18n="label_brand"></label>
+                <select id="choose-brand"></select>
+                <label data-i18n="label_key"></label>
+                <select id="choose-key"></select>
+                <button type="submit" data-i18n="choose_logistics_apply"></button>
+            </form>
+        </div>
+    </div>
+
+    <div id="export-logistics-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-export-logistics-modal">&times;</span>
+            <h2 data-i18n="export_logistics_modal_title"></h2>
+            <form id="export-logistics-form">
+                <label for="export-brand-select" data-i18n="export_logistics_select_brand"></label>
+                <select id="export-brand-select" style="margin-bottom: 10px;"></select>
+                <div id="export-keys-checkboxes" style="margin:12px 0;"></div>
+                <button type="submit" id="export-logistics-export-btn" data-i18n="export_logistics_export_btn"></button>
+                <button type="button" id="show-empty-keys-btn" data-i18n="export_logistics_show_empty"></button>
+            </form>
+            <div id="export-logistics-success" style="display:none; color:green; margin-top:12px;"></div>
+            <div id="export-logistics-error" style="display:none; color:red; margin-top:12px;"></div>
+        </div>
+    </div>
+
+    <div id="add-logistics-key-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 data-i18n="add_logistics_key_title"></h2>
+            <form id="add-logistics-key-form">
+                <label data-i18n="label_brand"></label>
+                <select id="add-logistics-brand"></select>
+                <label data-i18n="label_new_logistics_key"></label>
+                <input type="text" id="add-logistics-key-name" placeholder="e.g. 500A">
+                <div style="margin-top:12px;">
+                    <button type="submit" data-i18n="create"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
+    <script src="editor.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,1830 @@
+{
+  "Lilien": {
+    "30": {
+      "ITEM": {
+        "length": "3.8 cm",
+        "width": "3.8 cm",
+        "height": "10.2 cm",
+        "weight": "0.98 kg"
+      },
+      "CARTON": {
+        "length": "25.0 cm",
+        "width": "90.0 cm",
+        "height": "12.0 cm",
+        "weight": "1.24 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 492,
+        "nr_of_cartons": 41
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "530.0 kg",
+        "nr_of_cartons": 410,
+        "nr_of_items": 4920,
+        "nr_of_layers": 10
+      }
+    },
+    "45": {
+      "ITEM": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null
+      },
+      "CARTON": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null,
+        "nr_of_items": null
+      },
+      "LAYER": {
+        "nr_of_items": null,
+        "nr_of_cartons": null
+      },
+      "PALLET": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null,
+        "nr_of_cartons": null,
+        "nr_of_items": null,
+        "nr_of_layers": null
+      }
+    },
+    "50": {
+      "ITEM": {
+        "length": "4.0 cm",
+        "width": "2.5 cm",
+        "height": "10.5 cm",
+        "weight": "0.06 kg"
+      },
+      "CARTON": {
+        "length": "21.5 cm",
+        "width": "15.0 cm",
+        "height": "10.5 cm",
+        "weight": "1.8 kg",
+        "nr_of_items": 25
+      },
+      "LAYER": {
+        "nr_of_items": 625,
+        "nr_of_cartons": 25
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "129.0 cm",
+        "weight": "470.0 kg",
+        "nr_of_cartons": 250,
+        "nr_of_items": 6250,
+        "nr_of_layers": 10
+      }
+    },
+    "75": {
+      "ITEM": {
+        "length": "5.4 cm",
+        "width": "5.4 cm",
+        "height": "8.3 cm",
+        "weight": "0.093 kg"
+      },
+      "CARTON": {
+        "length": "28.0 cm",
+        "width": "22.0 cm",
+        "height": "9.0 cm",
+        "weight": "1.86 kg",
+        "nr_of_items": 20
+      },
+      "LAYER": {
+        "nr_of_items": 280,
+        "nr_of_cartons": 14
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "157.0 cm",
+        "weight": "411.0 kg",
+        "nr_of_cartons": 210,
+        "nr_of_items": 4200,
+        "nr_of_layers": 15
+      }
+    },
+    "100": {
+      "ITEM": {
+        "length": "5.1 cm",
+        "width": "3.1 cm",
+        "height": "11.8 cm",
+        "weight": "0.115 kg"
+      },
+      "CARTON": {
+        "length": "22.0 cm",
+        "width": "15.5 cm",
+        "height": "12.5 cm",
+        "weight": "2.4 kg",
+        "nr_of_items": 20
+      },
+      "LAYER": {
+        "nr_of_items": 500,
+        "nr_of_cartons": 25
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "145.0 cm",
+        "weight": "620.0 kg",
+        "nr_of_cartons": 250,
+        "nr_of_items": 5000,
+        "nr_of_layers": 10
+      }
+    },
+    "110": {
+      "ITEM": {
+        "length": "6.0 cm",
+        "width": "3.0 cm",
+        "height": "10.5 cm",
+        "weight": "0.13 kg"
+      },
+      "CARTON": {
+        "length": "29.0 cm",
+        "width": "18.0 cm",
+        "height": "11.0 cm",
+        "weight": "2.8 kg",
+        "nr_of_items": 25
+      },
+      "LAYER": {
+        "nr_of_items": 400,
+        "nr_of_cartons": 16
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "130.0 cm",
+        "weight": "471.0 kg",
+        "nr_of_cartons": 160,
+        "nr_of_items": 4000,
+        "nr_of_layers": 10
+      }
+    },
+    "180": {
+      "ITEM": {
+        "length": "19 cm",
+        "width": "4 cm",
+        "height": "13.5 cm",
+        "weight": "0.087 kg"
+      },
+      "CARTON": {
+        "length": "37.0 cm",
+        "width": "18.0 cm",
+        "height": "13.0 cm",
+        "weight": "0.921 kg",
+        "nr_of_items": 9
+      },
+      "LAYER": {
+        "nr_of_items": 108,
+        "nr_of_cartons": 12
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "176.0 cm",
+        "weight": "152.0 kg",
+        "nr_of_cartons": 144,
+        "nr_of_items": 1296,
+        "nr_of_layers": 12
+      }
+    },
+    "200": {
+      "ITEM": {
+        "length": "6.0 cm",
+        "width": "3.0 cm",
+        "height": "16.5 cm",
+        "weight": "0.19 kg"
+      },
+      "CARTON": {
+        "length": "29.0 cm",
+        "width": "25.5 cm",
+        "height": "17.5 cm",
+        "weight": "6.8 kg",
+        "nr_of_items": 35
+      },
+      "LAYER": {
+        "nr_of_items": 420,
+        "nr_of_cartons": 12
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "158.0 cm",
+        "weight": "673.0 kg",
+        "nr_of_cartons": 96,
+        "nr_of_items": 3360,
+        "nr_of_layers": 8
+      }
+    },
+    "300": {
+      "ITEM": {
+        "length": "9.0 cm",
+        "width": "5.5 cm",
+        "height": "13.0 cm",
+        "weight": "0.34 kg"
+      },
+      "CARTON": {
+        "length": "37.0 cm",
+        "width": "18.5 cm",
+        "height": "13.5 cm",
+        "weight": "4.2 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 144,
+        "nr_of_cartons": 12
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "181.0 cm",
+        "weight": "625.0 kg",
+        "nr_of_cartons": 144,
+        "nr_of_items": 1728,
+        "nr_of_layers": 12
+      }
+    },
+    "350": {
+      "ITEM": {
+        "length": "7.5 cm",
+        "width": "4.1 cm",
+        "height": "19.3 cm",
+        "weight": "0.4 kg"
+      },
+      "CARTON": {
+        "length": "26.0 cm",
+        "width": "15.0 cm",
+        "height": "20.0 cm",
+        "weight": "4.93 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 252,
+        "nr_of_cartons": 21
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "160.0 cm",
+        "weight": "745.0 kg",
+        "nr_of_cartons": 147,
+        "nr_of_items": 1764,
+        "nr_of_layers": 7
+      }
+    },
+    "400": {
+      "ITEM": {
+        "length": "8.5 cm",
+        "width": "3.5 cm",
+        "height": "20.5 cm",
+        "weight": "0.48 kg"
+      },
+      "CARTON": {
+        "length": "23.0 cm",
+        "width": "19.0 cm",
+        "height": "22.0 cm",
+        "weight": "5.8 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 240,
+        "nr_of_cartons": 20
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "150.0 cm",
+        "weight": "716.0 kg",
+        "nr_of_cartons": 120,
+        "nr_of_items": 1440,
+        "nr_of_layers": 6
+      }
+    },
+    "500": {
+      "ITEM": {
+        "length": "10.0 cm",
+        "width": "6.5 cm",
+        "height": "14.0 cm",
+        "weight": "0.55 kg"
+      },
+      "CARTON": {
+        "length": "39.0 cm",
+        "width": "22.5 cm",
+        "height": "15.0 cm",
+        "weight": "6.8 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 120,
+        "nr_of_cartons": 10
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "152.0 cm",
+        "weight": "632.0 kg",
+        "nr_of_cartons": 90,
+        "nr_of_items": 1080,
+        "nr_of_layers": 9
+      }
+    },
+    "750": {
+      "ITEM": {
+        "length": "11.1 cm",
+        "width": "4.9 cm",
+        "height": "25.8 cm",
+        "weight": "0.81 kg"
+      },
+      "CARTON": {
+        "length": "29.7 cm",
+        "width": "22.5 cm",
+        "height": "26.1 cm",
+        "weight": "10.0 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 156,
+        "nr_of_cartons": 13
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "146.0 cm",
+        "weight": "670.0 kg",
+        "nr_of_cartons": 65,
+        "nr_of_items": 780,
+        "nr_of_layers": 5
+      }
+    },
+    "1000": {
+      "ITEM": {
+        "length": "7.0 cm",
+        "width": "7.0 cm",
+        "height": "25.0 cm",
+        "weight": "1.12 kg"
+      },
+      "CARTON": {
+        "length": "37.5 cm",
+        "width": "23.5 cm",
+        "height": "26.0 cm",
+        "weight": "17.0 kg",
+        "nr_of_items": 15
+      },
+      "LAYER": {
+        "nr_of_items": 150,
+        "nr_of_cartons": 10
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "122.0 cm",
+        "weight": "700.0 kg",
+        "nr_of_cartons": 40,
+        "nr_of_items": 600,
+        "nr_of_layers": 4
+      }
+    },
+    "1250": {
+      "ITEM": {
+        "length": "15.0 cm",
+        "width": "8.0 cm",
+        "height": "27.0 cm",
+        "weight": "1.32 kg"
+      },
+      "CARTON": {
+        "length": "36.7 cm",
+        "width": "21.5 cm",
+        "height": "31.0 cm",
+        "weight": "13.35 kg",
+        "nr_of_items": 10
+      },
+      "LAYER": {
+        "nr_of_items": 100,
+        "nr_of_cartons": 10
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "615.0 kg",
+        "nr_of_cartons": 40,
+        "nr_of_items": 400,
+        "nr_of_layers": 4
+      }
+    },
+    "1000A": {
+      "ITEM": {
+        "length": "10.4 cm",
+        "width": "6.0 cm",
+        "height": "28.1 cm",
+        "weight": "1.1 kg"
+      },
+      "CARTON": {
+        "length": "36.7 cm",
+        "width": "21.5 cm",
+        "height": "28.7 cm",
+        "weight": "13.35 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 120,
+        "nr_of_cartons": 10
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "163.5 cm",
+        "weight": "690.0 kg",
+        "nr_of_cartons": 50,
+        "nr_of_items": 600,
+        "nr_of_layers": 5
+      }
+    },
+    "350A": {
+      "ITEM": {
+        "length": "8.6 cm",
+        "width": "4.1 cm",
+        "height": "21.3 cm",
+        "weight": "0.41 kg"
+      },
+      "CARTON": {
+        "length": "26.0 cm",
+        "width": "15.0 cm",
+        "height": "22.0 cm",
+        "weight": "5.12 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 252,
+        "nr_of_cartons": 21
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "172.0 cm",
+        "weight": "772.0 kg",
+        "nr_of_cartons": 147,
+        "nr_of_items": 1764,
+        "nr_of_layers": 7
+      }
+    },
+    "200A": {
+      "ITEM": {
+        "length": "5.7 cm",
+        "width": "5.7 cm",
+        "height": "12.5 cm",
+        "weight": "0.25 kg"
+      },
+      "CARTON": {
+        "length": "37.0 cm",
+        "width": "18.0 cm",
+        "height": "13.0 cm",
+        "weight": "4.8 kg",
+        "nr_of_items": 18
+      },
+      "LAYER": {
+        "nr_of_items": 216,
+        "nr_of_cartons": 12
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "180.0 cm",
+        "weight": "714.0 kg",
+        "nr_of_cartons": 144,
+        "nr_of_items": 2592,
+        "nr_of_layers": 12
+      }
+    },
+    "4g": {
+      "ITEM": {
+        "length": "8.0 cm",
+        "width": "2.0 cm",
+        "height": "12.0 cm",
+        "weight": "0.018 kg"
+      },
+      "CARTON": {
+        "length": "25.0 cm",
+        "width": "9.0 cm",
+        "height": "12.0 cm",
+        "weight": "0.415 kg",
+        "nr_of_items": 20
+      },
+      "LAYER": {
+        "nr_of_items": 820,
+        "nr_of_cartons": 41
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "142.0 cm",
+        "weight": "193.0 kg",
+        "nr_of_cartons": 410,
+        "nr_of_items": 8200,
+        "nr_of_layers": 10
+      }
+    },
+    "140g": {
+      "ITEM": {
+        "length": "6.0 cm",
+        "width": "6.0 cm",
+        "height": "6.0 cm",
+        "weight": "0.14 kg"
+      },
+      "CARTON": {
+        "length": "29.5 cm",
+        "width": "22.5 cm",
+        "height": "7.4 cm",
+        "weight": "1.68 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 180,
+        "nr_of_cartons": 15
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "111.0 cm",
+        "weight": "348.0 kg",
+        "nr_of_cartons": 195,
+        "nr_of_items": 2340,
+        "nr_of_layers": 13
+      }
+    },
+    "250B": {
+      "ITEM": {
+        "length": "5.9 cm",
+        "width": "4.3 cm",
+        "height": "16.9 cm",
+        "weight": "0.28 kg"
+      },
+      "CARTON": {
+        "length": "25.0 cm",
+        "width": "13.0 cm",
+        "height": "18.0 cm",
+        "weight": "3.5 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 324,
+        "nr_of_cartons": 27
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "145.0 cm",
+        "weight": "682.0 kg",
+        "nr_of_cartons": 189,
+        "nr_of_items": 2268,
+        "nr_of_layers": 7
+      }
+    },
+    "50A": {
+      "ITEM": {
+        "length": "6.0 cm",
+        "width": "3.5 cm",
+        "height": "10.5 cm",
+        "weight": "0.27 kg"
+      },
+      "CARTON": {
+        "length": "29.0 cm",
+        "width": "18.0 cm",
+        "height": "11.0 cm",
+        "weight": "6.5 kg",
+        "nr_of_items": 24
+      },
+      "LAYER": {
+        "nr_of_items": 384,
+        "nr_of_cartons": 16
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "85.0 cm",
+        "weight": "645.0 kg",
+        "nr_of_cartons": 96,
+        "nr_of_items": 2304,
+        "nr_of_layers": 6
+      }
+    },
+    "250A": {
+      "ITEM": {
+        "length": "7.3 cm",
+        "width": "3.4 cm",
+        "height": "17.4 cm",
+        "weight": "0.275 kg"
+      },
+      "CARTON": {
+        "length": "25.0 cm",
+        "width": "13.0 cm",
+        "height": "18.0 cm",
+        "weight": "3.5 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 324,
+        "nr_of_cartons": 27
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "143.0 cm",
+        "weight": "682.0 kg",
+        "nr_of_cartons": 189,
+        "nr_of_items": 2268,
+        "nr_of_layers": 7
+      }
+    },
+    "100C": {
+      "ITEM": {
+        "length": "5.1 cm",
+        "width": "3.1 cm",
+        "height": "11.8 cm",
+        "weight": "0.13 kg"
+      },
+      "CARTON": {
+        "length": "22.0 cm",
+        "width": "15.5 cm",
+        "height": "12.5 cm",
+        "weight": "2.7 kg",
+        "nr_of_items": 20
+      },
+      "LAYER": {
+        "nr_of_items": 500,
+        "nr_of_cartons": 25
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "145.0 cm",
+        "weight": "695.0 kg",
+        "nr_of_cartons": 250,
+        "nr_of_items": 5000,
+        "nr_of_layers": 10
+      }
+    },
+    "100B": {
+      "ITEM": {
+        "length": "6.0 cm",
+        "width": "3.7 cm",
+        "height": "14.0 cm",
+        "weight": "0.115 kg"
+      },
+      "CARTON": {
+        "length": "22.5 cm",
+        "width": "14.3 cm",
+        "height": "14.9 cm",
+        "weight": "1.85 kg",
+        "nr_of_items": 15
+      },
+      "LAYER": {
+        "nr_of_items": 375,
+        "nr_of_cartons": 25
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "390.0 kg",
+        "nr_of_cartons": 200,
+        "nr_of_items": 3000,
+        "nr_of_layers": 8
+      }
+    },
+    "500A": {
+      "ITEM": {
+        "length": "9.9 cm",
+        "width": "6.2 cm",
+        "height": "18.7 cm",
+        "weight": "0.53 kg"
+      },
+      "CARTON": {
+        "length": "38.0 cm",
+        "width": "21.0 cm",
+        "height": "19.2 cm",
+        "weight": "6.5 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 120,
+        "nr_of_cartons": 10
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "168.0 cm",
+        "weight": "540.0 kg",
+        "nr_of_cartons": 80,
+        "nr_of_items": 960,
+        "nr_of_layers": 8
+      }
+    }
+  },
+  "Naturalis": {
+    "125": {
+      "ITEM": {
+        "length": "6.0 cm",
+        "width": "3.5 cm",
+        "height": "16.0 cm",
+        "weight": "0.14 kg"
+      },
+      "CARTON": {
+        "length": "22.0 cm",
+        "width": "16.0 cm",
+        "height": "18.0 cm",
+        "weight": "2.2 kg",
+        "nr_of_items": 15
+      },
+      "LAYER": {
+        "nr_of_items": 375,
+        "nr_of_cartons": 25
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "159.0 cm",
+        "weight": "460.0 kg",
+        "nr_of_cartons": 200,
+        "nr_of_items": 3000,
+        "nr_of_layers": 8
+      }
+    },
+    "200": {
+      "ITEM": {
+        "length": "3.9 cm",
+        "width": "3.9 cm",
+        "height": "14.9 cm",
+        "weight": "0.23 kg"
+      },
+      "CARTON": {
+        "length": "22.5 cm",
+        "width": "14.3 cm",
+        "height": "14.9 cm",
+        "weight": "3.54 kg",
+        "nr_of_items": 15
+      },
+      "LAYER": {
+        "nr_of_items": 375,
+        "nr_of_cartons": 25
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "120.0 cm",
+        "weight": "640.0 kg",
+        "nr_of_cartons": 175,
+        "nr_of_items": 2625,
+        "nr_of_layers": 7
+      }
+    },
+    "500": {
+      "ITEM": {
+        "length": "6.0 cm",
+        "width": "5.0 cm",
+        "height": "22.0 cm",
+        "weight": "0.57 kg"
+      },
+      "CARTON": {
+        "length": "26.5 cm",
+        "width": "20.5 cm",
+        "height": "23.0 cm",
+        "weight": "8.8 kg",
+        "nr_of_items": 15
+      },
+      "LAYER": {
+        "nr_of_items": 270,
+        "nr_of_cartons": 18
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "153.0 cm",
+        "weight": "970.0 kg",
+        "nr_of_cartons": 108,
+        "nr_of_items": 1620,
+        "nr_of_layers": 6
+      }
+    },
+    "800": {
+      "ITEM": {
+        "length": "8.0 cm",
+        "width": "8.0 cm",
+        "height": "17.5 cm",
+        "weight": "0.86 kg"
+      },
+      "CARTON": {
+        "length": "39.0 cm",
+        "width": "16.5 cm",
+        "height": "19.5 cm",
+        "weight": "9.0 kg",
+        "nr_of_items": 10
+      },
+      "LAYER": {
+        "nr_of_items": 140,
+        "nr_of_cartons": 14
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "113.0 cm",
+        "weight": "650.0 kg",
+        "nr_of_cartons": 70,
+        "nr_of_items": 700,
+        "nr_of_layers": 5
+      }
+    },
+    "1000": {
+      "ITEM": {
+        "length": "7.0 cm",
+        "width": "7.0 cm",
+        "height": "25.0 cm",
+        "weight": "1.12 kg"
+      },
+      "CARTON": {
+        "length": "37.5 cm",
+        "width": "23.5 cm",
+        "height": "26.0 cm",
+        "weight": "17.0 kg",
+        "nr_of_items": 15
+      },
+      "LAYER": {
+        "nr_of_items": 150,
+        "nr_of_cartons": 10
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "119.0 cm",
+        "weight": "700.0 kg",
+        "nr_of_cartons": 40,
+        "nr_of_items": 600,
+        "nr_of_layers": 4
+      }
+    },
+    "200g": {
+      "ITEM": {
+        "length": "4.9 cm",
+        "width": "7.7 cm",
+        "height": "20.0 cm",
+        "weight": "0.224 kg"
+      },
+      "CARTON": {
+        "length": "26.5 cm",
+        "width": "18.0 cm",
+        "height": "20.5 cm",
+        "weight": "3.51 kg",
+        "nr_of_items": 15
+      },
+      "LAYER": {
+        "nr_of_items": 270,
+        "nr_of_cartons": 18
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "162.0 cm",
+        "weight": "463.0 kg",
+        "nr_of_cartons": 126,
+        "nr_of_items": 1890,
+        "nr_of_layers": 7
+      }
+    },
+    "500A": {
+      "ITEM": {
+        "length": "8.5 cm",
+        "width": "4.5 cm",
+        "height": "24.2 cm",
+        "weight": "0.55 kg"
+      },
+      "CARTON": {
+        "length": "28.0 cm",
+        "width": "18.0 cm",
+        "height": "25.5 cm",
+        "weight": "6.6 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 192,
+        "nr_of_cartons": 16
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "176.0 cm",
+        "weight": "655.0 kg",
+        "nr_of_cartons": 96,
+        "nr_of_items": 1152,
+        "nr_of_layers": 6
+      }
+    },
+    "300g": {
+      "ITEM": {
+        "length": "10.4 cm",
+        "width": "10.4 cm",
+        "height": "5.6 cm",
+        "weight": "0.34 kg"
+      },
+      "CARTON": {
+        "length": "32.0 cm",
+        "width": "21.5 cm",
+        "height": "12.0 cm",
+        "weight": "4.2 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 144,
+        "nr_of_cartons": 12
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "525.0 kg",
+        "nr_of_cartons": 120,
+        "nr_of_items": 1440,
+        "nr_of_layers": 10
+      }
+    },
+    "100g": {
+      "ITEM": {
+        "length": "8.5 cm",
+        "width": "8.5 cm",
+        "height": "3.7 cm",
+        "weight": "0.12 kg"
+      },
+      "CARTON": {
+        "length": "27.5 cm",
+        "width": "18.5 cm",
+        "height": "8.0 cm",
+        "weight": "1.6 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 192,
+        "nr_of_cartons": 16
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "139.0 cm",
+        "weight": "405.0 kg",
+        "nr_of_cartons": 240,
+        "nr_of_items": 2880,
+        "nr_of_layers": 15
+      }
+    },
+    "250g": {
+      "ITEM": {
+        "length": "10.4 cm",
+        "width": "10.4 cm",
+        "height": "4.9 cm",
+        "weight": "0.3 kg"
+      },
+      "CARTON": {
+        "length": "32.0 cm",
+        "width": "21.5 cm",
+        "height": "12.0 cm",
+        "weight": "4.1 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 144,
+        "nr_of_cartons": 12
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "515.0 kg",
+        "nr_of_cartons": 120,
+        "nr_of_items": 1440,
+        "nr_of_layers": 10
+      }
+    },
+    "1000g": {
+      "ITEM": {
+        "length": "8.0 cm",
+        "width": "8.0 cm",
+        "height": "17.5 cm",
+        "weight": "1.0 kg"
+      },
+      "CARTON": {
+        "length": "39.0 cm",
+        "width": "16.5 cm",
+        "height": "19.5 cm",
+        "weight": "10.8 kg",
+        "nr_of_items": 10
+      },
+      "LAYER": {
+        "nr_of_items": 140,
+        "nr_of_cartons": 14
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "113.0 cm",
+        "weight": "776.0 kg",
+        "nr_of_cartons": 70,
+        "nr_of_items": 700,
+        "nr_of_layers": 5
+      }
+    }
+  },
+  "Twister": {
+    "250": {
+      "ITEM": {
+        "length": "5.0 cm",
+        "width": "5.0 cm",
+        "height": "18.0 cm",
+        "weight": "0.3 kg"
+      },
+      "CARTON": {
+        "length": "31.0 cm",
+        "width": "10.5 cm",
+        "height": "18.5 cm",
+        "weight": "3.7 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 300,
+        "nr_of_cartons": 25
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "150.0 cm",
+        "weight": "670.0 kg",
+        "nr_of_cartons": 175,
+        "nr_of_items": 2100,
+        "nr_of_layers": 7
+      }
+    },
+    "500": {
+      "ITEM": {
+        "length": "12.0 cm",
+        "width": "4.5 cm",
+        "height": "23.5 cm",
+        "weight": "0.57 kg"
+      },
+      "CARTON": {
+        "length": "29.5 cm",
+        "width": "25.5 cm",
+        "height": "24.5 cm",
+        "weight": "7.0 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 144,
+        "nr_of_cartons": 12
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "162.0 cm",
+        "weight": "524.0 kg",
+        "nr_of_cartons": 72,
+        "nr_of_items": 864,
+        "nr_of_layers": 6
+      }
+    },
+    "1000": {
+      "ITEM": {
+        "length": "10.5 cm",
+        "width": "7.8 cm",
+        "height": "24.8 cm",
+        "weight": "1.12 kg"
+      },
+      "CARTON": {
+        "length": "38.4 cm",
+        "width": "22.8 cm",
+        "height": "25.8 cm",
+        "weight": "11.35 kg",
+        "nr_of_items": 10
+      },
+      "LAYER": {
+        "nr_of_items": 100,
+        "nr_of_cartons": 10
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "148.0 cm",
+        "weight": "588.0 kg",
+        "nr_of_cartons": 50,
+        "nr_of_items": 500,
+        "nr_of_layers": 5
+      }
+    },
+    "1500": {
+      "ITEM": {
+        "length": "14.7 cm",
+        "width": "7.9 cm",
+        "height": "29.9 cm",
+        "weight": "1.6 kg"
+      },
+      "CARTON": {
+        "length": "59.0 cm",
+        "width": "15.5 cm",
+        "height": "30.5 cm",
+        "weight": "14.0 kg",
+        "nr_of_items": 8
+      },
+      "LAYER": {
+        "nr_of_items": 80,
+        "nr_of_cartons": 10
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "168.0 cm",
+        "weight": "720.0 kg",
+        "nr_of_cartons": 50,
+        "nr_of_items": 400,
+        "nr_of_layers": 5
+      }
+    },
+    "2000": {
+      "ITEM": {
+        "length": "11.5 cm",
+        "width": "9.0 cm",
+        "height": "30.5 cm",
+        "weight": "2.2 kg"
+      },
+      "CARTON": {
+        "length": "31.0 cm",
+        "width": "26.0 cm",
+        "height": "33.0 cm",
+        "weight": "13.5 kg",
+        "nr_of_items": 6
+      },
+      "LAYER": {
+        "nr_of_items": 60,
+        "nr_of_cartons": 12
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "180.0 cm",
+        "weight": "830.0 kg",
+        "nr_of_cartons": 60,
+        "nr_of_items": 360,
+        "nr_of_layers": 5
+      }
+    },
+    "1000A": {
+      "ITEM": {
+        "length": "7.0 cm",
+        "width": "7.0 cm",
+        "height": "23.7 cm",
+        "weight": "1.05 kg"
+      },
+      "CARTON": {
+        "length": "38.7 cm",
+        "width": "15.9 cm",
+        "height": "23.7 cm",
+        "weight": "10.68 kg",
+        "nr_of_items": 10
+      },
+      "LAYER": {
+        "nr_of_items": 140,
+        "nr_of_cartons": 14
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "114.0 cm",
+        "weight": "620.0 kg",
+        "nr_of_cartons": 56,
+        "nr_of_items": 560,
+        "nr_of_layers": 4
+      }
+    }
+  },
+  "Natava": {
+    "250": {
+      "ITEM": {
+        "length": "7.3 cm",
+        "width": "3.4 cm",
+        "height": "17.4 cm",
+        "weight": "0.275 kg"
+      },
+      "CARTON": {
+        "length": "25.0 cm",
+        "width": "13.0 cm",
+        "height": "18.0 cm",
+        "weight": "3.5 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 324,
+        "nr_of_cartons": 27
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "143.0 cm",
+        "weight": "667.0 kg",
+        "nr_of_cartons": 189,
+        "nr_of_items": 2268,
+        "nr_of_layers": 7
+      }
+    },
+    "85g": {
+      "ITEM": {
+        "length": "9.3 cm",
+        "width": "4.5 cm",
+        "height": "9.2 cm",
+        "weight": "0.085 kg"
+      },
+      "CARTON": {
+        "length": "21.5 cm",
+        "width": "14.3 cm",
+        "height": "20.0 cm",
+        "weight": "1.5 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 300,
+        "nr_of_cartons": 25
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "245.0 kg",
+        "nr_of_cartons": 150,
+        "nr_of_items": 1800,
+        "nr_of_layers": 6
+      }
+    },
+    "95g": {
+      "ITEM": {
+        "length": "9.3 cm",
+        "width": "4.5 cm",
+        "height": "9.2 cm",
+        "weight": "0.095 kg"
+      },
+      "CARTON": {
+        "length": "21.5 cm",
+        "width": "14.3 cm",
+        "height": "20.0 cm",
+        "weight": "1.61 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 300,
+        "nr_of_cartons": 25
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "261.0 kg",
+        "nr_of_cartons": 150,
+        "nr_of_items": 1800,
+        "nr_of_layers": 6
+      }
+    },
+    "75g": {
+      "ITEM": {
+        "length": "9.3 cm",
+        "width": "4.5 cm",
+        "height": "9.2 cm",
+        "weight": "0.075 kg"
+      },
+      "CARTON": {
+        "length": "21.5 cm",
+        "width": "14.3 cm",
+        "height": "20.0 cm",
+        "weight": "1.3 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 300,
+        "nr_of_cartons": 25
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "220.0 kg",
+        "nr_of_cartons": 150,
+        "nr_of_items": 1800,
+        "nr_of_layers": 6
+      }
+    },
+    "100g": {
+      "ITEM": {
+        "length": "9.3 cm",
+        "width": "4.5 cm",
+        "height": "9.2 cm",
+        "weight": "0.1 kg"
+      },
+      "CARTON": {
+        "length": "21.5 cm",
+        "width": "14.3 cm",
+        "height": "20.0 cm",
+        "weight": "1.67 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 300,
+        "nr_of_cartons": 25
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "270.0 kg",
+        "nr_of_cartons": 150,
+        "nr_of_items": 1800,
+        "nr_of_layers": 6
+      }
+    },
+    "alu jar round": {
+      "ITEM": {
+        "length": "14.5 cm",
+        "width": "3.6 cm",
+        "height": "10.0 cm",
+        "weight": "0.041 kg"
+      },
+      "CARTON": {
+        "length": "38.0 cm",
+        "width": "14.5 cm",
+        "height": "13.5 cm",
+        "weight": "0.53 kg",
+        "nr_of_items": 10
+      },
+      "LAYER": {
+        "nr_of_items": 160,
+        "nr_of_cartons": 16
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "155.0 cm",
+        "weight": "105.0 kg",
+        "nr_of_cartons": 160,
+        "nr_of_items": 1600,
+        "nr_of_layers": 10
+      }
+    },
+    "100g A": {
+      "ITEM": {
+        "length": "5.8 cm",
+        "width": "3.9 cm",
+        "height": "8.8 cm",
+        "weight": "0.1 kg"
+      },
+      "CARTON": {
+        "length": "25.0 cm",
+        "width": "9.0 cm",
+        "height": "12.0 cm",
+        "weight": "1.4 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 492,
+        "nr_of_cartons": 41
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "610.0 kg",
+        "nr_of_cartons": 410,
+        "nr_of_items": 4920,
+        "nr_of_layers": 10
+      }
+    },
+    "80g": {
+      "ITEM": {
+        "length": "4.1 cm",
+        "width": "4.1 cm",
+        "height": "13.5 cm",
+        "weight": "0,103 kg"
+      },
+      "CARTON": {
+        "length": "22.5 cm",
+        "width": "14.3 cm",
+        "height": "14.9 cm",
+        "weight": "1.64 kg",
+        "nr_of_items": 15
+      },
+      "LAYER": {
+        "nr_of_items": 375,
+        "nr_of_cartons": 25
+      },
+      "PALLET": {
+        "length": "120 cm",
+        "width": "80 cm",
+        "height": "140 cm",
+        "weight": "350 kg",
+        "nr_of_cartons": 200,
+        "nr_of_items": 3000,
+        "nr_of_layers": 8
+      }
+    },
+    "alu jar square": {
+      "ITEM": {
+        "length": "14.5 cm",
+        "width": "3.6 cm",
+        "height": "10.0 cm",
+        "weight": "0.044 kg"
+      },
+      "CARTON": {
+        "length": "38.0 cm",
+        "width": "14.5 cm",
+        "height": "13.5 cm",
+        "weight": "0.56 kg",
+        "nr_of_items": 10
+      },
+      "LAYER": {
+        "nr_of_items": 160,
+        "nr_of_cartons": 16
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "155.0 cm",
+        "weight": "120.0 kg",
+        "nr_of_cartons": 160,
+        "nr_of_items": 1600,
+        "nr_of_layers": 10
+      }
+    },
+    "soap dispenser and metal pad": {
+      "ITEM": {
+        "length": "14.5 cm",
+        "width": "3.6 cm",
+        "height": "10.0 cm",
+        "weight": "0.038 kg"
+      },
+      "CARTON": {
+        "length": "38.0 cm",
+        "width": "14.5 cm",
+        "height": "13.5 cm",
+        "weight": "2.7 kg",
+        "nr_of_items": 10
+      },
+      "LAYER": {
+        "nr_of_items": 160,
+        "nr_of_cartons": 16
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "155.0 cm",
+        "weight": "465.0 kg",
+        "nr_of_cartons": 160,
+        "nr_of_items": 1600,
+        "nr_of_layers": 10
+      }
+    },
+    "soap dispenser and bamboo pad": {
+      "ITEM": {
+        "length": "14.5 cm",
+        "width": "3.6 cm",
+        "height": "10.0 cm",
+        "weight": "0.028 kg"
+      },
+      "CARTON": {
+        "length": "38.0 cm",
+        "width": "14.5 cm",
+        "height": "13.5 cm",
+        "weight": "3.0 kg",
+        "nr_of_items": 10
+      },
+      "LAYER": {
+        "nr_of_items": 160,
+        "nr_of_cartons": 16
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "155.0 cm",
+        "weight": "500.0 kg",
+        "nr_of_cartons": 160,
+        "nr_of_items": 1600,
+        "nr_of_layers": 10
+      }
+    },
+    "ear buds": {
+      "ITEM": {
+        "length": "11.2 cm",
+        "width": "4.4 cm",
+        "height": "9.0 cm",
+        "weight": "0.08 kg"
+      },
+      "CARTON": {
+        "length": "21.5 cm",
+        "width": "14.3 cm",
+        "height": "20.0 cm",
+        "weight": "0.9 kg",
+        "nr_of_items": 10
+      },
+      "LAYER": {
+        "nr_of_items": 250,
+        "nr_of_cartons": 25
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "160.0 kg",
+        "nr_of_cartons": 150,
+        "nr_of_items": 1500,
+        "nr_of_layers": 6
+      }
+    },
+    "massage sisal": {
+      "ITEM": {
+        "length": "14.0 cm",
+        "width": "7.0 cm",
+        "height": "3.0 cm",
+        "weight": "0.03 kg"
+      },
+      "CARTON": {
+        "length": "25.0 cm",
+        "width": "9.0 cm",
+        "height": "12.0 cm",
+        "weight": "0.4 kg",
+        "nr_of_items": 10
+      },
+      "LAYER": {
+        "nr_of_items": 410,
+        "nr_of_cartons": 41
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "190.0 kg",
+        "nr_of_cartons": 410,
+        "nr_of_items": 4100,
+        "nr_of_layers": 10
+      }
+    },
+    "60g": {
+      "ITEM": {
+        "length": "3.7 cm",
+        "width": "3.7 cm",
+        "height": "8.9 cm",
+        "weight": "0.06 kg"
+      },
+      "CARTON": {
+        "length": "25.0 cm",
+        "width": "9.0 cm",
+        "height": "12.0 cm",
+        "weight": "1.01 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 492,
+        "nr_of_cartons": 41
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "434.0 kg",
+        "nr_of_cartons": 410,
+        "nr_of_items": 4920,
+        "nr_of_layers": 10
+      }
+    },
+    "30ml": {
+      "ITEM": {
+        "length": "4.0 cm",
+        "width": "4.0 cm",
+        "height": "9.8 cm",
+        "weight": "0.03 kg"
+      },
+      "CARTON": {
+        "length": "25.0 cm",
+        "width": "9.0 cm",
+        "height": "12.0 cm",
+        "weight": "1.3 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 492,
+        "nr_of_cartons": 41
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "535.0 kg",
+        "nr_of_cartons": 410,
+        "nr_of_items": 4920,
+        "nr_of_layers": 10
+      }
+    },
+    "50ml": {
+      "ITEM": {
+        "length": "4.2 cm",
+        "width": "4.2 cm",
+        "height": "10.8 cm",
+        "weight": "0.05 kg"
+      },
+      "CARTON": {
+        "length": "25.0 cm",
+        "width": "9.0 cm",
+        "height": "12.0 cm",
+        "weight": "1.5 kg",
+        "nr_of_items": 10
+      },
+      "LAYER": {
+        "nr_of_items": 410,
+        "nr_of_cartons": 41
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "640.0 kg",
+        "nr_of_cartons": 410,
+        "nr_of_items": 4100,
+        "nr_of_layers": 10
+      }
+    },
+    "100ml": {
+      "ITEM": {
+        "length": "5.0 cm",
+        "width": "5.0 cm",
+        "height": "12.7 cm",
+        "weight": "0.1 kg"
+      },
+      "CARTON": {
+        "length": "15.0 cm",
+        "width": "10.0 cm",
+        "height": "17.5 cm",
+        "weight": "1.3 kg",
+        "nr_of_items": 6
+      },
+      "LAYER": {
+        "nr_of_items": 330,
+        "nr_of_cartons": 55
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "125.0 cm",
+        "weight": "455.0 kg",
+        "nr_of_cartons": 330,
+        "nr_of_items": 1980,
+        "nr_of_layers": 6
+      }
+    },
+    "60g A": {
+      "ITEM": {
+        "length": "7.9 cm",
+        "width": "7.9 cm",
+        "height": "5.8 cm",
+        "weight": "0.06 kg"
+      },
+      "CARTON": {
+        "length": "17.3 cm",
+        "width": "16.0 cm",
+        "height": "19.8 cm",
+        "weight": "1.4 kg",
+        "nr_of_items": 12
+      },
+      "LAYER": {
+        "nr_of_items": 336,
+        "nr_of_cartons": 28
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "140.0 cm",
+        "weight": "250.0 kg",
+        "nr_of_cartons": 168,
+        "nr_of_items": 2016,
+        "nr_of_layers": 6
+      }
+    },
+    "220g": {
+      "ITEM": {
+        "length": "8.7 cm",
+        "width": "8.7 cm",
+        "height": "10.4 cm",
+        "weight": "0.22 kg"
+      },
+      "CARTON": {
+        "length": "39.4 cm",
+        "width": "19.0 cm",
+        "height": "22.0 cm",
+        "weight": "8.7 kg",
+        "nr_of_items": 16
+      },
+      "LAYER": {
+        "nr_of_items": 192,
+        "nr_of_cartons": 12
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "130.0 cm",
+        "weight": "542.0 kg",
+        "nr_of_cartons": 60,
+        "nr_of_items": 960,
+        "nr_of_layers": 5
+      }
+    },
+    "500 ml": {
+      "ITEM": {
+        "length": "8.3 cm",
+        "width": "8.3 cm",
+        "height": "15.0 cm",
+        "weight": "0.575 kg"
+      },
+      "CARTON": {
+        "length": "34.0 cm",
+        "width": "18.3 cm",
+        "height": "18.2 cm",
+        "weight": "4.763 kg",
+        "nr_of_items": 8
+      },
+      "LAYER": {
+        "nr_of_items": 96,
+        "nr_of_cartons": 12
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "110.0 cm",
+        "weight": "480.0 kg",
+        "nr_of_cartons": 60,
+        "nr_of_items": 480,
+        "nr_of_layers": 5
+      }
+    },
+    "500g": {
+      "ITEM": {
+        "length": "11.8 cm",
+        "width": "11.8 cm",
+        "height": "11.6 cm",
+        "weight": "0.540 kg"
+      },
+      "CARTON": {
+        "length": "35.5 cm",
+        "width": "12.1 cm",
+        "height": "14.5 cm",
+        "weight": "1.730 kg",
+        "nr_of_items": 3
+      },
+      "LAYER": {
+        "nr_of_items": 60,
+        "nr_of_cartons": 20
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "150.0 cm",
+        "weight": "330.0 kg",
+        "nr_of_cartons": 180,
+        "nr_of_items": 540,
+        "nr_of_layers": 9
+      }
+    },
+    "50g": {
+      "ITEM": {
+        "length": "7.3 cm",
+        "width": "4.7 cm",
+        "height": "8.0 cm",
+        "weight": "0.055 kg"
+      },
+      "CARTON": {
+        "length": "28.0 cm",
+        "width": "22.0 cm",
+        "height": "9.0 cm",
+        "weight": "1.1 kg",
+        "nr_of_items": 18
+      },
+      "LAYER": {
+        "nr_of_items": 252,
+        "nr_of_cartons": 14
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "164.0 cm",
+        "weight": "247.0 kg",
+        "nr_of_cartons": 224,
+        "nr_of_items": 4032,
+        "nr_of_layers": 16
+      }
+    }
+  }
+}

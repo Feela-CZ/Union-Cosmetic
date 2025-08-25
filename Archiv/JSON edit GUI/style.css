@@ -1,0 +1,350 @@
+body {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    margin: 20px;
+    background-color: #f9f9f9;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h4 {
+    text-decoration: underline;
+    font-size: 1rem;
+}
+
+#upload-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#product-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#product-table th, #product-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+#product-table th {
+    background-color: #007bff;
+    color: white;
+}
+#product-table th.sortable {
+    background-color: #007bff;
+    cursor: pointer;
+    color: white;
+}
+
+#product-table th.sortable:hover {
+    background-color: #0056b3;
+}
+
+button {
+    margin: 2px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.delete-button {
+    margin: 2px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #dc3545;
+    color: white;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.button {
+    margin: 2px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+#add-product {
+    margin-bottom: 10px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 5vh auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    box-shadow: 3px 3px 8px #222;
+    border-radius: 10px;
+}
+
+.close-modal {
+    float: right;
+    cursor: pointer;
+    font-size: 28px;
+    font-weight: bold;
+    color: #888;
+    transition: color 0.15s;
+}
+.close-modal:hover {
+    color: #333;
+}
+
+#product-form label {
+    display: block;
+    margin-top: 8px;
+}
+
+#product-form select,
+#product-form input[type="text"],
+#product-form input[type="number"] {
+    padding: 6px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#volume-wrapper {
+    display: flex;
+    gap: 8px;
+}
+
+#volume-number {
+    width: 70%;
+}
+
+#volume-unit {
+    width: 30%;
+}
+
+button.logistics-empty {
+    background-color: #555;
+    color: white;
+}
+
+button.logistics-partial {
+    background-color: #999;
+    color: white;
+}
+
+#add-logistics-key {
+    margin-left: 8px;
+}
+
+#validation-modal button {
+    margin-right: 10px;
+}
+
+#validation-modal h2 {
+    color: #c82333;
+    margin-top: 0;
+}
+
+#reset-filters {
+    margin-left: 10px;
+}
+
+#logistics-edit-modal .modal-content {
+    background-color: #fff;
+    margin: 5vh auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 800px;
+    max-width: 98vw;
+    box-sizing: border-box;
+    max-height: 95vh;
+    overflow-y: auto;
+}
+
+#logistics-edit-modal h3 {
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-size: 1.35em;
+    color: #000;
+    font-weight: bold;
+    text-align: left;
+    letter-spacing: 0;
+}
+
+#logistics-fields {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    column-gap: 32px;   /* místo gap: zachová „funkčnost do všech směrů“ kromě spodního */
+    row-gap: 0;         /* žádný svislý gap mezi řádky sloupců */
+}
+
+#logistics-fields .logistics-fields-col {
+    flex: 1 1 0;
+    min-width: 210px;
+}
+
+#logistics-fields .section-group {
+    margin: 0 0 12px 0;
+}
+
+#logistics-fields .ean-block {
+    order: 99;
+    flex: 0 0 100%;
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 0;
+    padding-right: 0;
+}
+
+#logistics-fields .ean-block h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 1.08em;
+    font-weight: bold;
+    color: #007bff;
+    border-bottom: 1px solid #e3e3e3;
+    padding-bottom: 2px;
+}
+
+#logistics-fields .ean-block label {
+    display: block;
+}
+
+#logistics-fields .ean-block input[type="text"] {
+    margin-top: 4px;
+}
+
+.carton-ean-line {
+    margin-top: 25px;
+    font-size: 1rem;
+}
+
+#logistics-fields h4 {
+    margin-top: 18px;
+    margin-bottom: 5px;
+    font-size: 1.08em;
+    font-weight: bold;
+    color: #007bff;    
+    border-bottom: 1px solid #e3e3e3;
+    padding-bottom: 2px;
+}
+
+#logistics-fields label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 5px;
+    font-size: 1em;
+    color: #222;
+    font-weight: bold;
+}
+
+#logistics-fields input[type="text"],
+#logistics-fields input[type="number"] {
+    padding: 6px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #b8b8b8;
+    border-radius: 4px;
+    background: #fff;
+}
+
+#czFlag {
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+#enFlag {
+    cursor: pointer;
+}
+
+#lang-switcher {
+   text-align: right;
+}
+
+#product-table.hide-discontinued-cols th.col-discontinued,
+#product-table.hide-discontinued-cols td.col-discontinued {
+    display: none;
+}
+
+#edit-logistics-btn {
+    margin-top: 25px
+}
+
+/* Responsivita pro menší obrazovky */
+@media (max-width: 900px) {
+    #logistics-fields {
+        flex-direction: column;
+        column-gap: 0;
+    }
+    #logistics-fields .logistics-fields-col {
+        min-width: unset;
+    }
+}
+
+#logistics-edit-modal .modal-content .btn {
+    margin-top: 10px;
+}
+
+.close-logistics-modal {
+    float: right;
+    cursor: pointer;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+@media (max-width: 900px) {
+    #logistics-edit-modal .modal-content {
+        width: 98vw;
+        min-width: unset;
+        max-width: unset;
+        padding: 10vw 2vw;
+    }
+    #logistics-fields .logistics-fields-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    #logistics-fields .logistics-fields-col {
+        min-width: unset;
+    }
+    #logistics-fields h4 {
+        font-size: 1em;
+    }
+}

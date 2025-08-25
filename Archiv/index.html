@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Homepage</title>
+    <style>
+        body {
+            background: #f6f8fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            justify-content: center;
+        }
+
+        h1 {
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            color: #222;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-start;
+            width: 700px;
+        }
+
+        .app-btn {
+            font-size: 1.8rem;
+            padding: 1.5rem 4rem;
+            border: none;
+            border-radius: 1.2rem;
+            background: #1867c0;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 20px 0 #0002;
+            transition: background 0.2s, transform 0.15s;
+            margin: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .app-btn:hover {
+            background: #115293;
+            transform: translateY(-3px) scale(1.04);
+        }
+
+        @media (max-width: 600px) {
+            .button-group {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .app-btn {
+                width: 100%;
+                padding: 1.2rem 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Choose app/Vyber apku:</h1>
+    <div class="button-group">
+        <button class="app-btn" onclick="window.open('./JSON%20edit%20GUI/', '_blank')">📝 "Jason" (Editor dat)</button>
+        <button class="app-btn" onclick="window.open('./Order%20sheet/', '_blank')">📊 "Fredy" (Objednávkový
+            formulář)</button>
+    </div>
+</body>
+
+</html>

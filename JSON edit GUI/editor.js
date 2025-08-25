@@ -352,6 +352,11 @@ async function saveLogisticsToRepo() {
     }
 }
 
+function translateType(type) {
+    if (!type) return '';
+    return translations[currentLang].product_types[type] || type;
+}
+
 fetch(`${window.API_BASE}/api/logistics?ts=${Date.now()}`)
     .then(r => r.json())
     .then(data => {
@@ -679,7 +684,7 @@ function renderTable() {
 
         row.innerHTML = `
         <td>${product.brand}</td>
-        <td>${product.type}</td>
+        <td>${translateType(product.type)}</td>
         <td>${product.id}</td>
         <td>${product.hs}</td>
         <td>${product.name}</td>
@@ -1015,7 +1020,7 @@ function populateDropdowns() {
     brandFilter.innerHTML = `<option value="">${translations[currentLang].filter_brand}</option>` +
         brands.map(b => `<option value="${b}" ${b === selectedBrand ? 'selected' : ''}>${b}</option>`).join('');
     typeFilter.innerHTML = `<option value="">${translations[currentLang].filter_type}</option>` +
-        types.map(t => `<option value="${t}" ${t === selectedType ? 'selected' : ''}>${t}</option>`).join('');
+        types.map(t => `<option value="${t}" ${t === selectedType ? 'selected' : ''}>${translateType(t)}</option>`).join('');
 }
 
 function openAddModal() {
@@ -1273,7 +1278,7 @@ function populateTypeSelect() {
 
     const types = [...new Set(products.map(p => p.type))].sort();
     typeSelect.innerHTML = '<option value="">-- select type --</option>' +
-        types.map(t => `<option value="${t}">${t}</option>`).join('');
+        types.map(t => `<option value="${t}">${translateType(t)}</option>`).join('');
 }
 
 function getLogisticsClass(product) {
