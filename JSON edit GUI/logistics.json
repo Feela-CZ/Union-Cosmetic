@@ -755,6 +755,34 @@
         "nr_of_items": 960,
         "nr_of_layers": 8
       }
+    },
+    "null": {
+      "ITEM": {
+        "length": "15.5 cm",
+        "width": "13.5 cm",
+        "height": "24 cm",
+        "weight": "5.2 kg"
+      },
+      "CARTON": {
+        "length": "18.5 cm",
+        "width": "13.5 cm",
+        "height": "24 cm",
+        "weight": "5.2 kg",
+        "nr_of_items": 1
+      },
+      "LAYER": {
+        "nr_of_items": 32,
+        "nr_of_cartons": 32
+      },
+      "PALLET": {
+        "length": "120 cm",
+        "width": "80.0 cm",
+        "height": "86 cm",
+        "weight": "520 kg",
+        "nr_of_cartons": 96,
+        "nr_of_items": 96,
+        "nr_of_layers": 3
+      }
     }
   },
   "Naturalis": {
