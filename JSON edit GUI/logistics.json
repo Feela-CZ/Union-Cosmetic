@@ -727,6 +727,34 @@
         "nr_of_items": 960,
         "nr_of_layers": 8
       }
+    },
+    "null": {
+      "ITEM": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null
+      },
+      "CARTON": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null,
+        "nr_of_items": null
+      },
+      "LAYER": {
+        "nr_of_items": null,
+        "nr_of_cartons": null
+      },
+      "PALLET": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null,
+        "nr_of_cartons": null,
+        "nr_of_items": null,
+        "nr_of_layers": null
+      }
     }
   },
   "Naturalis": {
@@ -1037,6 +1065,34 @@
         "nr_of_items": 700,
         "nr_of_layers": 5
       }
+    },
+    "null": {
+      "ITEM": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null
+      },
+      "CARTON": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null,
+        "nr_of_items": null
+      },
+      "LAYER": {
+        "nr_of_items": null,
+        "nr_of_cartons": null
+      },
+      "PALLET": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null,
+        "nr_of_cartons": null,
+        "nr_of_items": null,
+        "nr_of_layers": null
+      }
     }
   },
   "Twister": {
@@ -1206,6 +1262,34 @@
         "nr_of_cartons": 56,
         "nr_of_items": 560,
         "nr_of_layers": 4
+      }
+    },
+    "null": {
+      "ITEM": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null
+      },
+      "CARTON": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null,
+        "nr_of_items": null
+      },
+      "LAYER": {
+        "nr_of_items": null,
+        "nr_of_cartons": null
+      },
+      "PALLET": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null,
+        "nr_of_cartons": null,
+        "nr_of_items": null,
+        "nr_of_layers": null
       }
     }
   },
@@ -1824,6 +1908,34 @@
         "nr_of_cartons": 224,
         "nr_of_items": 4032,
         "nr_of_layers": 16
+      }
+    },
+    "null": {
+      "ITEM": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null
+      },
+      "CARTON": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null,
+        "nr_of_items": null
+      },
+      "LAYER": {
+        "nr_of_items": null,
+        "nr_of_cartons": null
+      },
+      "PALLET": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null,
+        "nr_of_cartons": null,
+        "nr_of_items": null,
+        "nr_of_layers": null
       }
     }
   }
