@@ -374,7 +374,8 @@ function fillKeysSelect(brand, selectedKey = null) {
     const chooseKey = document.getElementById('choose-key');
     chooseKey.innerHTML = '';
     if (logisticsData[brand]) {
-        Object.keys(logisticsData[brand]).forEach(key => {
+        const sortedKeys = Object.keys(logisticsData[brand]).sort(logisticsKeyCompare);
+        sortedKeys.forEach(key => {
             const option = document.createElement('option');
             option.value = key;
             option.textContent = key;
@@ -548,7 +549,7 @@ function initUI() {
             }
 
             if (currentLogisticsProductIndex !== null) {
-                products[currentLogisticsProductIndex].key = selectedKey;
+                products[currentLogisticsProductIndex].key = selectedKey || null;
             }
 
             updateLogisticsModalContent(selectedBrand, selectedKey);
@@ -648,7 +649,11 @@ function renderTable() {
 
         let matchesLogisticsKey = true;
         if (brandFilter && logisticsKeyFilter) {
-            matchesLogisticsKey = (product.key != null && String(product.key) === logisticsKeyFilter);
+            if (logisticsKeyFilter === 'null') {
+                matchesLogisticsKey = (product.key == null || product.key === 'null');
+            } else {
+                matchesLogisticsKey = (product.key != null && String(product.key) === logisticsKeyFilter);
+            }
         }
 
         return matchesSearch && matchesBrand && matchesType && matchesLogisticsKey && includeByDiscontinued;
@@ -1281,6 +1286,22 @@ function populateTypeSelect() {
         types.map(t => `<option value="${t}">${translateType(t)}</option>`).join('');
 }
 
+function logisticsKeyCompare(a, b) {
+    const regex = /^(\d+)(.*)$/;
+    const ma = a.match(regex);
+    const mb = b.match(regex);
+
+    if (ma && mb) {
+        const numA = parseInt(ma[1], 10);
+        const numB = parseInt(mb[1], 10);
+        if (numA !== numB) return numA - numB;
+        return ma[2].localeCompare(mb[2], undefined, { sensitivity: 'base' });
+    }
+    if (ma) return -1;
+    if (mb) return 1;
+    return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+}
+
 function getLogisticsClass(product) {
     const logistics = logisticsData?.[product.brand]?.[product.key];
     if (!logistics) return 'logistics-empty';
@@ -1307,7 +1328,8 @@ function populateLogisticsKeySelect() {
     keySelect.innerHTML = '<option value="">-- select key --</option>';
 
     if (logisticsData && logisticsData[brand]) {
-        Object.keys(logisticsData[brand]).forEach((key) => {
+        const sortedKeys = Object.keys(logisticsData[brand]).sort(logisticsKeyCompare);
+        sortedKeys.forEach((key) => {
             const option = document.createElement('option');
             option.value = key;
             option.textContent = key;
@@ -1322,18 +1344,7 @@ function updateLogisticsKeyFilter() {
 
     if (brand && logisticsData[brand]) {
         const keys = Object.keys(logisticsData[brand]);
-        keys.sort((a, b) => {
-            const aNum = parseFloat(a);
-            const bNum = parseFloat(b);
-
-            const aIsNum = !isNaN(aNum) && a.match(/^\d/);
-            const bIsNum = !isNaN(bNum) && b.match(/^\d/);
-
-            if (aIsNum && bIsNum) return aNum - bNum;
-            if (aIsNum) return -1;
-            if (bIsNum) return 1;
-            return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
-        });
+        keys.sort(logisticsKeyCompare);
 
         logisticsKeyFilter.innerHTML = `<option value="">${translations[currentLang].filter_logistics_key}</option>` +
             keys.map(key => `<option value="${key}">${key}</option>`).join('');
