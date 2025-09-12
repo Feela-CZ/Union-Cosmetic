@@ -331,7 +331,9 @@ async function saveProductsToRepo() {
     try {
         await apiPut('products', products);
         // po uložení stáhni čerstvá data, ať je UI v syncu
-        products = await fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`).then(r => r.json());
+        products = await fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`)
+            .then(r => r.text())           // načteme syrový text
+            .then(t => JSON.parse(t));     // ručně převedeme na JSON
     } catch (e) {
         alert('Uložení products.json selhalo: ' + e.message);
     }
