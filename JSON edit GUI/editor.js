@@ -633,7 +633,7 @@ function renderTable() {
     populateDropdowns();
 
     const filteredProducts = products.filter(product => {
-        const matchesSearch = (product.brand + ' ' + product.type + ' ' + product.id + ' ' + product.name)
+        const matchesSearch = (product.brand + ' ' + product.type + ' ' + product.id + ' ' + product.name + ' ' + (product.csName || ''))
             .toLowerCase()
             .includes(searchText);
 
@@ -692,7 +692,7 @@ function renderTable() {
         <td>${translateType(product.type)}</td>
         <td>${product.id}</td>
         <td>${product.hs}</td>
-        <td>${product.name}</td>
+        <td>${(currentLang === 'cs' && product.csName) ? product.csName : product.name}</td>
         <td>${product.volume}</td>
         <td>${product.price}</td>
         <td>${product.new ? '✅' : ''}</td>
@@ -1057,7 +1057,8 @@ function saveProduct(event) {
     const type = document.getElementById('type').value.trim();
     const id = document.getElementById('id').value.trim();
     const hs = document.getElementById('hs').value.trim();
-    const name = document.getElementById('name').value.trim();
+    const nameEn = document.getElementById('name_en').value.trim();
+    const nameCs = document.getElementById('name_cs').value.trim();
     const volumeNumber = document.getElementById('volume-number').value.trim();
     const volumeUnit = document.getElementById('volume-unit').value.trim();
     const price = document.getElementById('price').value.trim();
@@ -1069,7 +1070,8 @@ function saveProduct(event) {
     if (!brand) missingFields.push('Brand');
     if (!type) missingFields.push('Type');
     if (!id) missingFields.push('ID (EAN)');
-    if (!name) missingFields.push('Name');
+    if (!nameEn) missingFields.push('Name (EN)');
+    if (!nameCs) missingFields.push('Name (CZ)');
     if (!volumeNumber || !volumeUnit) missingFields.push('Volume');
     if (!price) missingFields.push('Price');
     if (!pack) missingFields.push('Pack');
@@ -1082,7 +1084,8 @@ function saveProduct(event) {
         type,
         id,
         hs,
-        name,
+        name: nameEn,
+        csName: nameCs,
         volume: volumeNumber + ' ' + volumeUnit,
         price: parseFloat(price),
         pack: parseInt(pack),
@@ -1163,7 +1166,8 @@ function editProduct(index) {
     document.getElementById('logistics-key').value = product.key || '';
     document.getElementById('id').value = product.id;
     document.getElementById('hs').value = product.hs;
-    document.getElementById('name').value = product.name;
+    document.getElementById('name_en').value = product.name || '';
+    document.getElementById('name_cs').value = product.csName || '';
     const [volValue, volUnit] = (product.volume || '').split(' ');
     document.getElementById('volume-number').value = volValue || '';
     document.getElementById('volume-unit').value = volUnit || 'ml';

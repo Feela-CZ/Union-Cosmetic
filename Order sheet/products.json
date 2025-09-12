@@ -15,7 +15,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "carton_ean": "8596048007122"
+    "carton_ean": "8596048007122",
+    "csName": "Lilien šampon pro normální vlasy - Olivový olej"
   },
   {
     "brand": "Lilien",
@@ -31,7 +32,8 @@
     "new": false,
     "new_date": "",
     "key": 350,
-    "carton_ean": "8596048007139"
+    "carton_ean": "8596048007139",
+    "csName": "Lilien šampon pro barevné vlasy - Jojobový olej"
   },
   {
     "brand": "Lilien",
@@ -47,7 +49,8 @@
     "new": false,
     "new_date": "",
     "key": 350,
-    "carton_ean": 8596048007146
+    "carton_ean": 8596048007146,
+    "csName": "Lilien šampon pro suché a poškozené vlasy - Bambucké máslo"
   },
   {
     "brand": "Lilien",
@@ -63,7 +66,8 @@
     "new": false,
     "new_date": "",
     "key": 350,
-    "carton_ean": 8596048007153
+    "carton_ean": 8596048007153,
+    "csName": "Lilien šampon pro jemné vlasy - Makadamiový olej"
   },
   {
     "brand": "Lilien",
@@ -79,7 +83,8 @@
     "new": false,
     "new_date": "",
     "key": 350,
-    "carton_ean": 8596048007160
+    "carton_ean": 8596048007160,
+    "csName": "Lilien šampon pro všechny typy vlasů - Kokosové mléko 2v1"
   },
   {
     "brand": "Lilien",
@@ -95,7 +100,8 @@
     "new": false,
     "new_date": "",
     "key": 350,
-    "carton_ean": 8596048007184
+    "carton_ean": 8596048007184,
+    "csName": "Lilien kondicionér pro normální vlasy - Olivový olej"
   },
   {
     "brand": "Lilien",
@@ -111,7 +117,8 @@
     "new": false,
     "new_date": "",
     "key": 350,
-    "carton_ean": 8596048007191
+    "carton_ean": 8596048007191,
+    "csName": "Lilien kondicionér pro barvené vlasy - Jojobový olej"
   },
   {
     "brand": "Lilien",
@@ -127,7 +134,8 @@
     "new": false,
     "new_date": "",
     "key": 350,
-    "carton_ean": 8596048007207
+    "carton_ean": 8596048007207,
+    "csName": "Lilien kondicionér pro suché a poškozené vlasy - Bambucké máslo"
   },
   {
     "brand": "Lilien",
@@ -143,7 +151,8 @@
     "new": false,
     "new_date": "",
     "key": "1000A",
-    "carton_ean": 8596048007429
+    "carton_ean": 8596048007429,
+    "csName": "Lilien šampon pro normální vlasy - Olivový olej"
   },
   {
     "brand": "Lilien",
@@ -159,7 +168,8 @@
     "new": false,
     "new_date": "",
     "key": "1000A",
-    "carton_ean": 8596048007436
+    "carton_ean": 8596048007436,
+    "csName": "Lilien šampon pro všechny typy vlasů - Kokosové mléko 2v1"
   },
   {
     "brand": "Lilien",
@@ -175,7 +185,8 @@
     "new": false,
     "new_date": "",
     "key": "1000A",
-    "carton_ean": 8596048007443
+    "carton_ean": 8596048007443,
+    "csName": "Lilien šampon pro suché a poškozené vlasy - Bambucké máslo"
   },
   {
     "brand": "Lilien",
@@ -191,7 +202,8 @@
     "new": false,
     "new_date": "",
     "key": "1000A",
-    "carton_ean": 8596048007450
+    "carton_ean": 8596048007450,
+    "csName": "Lilien kondicionér pro normální vlasy Olivový olej -"
   },
   {
     "brand": "Lilien",
@@ -207,7 +219,8 @@
     "new": false,
     "new_date": "",
     "key": "1000A",
-    "carton_ean": 8596048007467
+    "carton_ean": 8596048007467,
+    "csName": "Lilien kondicionér pro suché a poškozené vlasy Bambucké máslo -"
   },
   {
     "brand": "Lilien",
@@ -225,7 +238,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 400,
-    "carton_ean": 8596048012027
+    "carton_ean": 8596048012027,
+    "csName": "Lilien olejový sprchový gel - Bergamot a Limeta"
   },
   {
     "brand": "Lilien",
@@ -243,7 +257,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 400,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Lilien olejový sprchový gel - Argan"
   },
   {
     "brand": "Lilien",
@@ -261,7 +276,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 400,
-    "carton_ean": 8596048012034
+    "carton_ean": 8596048012034,
+    "csName": "Lilien olejový sprchový gel - Granátové jablko"
   },
   {
     "brand": "Lilien",
@@ -279,7 +295,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 400,
-    "carton_ean": 8596048012041
+    "carton_ean": 8596048012041,
+    "csName": "Lilien olejový sprchový gel - Marakuja"
   },
   {
     "brand": "Lilien",
@@ -297,7 +314,8 @@
     "new_date": "",
     "discontinued": true,
     "discontinued_date": "2025-07-30",
-    "carton_ean": 8596048005197
+    "carton_ean": 8596048005197,
+    "csName": "Lilien krémový sprchový gel Med & Oves"
   },
   {
     "brand": "Lilien",
@@ -313,7 +331,8 @@
     "new": false,
     "new_date": "",
     "key": 750,
-    "carton_ean": 8596048005180
+    "carton_ean": 8596048005180,
+    "csName": "Lilien krémový sprchový gel Limetka & Máta"
   },
   {
     "brand": "Lilien",
@@ -329,7 +348,8 @@
     "new": false,
     "new_date": "",
     "key": 750,
-    "carton_ean": 8595196908749
+    "carton_ean": 8595196908749,
+    "csName": "Lilien krémový sprchový gel Karambola & Aloe Vera"
   },
   {
     "brand": "Lilien",
@@ -345,7 +365,8 @@
     "new": false,
     "new_date": "",
     "key": 750,
-    "carton_ean": 8596048005197
+    "carton_ean": 8596048005197,
+    "csName": "Lilien krémový sprchový gel Med & Oves"
   },
   {
     "brand": "Lilien",
@@ -361,7 +382,8 @@
     "new": false,
     "new_date": "",
     "key": 750,
-    "carton_ean": 8596048005203
+    "carton_ean": 8596048005203,
+    "csName": "Lilien krémový sprchový gel Mučenka"
   },
   {
     "brand": "Lilien",
@@ -379,7 +401,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "350A",
-    "carton_ean": 8596048008495
+    "carton_ean": 8596048008495,
+    "csName": "Lilien - intimní sprchový gel"
   },
   {
     "brand": "Lilien",
@@ -395,7 +418,8 @@
     "new": false,
     "new_date": "",
     "key": 350,
-    "carton_ean": 8596048011785
+    "carton_ean": 8596048011785,
+    "csName": "Lilien šampon pro muže s Kofeinem"
   },
   {
     "brand": "Lilien",
@@ -411,7 +435,8 @@
     "new": false,
     "new_date": "",
     "key": 350,
-    "carton_ean": 8596048011792
+    "carton_ean": 8596048011792,
+    "csName": "Lilien šampon pro muže s Černým uhlím"
   },
   {
     "brand": "Lilien",
@@ -427,7 +452,8 @@
     "new": false,
     "new_date": "",
     "key": 350,
-    "carton_ean": 8596048011655
+    "carton_ean": 8596048011655,
+    "csName": "Lilien pánský sprchový gel a šampon 2v1 - Dark Night"
   },
   {
     "brand": "Lilien",
@@ -443,7 +469,8 @@
     "new": false,
     "new_date": "",
     "key": 350,
-    "carton_ean": 8596048011662
+    "carton_ean": 8596048011662,
+    "csName": "Lilien pánský sprchový gel a šampon 2v1 - Ice Mint"
   },
   {
     "brand": "Lilien",
@@ -459,7 +486,8 @@
     "new": false,
     "new_date": "",
     "key": 350,
-    "carton_ean": 8596048011679
+    "carton_ean": 8596048011679,
+    "csName": "Lilien pánský sprchový gel a šampon 2v1 - Wild Seduction"
   },
   {
     "brand": "Lilien",
@@ -475,7 +503,8 @@
     "new": false,
     "new_date": "",
     "key": 400,
-    "carton_ean": 8595196906561
+    "carton_ean": 8595196906561,
+    "csName": "Lilien pánský sprchový gel a šampon 2v1 - Ice Cool"
   },
   {
     "brand": "Lilien",
@@ -491,7 +520,8 @@
     "new": false,
     "new_date": "",
     "key": 400,
-    "carton_ean": 8595196906578
+    "carton_ean": 8595196906578,
+    "csName": "Lilien pánský sprchový gel a šampon 2v1 - Dark Red"
   },
   {
     "brand": "Lilien",
@@ -507,7 +537,8 @@
     "new": false,
     "new_date": "",
     "key": 400,
-    "carton_ean": 8595196901825
+    "carton_ean": 8595196901825,
+    "csName": "Lilien pánský sprchový gel a šampon 2v1 - Extreme"
   },
   {
     "brand": "Lilien",
@@ -523,7 +554,8 @@
     "new": false,
     "new_date": "",
     "key": 300,
-    "carton_ean": 8596048004598
+    "carton_ean": 8596048004598,
+    "csName": "Lilien krém na ruce a nehty - Olivový olej"
   },
   {
     "brand": "Lilien",
@@ -539,7 +571,8 @@
     "new": false,
     "new_date": "",
     "key": 110,
-    "carton_ean": 8595196904413
+    "carton_ean": 8595196904413,
+    "csName": "Lilien regenerační odlakovač s Aloe Vera"
   },
   {
     "brand": "Lilien",
@@ -555,7 +588,8 @@
     "new": false,
     "new_date": "",
     "key": 75,
-    "carton_ean": 8596048003940
+    "carton_ean": 8596048003940,
+    "csName": "Lilien odlakovač Express Quick & Easy s houbičkou"
   },
   {
     "brand": "Lilien",
@@ -571,7 +605,8 @@
     "new": false,
     "new_date": "",
     "key": 200,
-    "carton_ean": 8595196905144
+    "carton_ean": 8595196905144,
+    "csName": "Lilien regenerační odlakovač s olejem Tea Tree"
   },
   {
     "brand": "Lilien",
@@ -587,7 +622,8 @@
     "new": false,
     "new_date": "",
     "key": "200A",
-    "carton_ean": 8595196902822
+    "carton_ean": 8595196902822,
+    "csName": "Lilien odlakovač bez acetonu s vůní Leknínu"
   },
   {
     "brand": "Lilien",
@@ -603,7 +639,8 @@
     "new": false,
     "new_date": "",
     "key": "200A",
-    "carton_ean": 8595196902839
+    "carton_ean": 8595196902839,
+    "csName": "Lilien odlakovač bez acetonu s vůní Lilie"
   },
   {
     "brand": "Lilien",
@@ -619,7 +656,8 @@
     "new": false,
     "new_date": "",
     "key": "4g",
-    "carton_ean": 8596048011556
+    "carton_ean": 8596048011556,
+    "csName": "Lilien kids balzám na rty TUTTI FRUTTI"
   },
   {
     "brand": "Lilien",
@@ -635,7 +673,8 @@
     "new": false,
     "new_date": "",
     "key": 400,
-    "carton_ean": 8596048002356
+    "carton_ean": 8596048002356,
+    "csName": "Lilien dětský šampon & pěna 2v1 pro chlapce"
   },
   {
     "brand": "Lilien",
@@ -651,7 +690,8 @@
     "new": false,
     "new_date": "",
     "key": 400,
-    "carton_ean": 8596048002370
+    "carton_ean": 8596048002370,
+    "csName": "Lilien dětský sprchový gel pro chlapce"
   },
   {
     "brand": "Lilien",
@@ -667,7 +707,8 @@
     "new": false,
     "new_date": "",
     "key": 400,
-    "carton_ean": 8596048002363
+    "carton_ean": 8596048002363,
+    "csName": "Lilien dětský šampon & pěna 2v1 pro dívky"
   },
   {
     "brand": "Lilien",
@@ -683,7 +724,8 @@
     "new": false,
     "new_date": "",
     "key": 400,
-    "carton_ean": 8596048002387
+    "carton_ean": 8596048002387,
+    "csName": "Lilien dětský sprchový gel pro dívky"
   },
   {
     "brand": "Lilien",
@@ -699,7 +741,8 @@
     "new": false,
     "new_date": "",
     "key": "140g",
-    "carton_ean": 8596048006828
+    "carton_ean": 8596048006828,
+    "csName": "Lilien Kids šumivá koule do koupele s překvapením"
   },
   {
     "brand": "Lilien",
@@ -715,7 +758,8 @@
     "new": false,
     "new_date": "",
     "key": 500,
-    "carton_ean": 8596048004497
+    "carton_ean": 8596048004497,
+    "csName": "Lilien krémové tekuté mýdlo s dávkovačem - Aloe Vera"
   },
   {
     "brand": "Lilien",
@@ -731,7 +775,8 @@
     "new": false,
     "new_date": "",
     "key": 500,
-    "carton_ean": 8596048004510
+    "carton_ean": 8596048004510,
+    "csName": "Lilien krémové tekuté mýdlo s dávkovačem - Makadam"
   },
   {
     "brand": "Lilien",
@@ -747,7 +792,8 @@
     "new": false,
     "new_date": "",
     "key": 500,
-    "carton_ean": 8596048004503
+    "carton_ean": 8596048004503,
+    "csName": "Lilien krémové tekuté mýdlo s dávkovačem - Med"
   },
   {
     "brand": "Lilien",
@@ -763,7 +809,8 @@
     "new": false,
     "new_date": "",
     "key": 500,
-    "carton_ean": 8596048004480
+    "carton_ean": 8596048004480,
+    "csName": "Lilien krémové tekuté mýdlo s dávkovačem - Mořské minerály"
   },
   {
     "brand": "Lilien",
@@ -779,7 +826,8 @@
     "new": false,
     "new_date": "",
     "key": 500,
-    "carton_ean": 8596048004534
+    "carton_ean": 8596048004534,
+    "csName": "Lilien krémové tekuté mýdlo s dávkovačem - Oliva"
   },
   {
     "brand": "Lilien",
@@ -795,7 +843,8 @@
     "new": false,
     "new_date": "",
     "key": 500,
-    "carton_ean": 8596048004527
+    "carton_ean": 8596048004527,
+    "csName": "Lilien krémové tekuté mýdlo s dávkovačem - Orchidej"
   },
   {
     "brand": "Lilien",
@@ -811,7 +860,8 @@
     "new": false,
     "new_date": "",
     "key": 500,
-    "carton_ean": 8596048004541
+    "carton_ean": 8596048004541,
+    "csName": "Lilien tekuté mýdlo s dávkovačem - Hygiene Plus"
   },
   {
     "brand": "Lilien",
@@ -827,7 +877,8 @@
     "new": false,
     "new_date": "",
     "key": 1000,
-    "carton_ean": 8596048004640
+    "carton_ean": 8596048004640,
+    "csName": "Lilien krémové tekuté mýdlo - Med"
   },
   {
     "brand": "Lilien",
@@ -843,7 +894,8 @@
     "new": false,
     "new_date": "",
     "key": 1000,
-    "carton_ean": 8596048004657
+    "carton_ean": 8596048004657,
+    "csName": "Lilien krémové tekuté mýdlo - Makadam"
   },
   {
     "brand": "Lilien",
@@ -859,7 +911,8 @@
     "new": false,
     "new_date": "",
     "key": 1000,
-    "carton_ean": 8596048004633
+    "carton_ean": 8596048004633,
+    "csName": "Lilien krémové tekuté mýdlo - Aloe Vera"
   },
   {
     "brand": "Lilien",
@@ -875,7 +928,8 @@
     "new": false,
     "new_date": "",
     "key": 1000,
-    "carton_ean": 8596048004626
+    "carton_ean": 8596048004626,
+    "csName": "Lilien krémové tekuté mýdlo - Mořské minerály"
   },
   {
     "brand": "Lilien",
@@ -891,7 +945,8 @@
     "new": false,
     "new_date": "",
     "key": 1000,
-    "carton_ean": 8596048004671
+    "carton_ean": 8596048004671,
+    "csName": "Lilien krémové tekuté mýdlo - Oliva"
   },
   {
     "brand": "Lilien",
@@ -907,7 +962,8 @@
     "new": false,
     "new_date": "",
     "key": 1000,
-    "carton_ean": 8596048004664
+    "carton_ean": 8596048004664,
+    "csName": "Lilien krémové tekuté mýdlo- Orchidej"
   },
   {
     "brand": "Lilien",
@@ -924,7 +980,8 @@
     "new_date": "",
     "discontinued": true,
     "discontinued_date": "2025-07-16",
-    "carton_ean": 8596048004688
+    "carton_ean": 8596048004688,
+    "csName": "Lilien tekuté mýdlo - Hygiene Plus"
   },
   {
     "brand": "Lilien",
@@ -940,7 +997,8 @@
     "new": false,
     "new_date": "",
     "key": "1250",
-    "carton_ean": 8596048012393
+    "carton_ean": 8596048012393,
+    "csName": "Lilien tekuté mýdlo - Granátové jablko XXL - sáček"
   },
   {
     "brand": "Lilien",
@@ -956,7 +1014,8 @@
     "new": false,
     "new_date": "",
     "key": 1250,
-    "carton_ean": 8596048010511
+    "carton_ean": 8596048010511,
+    "csName": "Lilien tekuté mýdlo - Orchidej XXL - sáček"
   },
   {
     "brand": "Lilien",
@@ -972,7 +1031,8 @@
     "new": false,
     "new_date": "",
     "key": 1250,
-    "carton_ean": 8596048011518
+    "carton_ean": 8596048011518,
+    "csName": "Lilien tekuté mýdlo - Oliva XXL - sáček"
   },
   {
     "brand": "Lilien",
@@ -988,7 +1048,8 @@
     "new": false,
     "new_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Lilien krémové tekuté mýdlo - Aloe Vera"
   },
   {
     "brand": "Lilien",
@@ -1004,7 +1065,8 @@
     "new": false,
     "new_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Lilien krémové tekuté mýdlo Med & Propolis"
   },
   {
     "brand": "Lilien",
@@ -1020,7 +1082,8 @@
     "new": false,
     "new_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Lilien krémové tekuté mýdlo - Mořské minerály"
   },
   {
     "brand": "Lilien",
@@ -1036,7 +1099,8 @@
     "new": false,
     "new_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Lilien krémové tekuté mýdlo - Oliva"
   },
   {
     "brand": "Lilien",
@@ -1054,7 +1118,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "250B",
-    "carton_ean": 8596048008501
+    "carton_ean": 8596048008501,
+    "csName": "Lilien odličovací mléko - Kyselina Hyaluronová"
   },
   {
     "brand": "Lilien",
@@ -1072,7 +1137,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "250B",
-    "carton_ean": 8596048008525
+    "carton_ean": 8596048008525,
+    "csName": "Lilien čistící plěťová voda - Kyselina Hyaluronová"
   },
   {
     "brand": "Lilien",
@@ -1090,7 +1156,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "250B",
-    "carton_ean": 8596048008518
+    "carton_ean": 8596048008518,
+    "csName": "Lilien odličovací mléko - Arganový olej"
   },
   {
     "brand": "Lilien",
@@ -1108,7 +1175,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "250B",
-    "carton_ean": 8596048008532
+    "carton_ean": 8596048008532,
+    "csName": "Lilien čistící plěťová voda - Arganový olej"
   },
   {
     "brand": "Lilien",
@@ -1126,7 +1194,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "250B",
-    "carton_ean": 8596048008549
+    "carton_ean": 8596048008549,
+    "csName": "Lilien micelární voda - Arganový olej"
   },
   {
     "brand": "Lilien",
@@ -1144,7 +1213,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "4g",
-    "carton_ean": 8596048001984
+    "carton_ean": 8596048001984,
+    "csName": "Lilien balzám na rty - Olivový olej"
   },
   {
     "brand": "Lilien",
@@ -1162,7 +1232,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "4g",
-    "carton_ean": 8596048002011
+    "carton_ean": 8596048002011,
+    "csName": "Lilien balzám na rty - Brusinka"
   },
   {
     "brand": "Lilien",
@@ -1180,7 +1251,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "4g",
-    "carton_ean": 8596048002004
+    "carton_ean": 8596048002004,
+    "csName": "Lilien balzám na rty - Klasik"
   },
   {
     "brand": "Lilien",
@@ -1196,7 +1268,8 @@
     "new": false,
     "new_date": "",
     "key": "50A",
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Lilien parfémovaná voda pro muže - Yellow Stone"
   },
   {
     "brand": "Lilien",
@@ -1212,7 +1285,8 @@
     "new": false,
     "new_date": "",
     "key": "50A",
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Lilien parfémovaná voda pro muže - Red Storm"
   },
   {
     "brand": "Lilien",
@@ -1228,7 +1302,8 @@
     "new": false,
     "new_date": "",
     "key": "250A",
-    "carton_ean": 8596048007238
+    "carton_ean": 8596048007238,
+    "csName": "Lilien MEN-ART pánský sprchový šampon - White"
   },
   {
     "brand": "Lilien",
@@ -1244,7 +1319,8 @@
     "new": false,
     "new_date": "",
     "key": "250A",
-    "carton_ean": 8596048007245
+    "carton_ean": 8596048007245,
+    "csName": "Lilien MEN-ART pánský sprchový šampon - Black"
   },
   {
     "brand": "Lilien",
@@ -1260,7 +1336,8 @@
     "new": false,
     "new_date": "",
     "key": 30,
-    "carton_ean": 8596048007252
+    "carton_ean": 8596048007252,
+    "csName": "Lilien MEN-ART olej na vlasy a vousy - White"
   },
   {
     "brand": "Lilien",
@@ -1276,7 +1353,8 @@
     "new": false,
     "new_date": "",
     "key": 30,
-    "carton_ean": 8596048007269
+    "carton_ean": 8596048007269,
+    "csName": "Lilien MEN-ART olej na vlasy a vousy - Black"
   },
   {
     "brand": "Lilien",
@@ -1292,7 +1370,8 @@
     "new": false,
     "new_date": "",
     "key": 45,
-    "carton_ean": 8596048007273
+    "carton_ean": 8596048007273,
+    "csName": "Lilien MEN-ART vosk na vlasy a vousy - White"
   },
   {
     "brand": "Lilien",
@@ -1308,7 +1387,8 @@
     "new": false,
     "new_date": "",
     "key": 45,
-    "carton_ean": 8596048007283
+    "carton_ean": 8596048007283,
+    "csName": "Lilien MEN-ART vosk na vlasy a vousy - Black"
   },
   {
     "brand": "Lilien",
@@ -1324,7 +1404,8 @@
     "new": false,
     "new_date": "",
     "key": 50,
-    "carton_ean": 8596048003995
+    "carton_ean": 8596048003995,
+    "csName": "Lilien vlasový balzám Aloe Vera - cestovní balení -"
   },
   {
     "brand": "Lilien",
@@ -1340,7 +1421,8 @@
     "new": false,
     "new_date": "",
     "key": 50,
-    "carton_ean": 8594008297538
+    "carton_ean": 8594008297538,
+    "csName": "Lilien vlasový šampon 2v1 - cestovní balení"
   },
   {
     "brand": "Lilien",
@@ -1356,7 +1438,8 @@
     "new": false,
     "new_date": "",
     "key": 50,
-    "carton_ean": 8594008297637
+    "carton_ean": 8594008297637,
+    "csName": "Lilien sprchový gel Aloe Vera - cestovní balení"
   },
   {
     "brand": "Lilien",
@@ -1372,7 +1455,8 @@
     "new": false,
     "new_date": "",
     "key": null,
-    "carton_ean": 8594008297545
+    "carton_ean": 8594008297545,
+    "csName": "Lilien tělové mléko Aloe Vera - cestovní balení"
   },
   {
     "brand": "Lilien",
@@ -1388,7 +1472,8 @@
     "new": false,
     "new_date": "",
     "key": null,
-    "carton_ean": 8596048011082
+    "carton_ean": 8596048011082,
+    "csName": "Lilien vlasový šampon 2v1 - cestovní balení"
   },
   {
     "brand": "Lilien",
@@ -1404,7 +1489,8 @@
     "new": false,
     "new_date": "",
     "key": "100C",
-    "carton_ean": 8596048011075
+    "carton_ean": 8596048011075,
+    "csName": "Lilien sprchový gel Aloe Vera - cestovní balení"
   },
   {
     "brand": "Lilien",
@@ -1420,7 +1506,8 @@
     "new": false,
     "new_date": "",
     "key": 100,
-    "carton_ean": 8596048011167
+    "carton_ean": 8596048011167,
+    "csName": "Lilien krém na ruce a tělo - cestovní balení"
   },
   {
     "brand": "Lilien",
@@ -1436,7 +1523,8 @@
     "new": false,
     "new_date": "",
     "key": null,
-    "carton_ean": 8596048011129
+    "carton_ean": 8596048011129,
+    "csName": "Lilien cestovní sada kosmetiky - s krémem na ruce a tělo 3 x"
   },
   {
     "brand": "Lilien",
@@ -1454,7 +1542,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 180,
-    "carton_ean": 8596048004404
+    "carton_ean": 8596048004404,
+    "csName": "Lilien cestovní sada lahviček - Travel Kit - 3 x 50 ml + 3 x"
   },
   {
     "brand": "Lilien",
@@ -1470,7 +1559,8 @@
     "new": false,
     "new_date": "",
     "key": 50,
-    "carton_ean": 8595196907476
+    "carton_ean": 8595196907476,
+    "csName": "Lilien čistící gel na ruce Hand Gel"
   },
   {
     "brand": "Lilien",
@@ -1486,7 +1576,8 @@
     "new": false,
     "new_date": "",
     "key": "100B",
-    "carton_ean": 8596048007610
+    "carton_ean": 8596048007610,
+    "csName": "Lilien čistící gel na ruce Hand Gel v tubě"
   },
   {
     "brand": "Lilien",
@@ -1504,7 +1595,8 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": "",
-    "carton_ean": 8596048005548
+    "carton_ean": 8596048005548,
+    "csName": "Lilien čistící gel na ruce Hand Gel s dávkovačem"
   },
   {
     "brand": "Naturalis",
@@ -1521,7 +1613,8 @@
     "new_date": "",
     "discontinued": true,
     "discontinued_date": "2025-08-01",
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Naturalis vlasový šampon - Slunečnice"
   },
   {
     "brand": "Naturalis",
@@ -1537,7 +1630,8 @@
     "new": false,
     "new_date": "",
     "key": 500,
-    "carton_ean": 8595196904185
+    "carton_ean": 8595196904185,
+    "csName": "Naturalis vlasový šampon - Chrpa"
   },
   {
     "brand": "Naturalis",
@@ -1553,7 +1647,8 @@
     "new": false,
     "new_date": "",
     "key": 500,
-    "carton_ean": 8595196904192
+    "carton_ean": 8595196904192,
+    "csName": "Naturalis vlasový šampon - Levandule"
   },
   {
     "brand": "Naturalis",
@@ -1569,7 +1664,8 @@
     "new": false,
     "new_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Naturalis vlasový šampon - Bodlák"
   },
   {
     "brand": "Naturalis",
@@ -1585,7 +1681,8 @@
     "new": false,
     "new_date": "",
     "key": 500,
-    "carton_ean": 8596048006378
+    "carton_ean": 8596048006378,
+    "csName": "Naturalis vlasový šampon - Len"
   },
   {
     "brand": "Naturalis",
@@ -1602,7 +1699,8 @@
     "new_date": "",
     "discontinued": true,
     "discontinued_date": "2025-08-01",
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Naturalis vlasový kondicionér - Univerzál"
   },
   {
     "brand": "Naturalis",
@@ -1620,7 +1718,8 @@
     "discontinued": true,
     "discontinued_date": "2025-07-18",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Naturalis bylinný šampon - Kopřiva"
   },
   {
     "brand": "Naturalis",
@@ -1638,7 +1737,8 @@
     "discontinued": true,
     "discontinued_date": "2025-07-18",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Naturalis bylinný šampon - Bříza"
   },
   {
     "brand": "Naturalis",
@@ -1654,7 +1754,8 @@
     "new": false,
     "new_date": "",
     "key": 1000,
-    "carton_ean": 8596048012607
+    "carton_ean": 8596048012607,
+    "csName": "Naturalis šampon Kopřiva - pro normální vlasy"
   },
   {
     "brand": "Naturalis",
@@ -1670,7 +1771,8 @@
     "new": false,
     "new_date": "",
     "key": 1000,
-    "carton_ean": 8596048012591
+    "carton_ean": 8596048012591,
+    "csName": "Naturalis šampon Bříza - pro suché vlasy"
   },
   {
     "brand": "Naturalis",
@@ -1686,7 +1788,8 @@
     "new": false,
     "new_date": "",
     "key": 125,
-    "carton_ean": 8595196907384
+    "carton_ean": 8595196907384,
+    "csName": "Naturalis krém na ruce s Konopným olejem"
   },
   {
     "brand": "Naturalis",
@@ -1702,7 +1805,8 @@
     "new": false,
     "new_date": "",
     "key": 125,
-    "carton_ean": 8595196907407
+    "carton_ean": 8595196907407,
+    "csName": "Naturalis krém na ruce Aloe Vera"
   },
   {
     "brand": "Naturalis",
@@ -1718,7 +1822,8 @@
     "new": false,
     "new_date": "",
     "key": 125,
-    "carton_ean": 8595196907414
+    "carton_ean": 8595196907414,
+    "csName": "Naturalis krém na ruce Měsíček"
   },
   {
     "brand": "Naturalis",
@@ -1734,7 +1839,8 @@
     "new": false,
     "new_date": "",
     "key": 125,
-    "carton_ean": 8595196907421
+    "carton_ean": 8595196907421,
+    "csName": "Naturalis krém na ruce Mandle"
   },
   {
     "brand": "Naturalis",
@@ -1750,7 +1856,8 @@
     "new": false,
     "new_date": "",
     "key": 125,
-    "carton_ean": 8595196907438
+    "carton_ean": 8595196907438,
+    "csName": "Naturalis krém na ruce s Včelím voskem"
   },
   {
     "brand": "Naturalis",
@@ -1766,7 +1873,8 @@
     "new": false,
     "new_date": "",
     "key": 125,
-    "carton_ean": 8595196907391
+    "carton_ean": 8595196907391,
+    "csName": "Naturalis krém na nohy s Konopným olejem"
   },
   {
     "brand": "Naturalis",
@@ -1782,7 +1890,8 @@
     "new": false,
     "new_date": "",
     "key": "200g",
-    "carton_ean": 8596048002110
+    "carton_ean": 8596048002110,
+    "csName": "Naturalis masážní emulze Konopí & Chilli"
   },
   {
     "brand": "Naturalis",
@@ -1798,7 +1907,8 @@
     "new": false,
     "new_date": "",
     "key": "200g",
-    "carton_ean": 8596048002127
+    "carton_ean": 8596048002127,
+    "csName": "Naturalis masážní emulze Kaštan & Kostival"
   },
   {
     "brand": "Naturalis",
@@ -1814,7 +1924,8 @@
     "new": false,
     "new_date": "",
     "key": "500A",
-    "carton_ean": 8595196900897
+    "carton_ean": 8595196900897,
+    "csName": "Naturalis tělové mléko s extraktem z Rakytníku"
   },
   {
     "brand": "Naturalis",
@@ -1830,7 +1941,8 @@
     "new": false,
     "new_date": "",
     "key": "500A",
-    "carton_ean": 8596048006163
+    "carton_ean": 8596048006163,
+    "csName": "Naturalis tělové mléko s Makadamovým olejem"
   },
   {
     "brand": "Naturalis",
@@ -1848,7 +1960,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "500A",
-    "carton_ean": 8595196904086
+    "carton_ean": 8595196904086,
+    "csName": "Naturalis tělové mléko s Olivovým olejem"
   },
   {
     "brand": "Naturalis",
@@ -1866,7 +1979,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "500A",
-    "carton_ean": 8596048000857
+    "carton_ean": 8596048000857,
+    "csName": "Naturalis tělové mléko s Kokosovým olejem"
   },
   {
     "brand": "Naturalis",
@@ -1882,7 +1996,8 @@
     "new": false,
     "new_date": "",
     "key": "300g",
-    "carton_ean": 8596048000789
+    "carton_ean": 8596048000789,
+    "csName": "Naturalis tělové máslo s Kokosovým olejem"
   },
   {
     "brand": "Naturalis",
@@ -1898,7 +2013,8 @@
     "new": false,
     "new_date": "",
     "key": "300g",
-    "carton_ean": 8596048000796
+    "carton_ean": 8596048000796,
+    "csName": "Naturalis tělové máslo s extraktem z Rakytníku"
   },
   {
     "brand": "Naturalis",
@@ -1914,7 +2030,8 @@
     "new": false,
     "new_date": "",
     "key": "300g",
-    "carton_ean": 8596048011228
+    "carton_ean": 8596048011228,
+    "csName": "Naturalis tělové máslo s Olivovým olejem"
   },
   {
     "brand": "Naturalis",
@@ -1930,7 +2047,8 @@
     "new": false,
     "new_date": "",
     "key": "100g",
-    "carton_ean": 8596048000697
+    "carton_ean": 8596048000697,
+    "csName": "Naturalis kosmetická vazelína s Minerálním olejem"
   },
   {
     "brand": "Naturalis",
@@ -1946,7 +2064,8 @@
     "new": false,
     "new_date": "",
     "key": "100g",
-    "carton_ean": 8596048000703
+    "carton_ean": 8596048000703,
+    "csName": "Naturalis kosmetická vazelína s Konopným olejem"
   },
   {
     "brand": "Naturalis",
@@ -1964,7 +2083,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "250g",
-    "carton_ean": 8596048012461
+    "carton_ean": 8596048012461,
+    "csName": "Naturalis cukrový tělový scrub Bergamot a Limeta"
   },
   {
     "brand": "Naturalis",
@@ -1982,7 +2102,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "250g",
-    "carton_ean": 8596048012478
+    "carton_ean": 8596048012478,
+    "csName": "Naturalis cukrový tělový scrub Granátové jablko"
   },
   {
     "brand": "Naturalis",
@@ -1998,7 +2119,8 @@
     "new": false,
     "new_date": "",
     "key": "1000g",
-    "carton_ean": 8596048000611
+    "carton_ean": 8596048000611,
+    "csName": "Naturalis sůl na nohy s vůní Měsíčku a Rozmarýnu"
   },
   {
     "brand": "Naturalis",
@@ -2014,7 +2136,8 @@
     "new": false,
     "new_date": "",
     "key": "1000g",
-    "carton_ean": 8596048000642
+    "carton_ean": 8596048000642,
+    "csName": "Naturalis sůl na nohy s vůní Jalovce a Borovice"
   },
   {
     "brand": "Naturalis",
@@ -2030,7 +2153,8 @@
     "new": false,
     "new_date": "",
     "key": "1000g",
-    "carton_ean": 8596048012065
+    "carton_ean": 8596048012065,
+    "csName": "Naturalis koupelová sůl - Sakura"
   },
   {
     "brand": "Naturalis",
@@ -2046,7 +2170,8 @@
     "new": false,
     "new_date": "",
     "key": "1000g",
-    "carton_ean": 8595196908824
+    "carton_ean": 8595196908824,
+    "csName": "Naturalis koupelová sůl - Levandule"
   },
   {
     "brand": "Naturalis",
@@ -2062,7 +2187,8 @@
     "new": false,
     "new_date": "",
     "key": "1000g",
-    "carton_ean": 8596048012072
+    "carton_ean": 8596048012072,
+    "csName": "Naturalis koupelová sůl - Marakuja"
   },
   {
     "brand": "Naturalis",
@@ -2078,7 +2204,8 @@
     "new": false,
     "new_date": "",
     "key": "1000g",
-    "carton_ean": 8596048012089
+    "carton_ean": 8596048012089,
+    "csName": "Naturalis koupelová sůl - Bergamot a Limeta"
   },
   {
     "brand": "Naturalis",
@@ -2094,7 +2221,8 @@
     "new": false,
     "new_date": "",
     "key": "1000g",
-    "carton_ean": 8596048012096
+    "carton_ean": 8596048012096,
+    "csName": "Naturalis koupelová sůl - Vanilka a Banán"
   },
   {
     "brand": "Naturalis",
@@ -2110,7 +2238,8 @@
     "new": false,
     "new_date": "",
     "key": 1000,
-    "carton_ean": 8595196904314
+    "carton_ean": 8595196904314,
+    "csName": "Naturalis pěnivá koupel - Fresh Touch"
   },
   {
     "brand": "Naturalis",
@@ -2126,7 +2255,8 @@
     "new": false,
     "new_date": "",
     "key": 1000,
-    "carton_ean": 8595196903058
+    "carton_ean": 8595196903058,
+    "csName": "Naturalis pěnivá koupel - Time to Chill"
   },
   {
     "brand": "Naturalis",
@@ -2143,7 +2273,8 @@
     "new": false,
     "new_date": "",
     "discontinued": true,
-    "discontinued_date": "2025-08-25"
+    "discontinued_date": "2025-08-25",
+    "csName": "Naturalis pěnivá koupel - Green Garden"
   },
   {
     "brand": "Naturalis",
@@ -2159,7 +2290,8 @@
     "new": false,
     "new_date": "",
     "key": 1000,
-    "carton_ean": 8595196903041
+    "carton_ean": 8595196903041,
+    "csName": "Naturalis pěnivá koupel - Magic Moments"
   },
   {
     "brand": "Naturalis",
@@ -2175,7 +2307,8 @@
     "new": false,
     "new_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Naturalis relaxační lázeň - Tea Spa"
   },
   {
     "brand": "Naturalis",
@@ -2191,7 +2324,8 @@
     "new": false,
     "new_date": "",
     "key": 1000,
-    "carton_ean": 8595196903034
+    "carton_ean": 8595196903034,
+    "csName": "Naturalis relaxační lázeň - Indian Summer"
   },
   {
     "brand": "Naturalis",
@@ -2209,7 +2343,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 1000,
-    "carton_ean": 8596048012614
+    "carton_ean": 8596048012614,
+    "csName": "Naturalis relaxační lázěň - Matcha Delight"
   },
   {
     "brand": "Naturalis",
@@ -2227,7 +2362,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 1000,
-    "carton_ean": 8596048012621
+    "carton_ean": 8596048012621,
+    "csName": "Naturalis relaxační lázěň - Golden Argan"
   },
   {
     "brand": "Naturalis",
@@ -2245,7 +2381,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 1000,
-    "carton_ean": 8596048012638
+    "carton_ean": 8596048012638,
+    "csName": "Naturalis relaxační lázěň - Lavender Magic"
   },
   {
     "brand": "Naturalis",
@@ -2263,7 +2400,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 1000,
-    "carton_ean": 8596048012645
+    "carton_ean": 8596048012645,
+    "csName": "Naturalis pěnivá koupel - Eucalyptus Harmony"
   },
   {
     "brand": "Naturalis",
@@ -2281,7 +2419,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 1000,
-    "carton_ean": 8596048012652
+    "carton_ean": 8596048012652,
+    "csName": "Naturalis pěnivá koupel - Lotus Dream"
   },
   {
     "brand": "Naturalis",
@@ -2299,7 +2438,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 1000,
-    "carton_ean": 8596048012669
+    "carton_ean": 8596048012669,
+    "csName": "Naturalis pěnivá koupel - Ginseng Energy"
   },
   {
     "brand": "Naturalis",
@@ -2317,7 +2457,8 @@
     "discontinued": true,
     "discontinued_date": "2025-07-14",
     "key": 800,
-    "carton_ean": 8595196909227
+    "carton_ean": 8595196909227,
+    "csName": "Naturalis dvousložková pěna do koupele - Oliva"
   },
   {
     "brand": "Naturalis",
@@ -2335,7 +2476,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Naturalis dvoufázová olejová pěna Marakuja"
   },
   {
     "brand": "Naturalis",
@@ -2353,7 +2495,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Naturalis dvoufázová olejová pěna Sakura"
   },
   {
     "brand": "Naturalis",
@@ -2371,7 +2514,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Naturalis dvoufázová olejová pěna Bergamot & Limeta"
   },
   {
     "brand": "Naturalis",
@@ -2389,7 +2533,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 200,
-    "carton_ean": 8596048011716
+    "carton_ean": 8596048011716,
+    "csName": "Naturalis koupelová esence - Relaxing Herbs"
   },
   {
     "brand": "Naturalis",
@@ -2407,7 +2552,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 200,
-    "carton_ean": 8596048011723
+    "carton_ean": 8596048011723,
+    "csName": "Naturalis koupelová esence - Lavender Dreaming"
   },
   {
     "brand": "Naturalis",
@@ -2425,7 +2571,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 200,
-    "carton_ean": 8596048011730
+    "carton_ean": 8596048011730,
+    "csName": "Naturalis koupelová esence - Royal Spa"
   },
   {
     "brand": "Twister",
@@ -2441,7 +2588,8 @@
     "new": false,
     "new_date": "",
     "key": 2000,
-    "carton_ean": 8595196905984
+    "carton_ean": 8595196905984,
+    "csName": "Twister avivážní prostředek - Magic Space"
   },
   {
     "brand": "Twister",
@@ -2457,7 +2605,8 @@
     "new": false,
     "new_date": "",
     "key": 2000,
-    "carton_ean": 8595196905991
+    "carton_ean": 8595196905991,
+    "csName": "Twister avivážní prostředek - Water Flower"
   },
   {
     "brand": "Twister",
@@ -2473,7 +2622,8 @@
     "new": false,
     "new_date": "",
     "key": 2000,
-    "carton_ean": 8595196906011
+    "carton_ean": 8595196906011,
+    "csName": "Twister avivážní prostředek - Alpine Freshness"
   },
   {
     "brand": "Twister",
@@ -2489,7 +2639,8 @@
     "new": false,
     "new_date": "",
     "key": 2000,
-    "carton_ean": 8595196906196
+    "carton_ean": 8595196906196,
+    "csName": "Twister avivážní prostředek - Silky Smooth"
   },
   {
     "brand": "Twister",
@@ -2505,7 +2656,8 @@
     "new": false,
     "new_date": "",
     "key": 2000,
-    "carton_ean": 8595196906028
+    "carton_ean": 8595196906028,
+    "csName": "Twister avivážní prostředek - Good Feel"
   },
   {
     "brand": "Twister",
@@ -2521,7 +2673,8 @@
     "new": false,
     "new_date": "",
     "key": 1500,
-    "carton_ean": 8596048004893
+    "carton_ean": 8596048004893,
+    "csName": "Twister tekutý prací gel - Fix & Sport - na barevné prádlo 1,"
   },
   {
     "brand": "Twister",
@@ -2537,7 +2690,8 @@
     "new": false,
     "new_date": "",
     "key": 1500,
-    "carton_ean": 8596048004923
+    "carton_ean": 8596048004923,
+    "csName": "Twister tekutý prací gel - Stable Form - na tmavé prádlo 1,"
   },
   {
     "brand": "Twister",
@@ -2553,7 +2707,8 @@
     "new": false,
     "new_date": "",
     "key": 1500,
-    "carton_ean": 8596048004916
+    "carton_ean": 8596048004916,
+    "csName": "Twister tekutý prací gel - Power Care - na všechny druhy prádla 1,"
   },
   {
     "brand": "Twister",
@@ -2570,7 +2725,8 @@
     "new": true,
     "new_date": "2025-08-14",
     "discontinued": false,
-    "discontinued_date": ""
+    "discontinued_date": "",
+    "csName": "Twister parfém na praní - Green Land"
   },
   {
     "brand": "Twister",
@@ -2587,7 +2743,8 @@
     "new": true,
     "new_date": "2025-08-14",
     "discontinued": false,
-    "discontinued_date": ""
+    "discontinued_date": "",
+    "csName": "Twister parfém na praní - Fresh Breeze"
   },
   {
     "brand": "Twister",
@@ -2604,7 +2761,8 @@
     "new": true,
     "new_date": "2025-08-14",
     "discontinued": false,
-    "discontinued_date": ""
+    "discontinued_date": "",
+    "csName": "Twister parfém na praní - Flower Bouquet"
   },
   {
     "brand": "Twister",
@@ -2620,7 +2778,8 @@
     "new": false,
     "new_date": "",
     "key": 500,
-    "carton_ean": 8596048012355
+    "carton_ean": 8596048012355,
+    "csName": "Twister wc gel - Fresh Forest"
   },
   {
     "brand": "Twister",
@@ -2636,7 +2795,8 @@
     "new": false,
     "new_date": "",
     "key": 500,
-    "carton_ean": 8595196901542
+    "carton_ean": 8595196901542,
+    "csName": "Twister wc gel - Ocean Breeze"
   },
   {
     "brand": "Twister",
@@ -2652,7 +2812,8 @@
     "new": false,
     "new_date": "",
     "key": 1000,
-    "carton_ean": 8595196901146
+    "carton_ean": 8595196901146,
+    "csName": "Twister mycí prostředek na nádobí - Limetka"
   },
   {
     "brand": "Twister",
@@ -2668,7 +2829,8 @@
     "new": false,
     "new_date": "",
     "key": 1000,
-    "carton_ean": 8595196901177
+    "carton_ean": 8595196901177,
+    "csName": "Twister mycí prostředek na nádobí - Citron"
   },
   {
     "brand": "Twister",
@@ -2684,7 +2846,8 @@
     "new": false,
     "new_date": "",
     "key": "1000A",
-    "carton_ean": 8596048011020
+    "carton_ean": 8596048011020,
+    "csName": "Twister avivážní prostředek - Magic Space 1 L D-PAK™"
   },
   {
     "brand": "Twister",
@@ -2700,7 +2863,8 @@
     "new": false,
     "new_date": "",
     "key": "1000A",
-    "carton_ean": 8596048011037
+    "carton_ean": 8596048011037,
+    "csName": "Twister avivážní prostředek - Alpine Freshness 1 L D-PAK™"
   },
   {
     "brand": "Twister",
@@ -2716,7 +2880,8 @@
     "new": false,
     "new_date": "",
     "key": "1000A",
-    "carton_ean": 8596048011044
+    "carton_ean": 8596048011044,
+    "csName": "Twister tekutý prací gel - Power Care - na všechny druhy prádla 1 L D-PAK™"
   },
   {
     "brand": "Twister",
@@ -2732,7 +2897,8 @@
     "new": false,
     "new_date": "",
     "key": "1000A",
-    "carton_ean": 8596048011051
+    "carton_ean": 8596048011051,
+    "csName": "Twister tekutý prací gel - Fix & Sport - na barevné prádlo 1 L D-PAK™"
   },
   {
     "brand": "Lilien",
@@ -2750,7 +2916,8 @@
     "discontinued": true,
     "discontinued_date": "2025-06-24",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Lilien Sun Active opalovací mléko OF 20 -"
   },
   {
     "brand": "Lilien",
@@ -2768,7 +2935,8 @@
     "discontinued": true,
     "discontinued_date": "2025-06-24",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Lilien Sun Active opalovací mléko OF 30 -"
   },
   {
     "brand": "Lilien",
@@ -2786,7 +2954,8 @@
     "discontinued": true,
     "discontinued_date": "2025-06-24",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Lilien Sun Active opalovací mléko OF 50 -"
   },
   {
     "brand": "Lilien",
@@ -2804,7 +2973,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Lilien Sun Active opalovací emulze OF 20 -"
   },
   {
     "brand": "Lilien",
@@ -2820,7 +2990,8 @@
     "new": false,
     "new_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Lilien Sun Active mléko po opalování"
   },
   {
     "brand": "Lilien",
@@ -2836,7 +3007,8 @@
     "new": false,
     "new_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Lilien Sun Active chladivý gel po opalování"
   },
   {
     "brand": "Lilien",
@@ -2852,7 +3024,8 @@
     "new": false,
     "new_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "Lilien Sun Active panthenol sprej po opalování"
   },
   {
     "brand": "Natava",
@@ -2870,7 +3043,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "85g",
-    "carton_ean": 8596048009706
+    "carton_ean": 8596048009706,
+    "csName": "NATAVA Tuhý šampon - Bambucké máslo"
   },
   {
     "brand": "Natava",
@@ -2888,7 +3062,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "85g",
-    "carton_ean": 8596048009713
+    "carton_ean": 8596048009713,
+    "csName": "NATAVA Tuhý šampon - Oliva"
   },
   {
     "brand": "Natava",
@@ -2906,7 +3081,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "85g",
-    "carton_ean": 8596048009720
+    "carton_ean": 8596048009720,
+    "csName": "NATAVA Tuhý šampon - Jojoba"
   },
   {
     "brand": "Natava",
@@ -2924,7 +3100,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "85g",
-    "carton_ean": 8596048009737
+    "carton_ean": 8596048009737,
+    "csName": "NATAVA Tuhý šampon - Šípek"
   },
   {
     "brand": "Natava",
@@ -2942,7 +3119,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "85g",
-    "carton_ean": 8596048009744
+    "carton_ean": 8596048009744,
+    "csName": "NATAVA Tuhý šampon - Aktivní uhlí"
   },
   {
     "brand": "Natava",
@@ -2960,7 +3138,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "85g",
-    "carton_ean": 8596048009751
+    "carton_ean": 8596048009751,
+    "csName": "NATAVA Tuhý šampon - Ylang-Ylang"
   },
   {
     "brand": "Natava",
@@ -2978,7 +3157,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "95g",
-    "carton_ean": 8596048009768
+    "carton_ean": 8596048009768,
+    "csName": "NATAVA Tuhý šampon - Ylang-Ylang - srdce"
   },
   {
     "brand": "Natava",
@@ -2996,7 +3176,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "75g",
-    "carton_ean": 8596048009775
+    "carton_ean": 8596048009775,
+    "csName": "NATAVA Tuhý balzám - Bambucké máslo"
   },
   {
     "brand": "Natava",
@@ -3014,7 +3195,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "75g",
-    "carton_ean": 8596048009782
+    "carton_ean": 8596048009782,
+    "csName": "NATAVA Tuhý balzám - Oliva"
   },
   {
     "brand": "Natava",
@@ -3032,7 +3214,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "75g",
-    "carton_ean": 8596048009799
+    "carton_ean": 8596048009799,
+    "csName": "NATAVA Tuhý balzám - Jojoba"
   },
   {
     "brand": "Natava",
@@ -3050,7 +3233,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "75g",
-    "carton_ean": 8596048009805
+    "carton_ean": 8596048009805,
+    "csName": "NATAVA Tuhý balzám - Šípek"
   },
   {
     "brand": "Natava",
@@ -3068,7 +3252,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "75g",
-    "carton_ean": 8596048009812
+    "carton_ean": 8596048009812,
+    "csName": "NATAVA Tuhý balzám - Ylang-Ylang"
   },
   {
     "brand": "Natava",
@@ -3086,7 +3271,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100g",
-    "carton_ean": 8596048009829
+    "carton_ean": 8596048009829,
+    "csName": "NATAVA Tuhé tělové máslo - Síla ovoce"
   },
   {
     "brand": "Natava",
@@ -3104,7 +3290,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100g",
-    "carton_ean": 8596048009836
+    "carton_ean": 8596048009836,
+    "csName": "NATAVA Tuhé tělové máslo - Květinová zahrada"
   },
   {
     "brand": "Natava",
@@ -3122,7 +3309,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100g",
-    "carton_ean": 8596048009843
+    "carton_ean": 8596048009843,
+    "csName": "NATAVA Tuhé tělové máslo - Vůně orientu"
   },
   {
     "brand": "Natava",
@@ -3140,7 +3328,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "alu jar round",
-    "carton_ean": 8596048009850
+    "carton_ean": 8596048009850,
+    "csName": "NATAVA hliníková cestovní mýdlenka - kulatá"
   },
   {
     "brand": "Natava",
@@ -3158,7 +3347,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100g A",
-    "carton_ean": 8596048009867
+    "carton_ean": 8596048009867,
+    "csName": "NATAVA Tuhé čistící mýdlo na obličej - Aktivní uhlí"
   },
   {
     "brand": "Natava",
@@ -3176,7 +3366,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100g A",
-    "carton_ean": 8596048009874
+    "carton_ean": 8596048009874,
+    "csName": "NATAVA Tuhé čistící mýdlo na obličej - Minerální bahno"
   },
   {
     "brand": "Natava",
@@ -3194,7 +3385,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "10g",
-    "carton_ean": 8596048011525
+    "carton_ean": 8596048011525,
+    "csName": "NATAVA balzám na rty - Sladká vanilka"
   },
   {
     "brand": "Natava",
@@ -3212,7 +3404,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "10g",
-    "carton_ean": 8596048011532
+    "carton_ean": 8596048011532,
+    "csName": "NATAVA balzám na rty - Multivitamín"
   },
   {
     "brand": "Natava",
@@ -3230,7 +3423,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "10g",
-    "carton_ean": 8596048011549
+    "carton_ean": 8596048011549,
+    "csName": "NATAVA balzám na rty - Konopí"
   },
   {
     "brand": "Natava",
@@ -3248,7 +3442,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "80g",
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "NATAVA Přírodní zubní pasta s Aktivním uhlím"
   },
   {
     "brand": "Natava",
@@ -3266,7 +3461,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "80g",
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "NATAVA Přírodní zubní pasta s bylinkami a CBD"
   },
   {
     "brand": "Natava",
@@ -3284,7 +3480,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100g A",
-    "carton_ean": 8596048009881
+    "carton_ean": 8596048009881,
+    "csName": "NATAVA Tuhé koupelové a sprchové mýdlo - Rakytník"
   },
   {
     "brand": "Natava",
@@ -3302,7 +3499,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100g A",
-    "carton_ean": 8596048009898
+    "carton_ean": 8596048009898,
+    "csName": "NATAVA Tuhé koupelové a sprchové mýdlo - Konopný olej"
   },
   {
     "brand": "Natava",
@@ -3320,7 +3518,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100g A",
-    "carton_ean": 8596048009904
+    "carton_ean": 8596048009904,
+    "csName": "NATAVA Tuhé koupelové a sprchové mýdlo - Protěž alpská"
   },
   {
     "brand": "Natava",
@@ -3338,7 +3537,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100g A",
-    "carton_ean": 8596048009911
+    "carton_ean": 8596048009911,
+    "csName": "NATAVA Tuhé mýdlo toaletní - Ylang-Ylang"
   },
   {
     "brand": "Natava",
@@ -3356,7 +3556,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100g A",
-    "carton_ean": 8596048009928
+    "carton_ean": 8596048009928,
+    "csName": "NATAVA Tuhé mýdlo toaletní - Marocká růže"
   },
   {
     "brand": "Natava",
@@ -3374,7 +3575,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100g A",
-    "carton_ean": 8596048009935
+    "carton_ean": 8596048009935,
+    "csName": "NATAVA Tuhé mýdlo toaletní - Citronová tráva"
   },
   {
     "brand": "Natava",
@@ -3392,7 +3594,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "alu jar square",
-    "carton_ean": 8596048009942
+    "carton_ean": 8596048009942,
+    "csName": "NATAVA hliníková cestovní mýdlenka - hranatá"
   },
   {
     "brand": "Natava",
@@ -3410,7 +3613,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "soap dispenser and metal pad",
-    "carton_ean": 8596048009959
+    "carton_ean": 8596048009959,
+    "csName": "NATAVA Kovová mýdlenka s keramickou podložkou"
   },
   {
     "brand": "Natava",
@@ -3428,7 +3632,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "soap dispenser and bamboo pad",
-    "carton_ean": 8596048009966
+    "carton_ean": 8596048009966,
+    "csName": "NATAVA Bambusová mýdlenka s keramickou podložkou"
   },
   {
     "brand": "Natava",
@@ -3446,7 +3651,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "ear buds",
-    "carton_ean": 8596048009973
+    "carton_ean": 8596048009973,
+    "csName": "NATAVA Bambusové vatové tyčinky"
   },
   {
     "brand": "Natava",
@@ -3464,7 +3670,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "massage sisal",
-    "carton_ean": 8596048009980
+    "carton_ean": 8596048009980,
+    "csName": "NATAVA tělová mycí žínka"
   },
   {
     "brand": "Natava",
@@ -3482,7 +3689,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "60g",
-    "carton_ean": 8596048009997
+    "carton_ean": 8596048009997,
+    "csName": "NATAVA Tuhý deodorant - Síla ovoce"
   },
   {
     "brand": "Natava",
@@ -3500,7 +3708,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "60g",
-    "carton_ean": 8596048010009
+    "carton_ean": 8596048010009,
+    "csName": "NATAVA Tuhý deodorant - Květinová zahrada"
   },
   {
     "brand": "Natava",
@@ -3518,7 +3727,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "60g",
-    "carton_ean": 8596048010016
+    "carton_ean": 8596048010016,
+    "csName": "NATAVA Tuhý deodorant - Vůně orientu"
   },
   {
     "brand": "Natava",
@@ -3536,7 +3746,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "60g",
-    "carton_ean": 8596048010023
+    "carton_ean": 8596048010023,
+    "csName": "NATAVA Tuhý deodorant - Alpská svěžest"
   },
   {
     "brand": "Natava",
@@ -3554,7 +3765,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "30ml",
-    "carton_ean": 8596048010030
+    "carton_ean": 8596048010030,
+    "csName": "NATAVA Pleťové olejové sérum - Geránium"
   },
   {
     "brand": "Natava",
@@ -3572,7 +3784,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "30ml",
-    "carton_ean": 8596048010047
+    "carton_ean": 8596048010047,
+    "csName": "NATAVA Pleťové olejové sérum - Levandule"
   },
   {
     "brand": "Natava",
@@ -3590,7 +3803,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "30ml",
-    "carton_ean": 8596048010054
+    "carton_ean": 8596048010054,
+    "csName": "NATAVA Pleťové olejové sérum - Pupalka"
   },
   {
     "brand": "Natava",
@@ -3608,7 +3822,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "30ml",
-    "carton_ean": 8596048010061
+    "carton_ean": 8596048010061,
+    "csName": "NATAVA Pleťové vodné sérum - Rozmarýn"
   },
   {
     "brand": "Natava",
@@ -3626,7 +3841,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "30ml",
-    "carton_ean": 8596048010078
+    "carton_ean": 8596048010078,
+    "csName": "NATAVA Pleťové vodné sérum - Orchidea"
   },
   {
     "brand": "Natava",
@@ -3644,7 +3860,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50ml",
-    "carton_ean": 8596048010085
+    "carton_ean": 8596048010085,
+    "csName": "NATAVA Pleťový olej - Argan"
   },
   {
     "brand": "Natava",
@@ -3662,7 +3879,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50ml",
-    "carton_ean": 8596048010092
+    "carton_ean": 8596048010092,
+    "csName": "NATAVA Pleťový olej - Moringa"
   },
   {
     "brand": "Natava",
@@ -3680,7 +3898,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50ml",
-    "carton_ean": 8596048010108
+    "carton_ean": 8596048010108,
+    "csName": "NATAVA Pleťový olej - Olej z pšeničných klíčků"
   },
   {
     "brand": "Natava",
@@ -3698,7 +3917,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100ml",
-    "carton_ean": 8596048010115
+    "carton_ean": 8596048010115,
+    "csName": "NATAVA Pleťový olej - Argan"
   },
   {
     "brand": "Natava",
@@ -3716,7 +3936,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100ml",
-    "carton_ean": 8596048010122
+    "carton_ean": 8596048010122,
+    "csName": "NATAVA Pleťový olej - Moringa"
   },
   {
     "brand": "Natava",
@@ -3734,7 +3955,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100ml",
-    "carton_ean": 8596048010139
+    "carton_ean": 8596048010139,
+    "csName": "NATAVA Pleťový olej - Olej z pšeničných klíčků"
   },
   {
     "brand": "Natava",
@@ -3752,7 +3974,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50ml",
-    "carton_ean": 8596048010146
+    "carton_ean": 8596048010146,
+    "csName": "NATAVA Tělový olej - Makadamie"
   },
   {
     "brand": "Natava",
@@ -3770,7 +3993,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50ml",
-    "carton_ean": 8596048010153
+    "carton_ean": 8596048010153,
+    "csName": "NATAVA Tělový olej - Šípek"
   },
   {
     "brand": "Natava",
@@ -3788,7 +4012,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50ml",
-    "carton_ean": 8596048010160
+    "carton_ean": 8596048010160,
+    "csName": "NATAVA Tělový olej - Malina"
   },
   {
     "brand": "Natava",
@@ -3806,7 +4031,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50ml",
-    "carton_ean": 8596048010177
+    "carton_ean": 8596048010177,
+    "csName": "NATAVA Tělový olej - Pupalka"
   },
   {
     "brand": "Natava",
@@ -3824,7 +4050,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100ml",
-    "carton_ean": 8596048010184
+    "carton_ean": 8596048010184,
+    "csName": "NATAVA Tělový olej - Makadamie"
   },
   {
     "brand": "Natava",
@@ -3842,7 +4069,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100ml",
-    "carton_ean": 8596048010191
+    "carton_ean": 8596048010191,
+    "csName": "NATAVA Tělový olej - Šípek"
   },
   {
     "brand": "Natava",
@@ -3860,7 +4088,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100ml",
-    "carton_ean": 8596048010207
+    "carton_ean": 8596048010207,
+    "csName": "NATAVA Tělový olej - Malina"
   },
   {
     "brand": "Natava",
@@ -3878,7 +4107,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100ml",
-    "carton_ean": 8596048010214
+    "carton_ean": 8596048010214,
+    "csName": "NATAVA Tělový olej - Pupalka"
   },
   {
     "brand": "Natava",
@@ -3896,7 +4126,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50ml",
-    "carton_ean": 8596048010221
+    "carton_ean": 8596048010221,
+    "csName": "NATAVA Vlasový olej - Jojoba"
   },
   {
     "brand": "Natava",
@@ -3914,7 +4145,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50ml",
-    "carton_ean": 8596048010238
+    "carton_ean": 8596048010238,
+    "csName": "NATAVA Vlasový olej - Avokádo"
   },
   {
     "brand": "Natava",
@@ -3932,7 +4164,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50ml",
-    "carton_ean": 8596048010245
+    "carton_ean": 8596048010245,
+    "csName": "NATAVA Vlasový olej - Marula"
   },
   {
     "brand": "Natava",
@@ -3950,7 +4183,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50ml",
-    "carton_ean": 8596048010252
+    "carton_ean": 8596048010252,
+    "csName": "NATAVA Vlasový olej - Nimba"
   },
   {
     "brand": "Natava",
@@ -3968,7 +4202,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100ml",
-    "carton_ean": 8596048010269
+    "carton_ean": 8596048010269,
+    "csName": "NATAVA Vlasový olej - Jojoba"
   },
   {
     "brand": "Natava",
@@ -3986,7 +4221,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100ml",
-    "carton_ean": 8596048010276
+    "carton_ean": 8596048010276,
+    "csName": "NATAVA Vlasový olej - Avokádo"
   },
   {
     "brand": "Natava",
@@ -4004,7 +4240,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100ml",
-    "carton_ean": 8596048010283
+    "carton_ean": 8596048010283,
+    "csName": "NATAVA Vlasový olej - Marula"
   },
   {
     "brand": "Natava",
@@ -4022,7 +4259,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "100ml",
-    "carton_ean": 8596048010290
+    "carton_ean": 8596048010290,
+    "csName": "NATAVA Vlasový olej - Nimba"
   },
   {
     "brand": "Natava",
@@ -4040,7 +4278,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "60g A",
-    "carton_ean": 8596048010306
+    "carton_ean": 8596048010306,
+    "csName": "NATAVA Masážní svíčka - Síla ovoce"
   },
   {
     "brand": "Natava",
@@ -4058,7 +4297,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "60g A",
-    "carton_ean": 8596048010313
+    "carton_ean": 8596048010313,
+    "csName": "NATAVA Masážní svíčka - Květinová zahrada"
   },
   {
     "brand": "Natava",
@@ -4076,7 +4316,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "60g A",
-    "carton_ean": 8596048010320
+    "carton_ean": 8596048010320,
+    "csName": "NATAVA Masážní svíčka - Vůně orientu"
   },
   {
     "brand": "Natava",
@@ -4094,7 +4335,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "NATAVA Masážní svíčka - Bylinné dřevo s CBD"
   },
   {
     "brand": "Natava",
@@ -4112,7 +4354,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "220g",
-    "carton_ean": 8596048010337
+    "carton_ean": 8596048010337,
+    "csName": "NATAVA Vonná sójová svíčka - Bílé květy"
   },
   {
     "brand": "Natava",
@@ -4130,7 +4373,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "220g",
-    "carton_ean": 8596048010344
+    "carton_ean": 8596048010344,
+    "csName": "NATAVA Vonná sójová svíčka - Černý čaj a kardamom"
   },
   {
     "brand": "Natava",
@@ -4148,7 +4392,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "220g",
-    "carton_ean": 8596048010351
+    "carton_ean": 8596048010351,
+    "csName": "NATAVA Vonná sójová svíčka s esenciálními oleji - Kouzlo lesa"
   },
   {
     "brand": "Natava",
@@ -4166,7 +4411,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "220g",
-    "carton_ean": 8596048010368
+    "carton_ean": 8596048010368,
+    "csName": "NATAVA Vonná sójová svíčka - Sladký šafrán"
   },
   {
     "brand": "Natava",
@@ -4184,7 +4430,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "220g",
-    "carton_ean": 8596048010375
+    "carton_ean": 8596048010375,
+    "csName": "NATAVA Vonná sójová svíčka s esenciálními oleji - Svěží citrus"
   },
   {
     "brand": "Natava",
@@ -4202,7 +4449,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "220g",
-    "carton_ean": 8596048010382
+    "carton_ean": 8596048010382,
+    "csName": "NATAVA Vonná sójová svíčka - Tajemství dýně"
   },
   {
     "brand": "Natava",
@@ -4220,7 +4468,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "220g",
-    "carton_ean": 8596048010399
+    "carton_ean": 8596048010399,
+    "csName": "NATAVA Vonná sójová svíčka s esenciálními oleji - Vůně Provence"
   },
   {
     "brand": "Natava",
@@ -4238,7 +4487,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "220g",
-    "carton_ean": 8596048011570
+    "carton_ean": 8596048011570,
+    "csName": "NATAVA Vonná sójová svíčka - Vánoční čas"
   },
   {
     "brand": "Natava",
@@ -4256,7 +4506,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "220g",
-    "carton_ean": 8596048011563
+    "carton_ean": 8596048011563,
+    "csName": "NATAVA Vonná sójová svíčka - Svařený cider"
   },
   {
     "brand": "Natava",
@@ -4274,7 +4525,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "220g",
-    "carton_ean": 8596048011815
+    "carton_ean": 8596048011815,
+    "csName": "NATAVA Vonná sójová svíčka - Vánoční cukroví"
   },
   {
     "brand": "Natava",
@@ -4292,7 +4544,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048006835
+    "carton_ean": 8596048006835,
+    "csName": "NATAVA Šampon na vlasy - Levandule"
   },
   {
     "brand": "Natava",
@@ -4310,7 +4563,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048006842
+    "carton_ean": 8596048006842,
+    "csName": "NATAVA Šampon na vlasy - Bříza"
   },
   {
     "brand": "Natava",
@@ -4328,7 +4582,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048006859
+    "carton_ean": 8596048006859,
+    "csName": "NATAVA Šampon na vlasy - Kopřiva"
   },
   {
     "brand": "Natava",
@@ -4346,7 +4601,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048006866
+    "carton_ean": 8596048006866,
+    "csName": "NATAVA Šampon na vlasy - Konopí"
   },
   {
     "brand": "Natava",
@@ -4364,7 +4620,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048006873
+    "carton_ean": 8596048006873,
+    "csName": "NATAVA Šampon na vlasy - Lopuch"
   },
   {
     "brand": "Natava",
@@ -4382,7 +4639,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048006880
+    "carton_ean": 8596048006880,
+    "csName": "NATAVA Šampon na vlasy - Rakytník"
   },
   {
     "brand": "Natava",
@@ -4400,7 +4658,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048006897
+    "carton_ean": 8596048006897,
+    "csName": "NATAVA Balzám na vlasy - Levandule"
   },
   {
     "brand": "Natava",
@@ -4418,7 +4677,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048006903
+    "carton_ean": 8596048006903,
+    "csName": "NATAVA Balzám na vlasy - Bříza"
   },
   {
     "brand": "Natava",
@@ -4436,7 +4696,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048006910
+    "carton_ean": 8596048006910,
+    "csName": "NATAVA Balzám na vlasy - Kopřiva"
   },
   {
     "brand": "Natava",
@@ -4454,7 +4715,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048006927
+    "carton_ean": 8596048006927,
+    "csName": "NATAVA Balzám na vlasy - Konopí"
   },
   {
     "brand": "Natava",
@@ -4472,7 +4734,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048006934
+    "carton_ean": 8596048006934,
+    "csName": "NATAVA Balzám na vlasy - Lopuch"
   },
   {
     "brand": "Natava",
@@ -4490,7 +4753,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048006941
+    "carton_ean": 8596048006941,
+    "csName": "NATAVA Balzám na vlasy - Rakytník"
   },
   {
     "brand": "Natava",
@@ -4508,7 +4772,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "500 ml",
-    "carton_ean": 8596048011860
+    "carton_ean": 8596048011860,
+    "csName": "NATAVA Přírodní tekuté mýdlo - Levandule"
   },
   {
     "brand": "Natava",
@@ -4526,7 +4791,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "500 ml",
-    "carton_ean": 8596048011877
+    "carton_ean": 8596048011877,
+    "csName": "NATAVA Přírodní tekuté mýdlo - Matcha Tea"
   },
   {
     "brand": "Natava",
@@ -4544,7 +4810,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "500 ml",
-    "carton_ean": 8596048011884
+    "carton_ean": 8596048011884,
+    "csName": "NATAVA Přírodní tekuté mýdlo - Protěž alpská"
   },
   {
     "brand": "Natava",
@@ -4562,7 +4829,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "500 ml",
-    "carton_ean": 8596048011891
+    "carton_ean": 8596048011891,
+    "csName": "NATAVA Přírodní tekuté mýdlo - Konopí"
   },
   {
     "brand": "Natava",
@@ -4580,7 +4848,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048012911
+    "carton_ean": 8596048012911,
+    "csName": "NATAVA Přírodní sprchový gel - Levandule"
   },
   {
     "brand": "Natava",
@@ -4598,7 +4867,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048012928
+    "carton_ean": 8596048012928,
+    "csName": "NATAVA Přírodní sprchový gel - Matcha Tea"
   },
   {
     "brand": "Natava",
@@ -4616,7 +4886,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048012935
+    "carton_ean": 8596048012935,
+    "csName": "NATAVA Přírodní sprchový gel - Protěž alpská"
   },
   {
     "brand": "Natava",
@@ -4634,7 +4905,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": 250,
-    "carton_ean": 8596048012942
+    "carton_ean": 8596048012942,
+    "csName": "NATAVA Přírodní sprchový gel - Konopí"
   },
   {
     "brand": "Natava",
@@ -4652,7 +4924,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "NATAVA Krém na ruce - Sladká moringa"
   },
   {
     "brand": "Natava",
@@ -4670,7 +4943,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "NATAVA Krém na ruce - Síla ovoce"
   },
   {
     "brand": "Natava",
@@ -4688,7 +4962,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "NATAVA Krém na ruce - Květinová zahrada"
   },
   {
     "brand": "Natava",
@@ -4706,7 +4981,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "NATAVA Krém na ruce - Bylinné dřevo"
   },
   {
     "brand": "Natava",
@@ -4724,7 +5000,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50g",
-    "carton_ean": 8596048005692
+    "carton_ean": 8596048005692,
+    "csName": "NATAVA olejová koule do koupele - Chrpa polní"
   },
   {
     "brand": "Natava",
@@ -4742,7 +5019,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50g",
-    "carton_ean": 8596048005708
+    "carton_ean": 8596048005708,
+    "csName": "NATAVA olejová koule do koupele - Růže stolistá"
   },
   {
     "brand": "Natava",
@@ -4760,7 +5038,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50g",
-    "carton_ean": 8596048005715
+    "carton_ean": 8596048005715,
+    "csName": "NATAVA olejová koule do koupele - Citronová tráva"
   },
   {
     "brand": "Natava",
@@ -4778,7 +5057,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50g",
-    "carton_ean": 8596048010467
+    "carton_ean": 8596048010467,
+    "csName": "NATAVA olejová koule do koupele - Luční kvítí"
   },
   {
     "brand": "Natava",
@@ -4796,7 +5076,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": null,
-    "carton_ean": 8596048010450
+    "carton_ean": 8596048010450,
+    "csName": "NATAVA olejová koule do koupele - Ibišek"
   },
   {
     "brand": "Natava",
@@ -4814,7 +5095,8 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "50g",
-    "carton_ean": 8596048010948
+    "carton_ean": 8596048010948,
+    "csName": "NATAVA olejová koule do koupele - Sléz lesní"
   },
   {
     "brand": "Natava",
@@ -4832,6 +5114,7 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": null,
-    "carton_ean": null
+    "carton_ean": null,
+    "csName": "NATAVA olejové koule do koupele - Dárková sada  4×"
   }
 ]
