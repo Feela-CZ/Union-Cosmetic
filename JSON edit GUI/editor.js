@@ -330,10 +330,7 @@ async function apiPut(name, data) {
 async function saveProductsToRepo() {
     try {
         await apiPut('products', products);
-        // po uložení stáhni čerstvá data, ať je UI v syncu
-        products = await fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`)
-            .then(r => r.text())           // načteme syrový text
-            .then(t => JSON.parse(t));     // ručně převedeme na JSON
+        products = await fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`).then(r => r.json());
     } catch (e) {
         alert('Uložení products.json selhalo: ' + e.message);
     }
@@ -563,12 +560,13 @@ function initUI() {
     });
 
     fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`)
-        .then(r => r.json())
-        .then(data => {
-            products = data;
-            renderTable();
-            document.getElementById('product-table-section').style.display = 'block';
-        });
+    .then(r => r.text())             // načteme jako text
+    .then(t => JSON.parse(t))        // ručně převedeme na JSON
+    .then(data => {
+        products = data;
+        renderTable();
+        document.getElementById('product-table-section').style.display = 'block';
+    });
 
     updateLogisticsKeyFilter();
 
