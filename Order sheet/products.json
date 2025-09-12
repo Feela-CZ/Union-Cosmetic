@@ -1047,9 +1047,8 @@
     "boxes_per_pallet": 96,
     "new": false,
     "new_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Lilien krémové tekuté mýdlo - Aloe Vera"
+    "key": "5000",
+    "carton_ean": "8596048012959"
   },
   {
     "brand": "Lilien",
@@ -1064,9 +1063,8 @@
     "boxes_per_pallet": 96,
     "new": false,
     "new_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Lilien krémové tekuté mýdlo Med & Propolis"
+    "key": "5000",
+    "carton_ean": "8596048012454"
   },
   {
     "brand": "Lilien",
@@ -2475,9 +2473,8 @@
     "new_date": "2025-07-14",
     "discontinued": false,
     "discontinued_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Naturalis dvoufázová olejová pěna Marakuja"
+    "key": "800",
+    "carton_ean": "8596048012676"
   },
   {
     "brand": "Naturalis",
@@ -2494,9 +2491,8 @@
     "new_date": "2025-07-14",
     "discontinued": false,
     "discontinued_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Naturalis dvoufázová olejová pěna Sakura"
+    "key": "800",
+    "carton_ean": "8596048012683"
   },
   {
     "brand": "Naturalis",
@@ -2513,9 +2509,8 @@
     "new_date": "2025-07-14",
     "discontinued": false,
     "discontinued_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Naturalis dvoufázová olejová pěna Bergamot & Limeta"
+    "key": "800",
+    "carton_ean": "8596048012690"
   },
   {
     "brand": "Naturalis",
@@ -3442,8 +3437,7 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "80g",
-    "carton_ean": null,
-    "csName": "NATAVA Přírodní zubní pasta s Aktivním uhlím"
+    "carton_ean": "8596048012256"
   },
   {
     "brand": "Natava",
@@ -3461,8 +3455,7 @@
     "discontinued": false,
     "discontinued_date": "",
     "key": "80g",
-    "carton_ean": null,
-    "csName": "NATAVA Přírodní zubní pasta s bylinkami a CBD"
+    "carton_ean": "8596048012263"
   },
   {
     "brand": "Natava",

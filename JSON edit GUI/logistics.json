@@ -420,6 +420,34 @@
         "nr_of_layers": 4
       }
     },
+    "5000": {
+      "ITEM": {
+        "length": "15.5 cm",
+        "width": "13.5 cm",
+        "height": "24 cm",
+        "weight": "5.2 kg"
+      },
+      "CARTON": {
+        "length": "18.5 cm",
+        "width": "13.5 cm",
+        "height": "24 cm",
+        "weight": "5.2 kg",
+        "nr_of_items": 1
+      },
+      "LAYER": {
+        "nr_of_items": 32,
+        "nr_of_cartons": 32
+      },
+      "PALLET": {
+        "length": "120 cm",
+        "width": "80.0 cm",
+        "height": "86 cm",
+        "weight": "520 kg",
+        "nr_of_cartons": 96,
+        "nr_of_items": 96,
+        "nr_of_layers": 3
+      }
+    },
     "1000A": {
       "ITEM": {
         "length": "10.4 cm",
@@ -730,30 +758,30 @@
     },
     "null": {
       "ITEM": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null
+        "length": "15.5 cm",
+        "width": "13.5 cm",
+        "height": "24 cm",
+        "weight": "5.2 kg"
       },
       "CARTON": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_items": null
+        "length": "18.5 cm",
+        "width": "13.5 cm",
+        "height": "24 cm",
+        "weight": "5.2 kg",
+        "nr_of_items": 1
       },
       "LAYER": {
-        "nr_of_items": null,
-        "nr_of_cartons": null
+        "nr_of_items": 32,
+        "nr_of_cartons": 32
       },
       "PALLET": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_cartons": null,
-        "nr_of_items": null,
-        "nr_of_layers": null
+        "length": "120 cm",
+        "width": "80.0 cm",
+        "height": "86 cm",
+        "weight": "520 kg",
+        "nr_of_cartons": 96,
+        "nr_of_items": 96,
+        "nr_of_layers": 3
       }
     }
   },
@@ -1068,30 +1096,30 @@
     },
     "null": {
       "ITEM": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null
+        "length": "8.0 cm",
+        "width": "8.0 cm",
+        "height": "17.5 cm",
+        "weight": "0.86 kg"
       },
       "CARTON": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_items": null
+        "length": "39.0 cm",
+        "width": "16.5 cm",
+        "height": "19.5 cm",
+        "weight": "9.0 kg",
+        "nr_of_items": 10
       },
       "LAYER": {
-        "nr_of_items": null,
-        "nr_of_cartons": null
+        "nr_of_items": 140,
+        "nr_of_cartons": 14
       },
       "PALLET": {
-        "length": null,
-        "width": null,
-        "height": null,
-        "weight": null,
-        "nr_of_cartons": null,
-        "nr_of_items": null,
-        "nr_of_layers": null
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "113.0 cm",
+        "weight": "650.0 kg",
+        "nr_of_cartons": 70,
+        "nr_of_items": 700,
+        "nr_of_layers": 5
       }
     }
   },
