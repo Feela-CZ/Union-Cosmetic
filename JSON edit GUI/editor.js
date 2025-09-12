@@ -560,13 +560,12 @@ function initUI() {
     });
 
     fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`)
-    .then(r => r.text())             // načteme jako text
-    .then(t => JSON.parse(t))        // ručně převedeme na JSON
-    .then(data => {
-        products = data;
-        renderTable();
-        document.getElementById('product-table-section').style.display = 'block';
-    });
+        .then(r => r.json())             
+        .then(data => {
+            products = data;
+            renderTable();
+            document.getElementById('product-table-section').style.display = 'block';
+        });
 
     updateLogisticsKeyFilter();
 
