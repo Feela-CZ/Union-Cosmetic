@@ -629,9 +629,6 @@ function renderTable() {
     const typeFilter = document.getElementById('type-filter').value;
     const logisticsKeyFilter = document.getElementById('logistics-key-filter').value;
 
-    populateDropdowns();
-    updateFilterPlaceholders();
-
     const filteredProducts = products.filter(product => {
         const matchesSearch = (product.brand + ' ' + product.type + ' ' + product.id + ' ' + product.name + ' ' + (product.csName || ''))
             .toLowerCase()
