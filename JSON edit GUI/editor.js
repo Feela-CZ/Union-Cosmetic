@@ -560,12 +560,14 @@ function initUI() {
     });
 
     fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`)
-        .then(r => r.json())
+        .then(r => r.json())             
         .then(data => {
             products = data;
             renderTable();
             document.getElementById('product-table-section').style.display = 'block';
         });
+
+    updateLogisticsKeyFilter();
 
     document.getElementById('toggle-discontinued').addEventListener('click', () => {
         showDiscontinued = !showDiscontinued;
@@ -580,6 +582,7 @@ function setLang(lang) {
     updateUITexts();
     updateToggleDiscontinuedText();
     renderTable();
+    updateFilterPlaceholders();
 }
 
 function updateUITexts() {
@@ -606,6 +609,13 @@ function updateToggleDiscontinuedText() {
     btn.textContent = translations[currentLang][key];
 }
 
+function updateFilterPlaceholders() {
+    document.getElementById('search-input').placeholder = translations[currentLang].placeholder_search;
+    document.getElementById('brand-filter').options[0].textContent = translations[currentLang].filter_brand;
+    document.getElementById('type-filter').options[0].textContent = translations[currentLang].filter_type;
+    document.getElementById('logistics-key-filter').options[0].textContent = translations[currentLang].filter_logistics_key;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     updateUITexts();
 });
@@ -618,6 +628,8 @@ function renderTable() {
     const brandFilter = document.getElementById('brand-filter').value;
     const typeFilter = document.getElementById('type-filter').value;
     const logisticsKeyFilter = document.getElementById('logistics-key-filter').value;
+
+    populateDropdowns();
 
     const filteredProducts = products.filter(product => {
         const matchesSearch = (product.brand + ' ' + product.type + ' ' + product.id + ' ' + product.name + ' ' + (product.csName || ''))
@@ -1002,16 +1014,21 @@ if (typeof setLang === 'function') {
 function populateDropdowns() {
     const brandFilter = document.getElementById('brand-filter');
     const typeFilter = document.getElementById('type-filter');
+
+    const selectedBrand = brandFilter.value;
+    const selectedType = typeFilter.value;
+
+    // Brandy necháváme tak, jak jsou
     const brands = [...new Set(products.map(p => p.brand))];
-
     brandFilter.innerHTML = '<option value="" data-i18n="brand_filter"></option>' +
-        brands.map(b => `<option value="${b}">${b}</option>`).join('');
+        brands.map(b => `<option value="${b}" ${b === selectedBrand ? 'selected' : ''}>${b}</option>`).join('');
 
+    // Typy řadíme podle překladu
     const types = [...new Set(products.map(p => p.type))]
         .sort((a, b) => translateType(a).localeCompare(translateType(b), currentLang, { sensitivity: 'base' }));
 
     typeFilter.innerHTML = '<option value="" data-i18n="type_filter"></option>' +
-        types.map(t => `<option value="${t}">${translateType(t)}</option>`).join('');
+        types.map(t => `<option value="${t}" ${t === selectedType ? 'selected' : ''}>${translateType(t)}</option>`).join('');
 }
 
 function openAddModal() {
@@ -1269,11 +1286,10 @@ function showLogistics(index) {
 
 function populateTypeSelect() {
     const typeSelect = document.getElementById('type');
-    const types = [...new Set(products.map(p => p.type))]
+    if (!typeSelect) return;
 
-        .sort((a, b) => translateType(a).localeCompare(translateType(b), currentLang, { sensitivity: 'base' }));
-
-    typeSelect.innerHTML = '<option value="" data-i18n="select_type"></option>' +
+    const types = [...new Set(products.map(p => p.type))].sort();
+    typeSelect.innerHTML = '<option value="">-- select type --</option>' +
         types.map(t => `<option value="${t}">${translateType(t)}</option>`).join('');
 }
 
