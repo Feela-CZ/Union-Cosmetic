@@ -630,6 +630,7 @@ function renderTable() {
     const logisticsKeyFilter = document.getElementById('logistics-key-filter').value;
 
     populateDropdowns();
+    updateFilterPlaceholders();
 
     const filteredProducts = products.filter(product => {
         const matchesSearch = (product.brand + ' ' + product.type + ' ' + product.id + ' ' + product.name + ' ' + (product.csName || ''))
@@ -1024,8 +1025,6 @@ function populateDropdowns() {
 
     typeFilter.innerHTML = '<option value="" data-i18n="type_filter"></option>' +
         types.map(t => `<option value="${t}">${translateType(t)}</option>`).join('');
-
-    translateDom();
 }
 
 function openAddModal() {
@@ -1289,8 +1288,6 @@ function populateTypeSelect() {
 
     typeSelect.innerHTML = '<option value="" data-i18n="select_type"></option>' +
         types.map(t => `<option value="${t}">${translateType(t)}</option>`).join('');
-
-    translateDom();
 }
 
 function logisticsKeyCompare(a, b) {
