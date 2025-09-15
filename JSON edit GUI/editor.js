@@ -560,7 +560,7 @@ function initUI() {
     });
 
     fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`)
-        .then(r => r.json())             
+        .then(r => r.json())
         .then(data => {
             products = data;
             renderTable();
@@ -1014,17 +1014,16 @@ if (typeof setLang === 'function') {
 function populateDropdowns() {
     const brandFilter = document.getElementById('brand-filter');
     const typeFilter = document.getElementById('type-filter');
+    const brands = [...new Set(products.map(p => p.brand))];
 
-    const selectedBrand = brandFilter.value;
-    const selectedType = typeFilter.value;
+    brandFilter.innerHTML = '<option value="" data-i18n="brand_filter"></option>' +
+        brands.map(b => `<option value="${b}">${b}</option>`).join('');
 
-    const brands = [...new Set(products.map(p => p.brand))].sort();
-    const types = [...new Set(products.map(p => p.type))].sort();
+    const types = [...new Set(products.map(p => p.type))]
+        .sort((a, b) => translateType(a).localeCompare(translateType(b), currentLang, { sensitivity: 'base' }));
 
-    brandFilter.innerHTML = `<option value="">${translations[currentLang].filter_brand}</option>` +
-        brands.map(b => `<option value="${b}" ${b === selectedBrand ? 'selected' : ''}>${b}</option>`).join('');
-    typeFilter.innerHTML = `<option value="">${translations[currentLang].filter_type}</option>` +
-        types.map(t => `<option value="${t}" ${t === selectedType ? 'selected' : ''}>${translateType(t)}</option>`).join('');
+    typeFilter.innerHTML = '<option value="" data-i18n="type_filter"></option>' +
+        types.map(t => `<option value="${t}">${translateType(t)}</option>`).join('');
 }
 
 function openAddModal() {
@@ -1282,10 +1281,11 @@ function showLogistics(index) {
 
 function populateTypeSelect() {
     const typeSelect = document.getElementById('type');
-    if (!typeSelect) return;
+    const types = [...new Set(products.map(p => p.type))]
 
-    const types = [...new Set(products.map(p => p.type))].sort();
-    typeSelect.innerHTML = '<option value="">-- select type --</option>' +
+        .sort((a, b) => translateType(a).localeCompare(translateType(b), currentLang, { sensitivity: 'base' }));
+
+    typeSelect.innerHTML = '<option value="" data-i18n="select_type"></option>' +
         types.map(t => `<option value="${t}">${translateType(t)}</option>`).join('');
 }
 
