@@ -582,7 +582,6 @@ function setLang(lang) {
     updateUITexts();
     updateToggleDiscontinuedText();
     renderTable();
-    updateFilterPlaceholders();
 }
 
 function updateUITexts() {
@@ -609,13 +608,6 @@ function updateToggleDiscontinuedText() {
     btn.textContent = translations[currentLang][key];
 }
 
-function updateFilterPlaceholders() {
-    document.getElementById('search-input').placeholder = translations[currentLang].placeholder_search;
-    document.getElementById('brand-filter').options[0].textContent = translations[currentLang].filter_brand;
-    document.getElementById('type-filter').options[0].textContent = translations[currentLang].filter_type;
-    document.getElementById('logistics-key-filter').options[0].textContent = translations[currentLang].filter_logistics_key;
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     updateUITexts();
 });
@@ -630,6 +622,7 @@ function renderTable() {
     const logisticsKeyFilter = document.getElementById('logistics-key-filter').value;
 
     populateDropdowns();
+    updateLogisticsKeyFilter();
 
     const filteredProducts = products.filter(product => {
         const matchesSearch = (product.brand + ' ' + product.type + ' ' + product.id + ' ' + product.name + ' ' + (product.csName || ''))
