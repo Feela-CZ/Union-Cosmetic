@@ -582,7 +582,6 @@ function setLang(lang) {
     updateUITexts();
     updateToggleDiscontinuedText();
     renderTable();
-    updateFilterPlaceholders();
 }
 
 function updateUITexts() {
@@ -607,13 +606,6 @@ function updateToggleDiscontinuedText() {
     const key = showDiscontinued ? 'hide_discontinued' : 'show_discontinued';
     btn.setAttribute('data-i18n', key);
     btn.textContent = translations[currentLang][key];
-}
-
-function updateFilterPlaceholders() {
-    document.getElementById('search-input').placeholder = translations[currentLang].placeholder_search;
-    document.getElementById('brand-filter').options[0].textContent = translations[currentLang].filter_brand;
-    document.getElementById('type-filter').options[0].textContent = translations[currentLang].filter_type;
-    document.getElementById('logistics-key-filter').options[0].textContent = translations[currentLang].filter_logistics_key;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
