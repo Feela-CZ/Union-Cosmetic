@@ -565,9 +565,6 @@ function initUI() {
             products = data;
             renderTable();
             document.getElementById('product-table-section').style.display = 'block';
-            populateDropdowns();
-            populateTypeSelect();
-            translateDom();
         });
 
     updateLogisticsKeyFilter();
@@ -1027,6 +1024,8 @@ function populateDropdowns() {
 
     typeFilter.innerHTML = '<option value="" data-i18n="type_filter"></option>' +
         types.map(t => `<option value="${t}">${translateType(t)}</option>`).join('');
+
+    translateDom();
 }
 
 function openAddModal() {
@@ -1290,6 +1289,8 @@ function populateTypeSelect() {
 
     typeSelect.innerHTML = '<option value="" data-i18n="select_type"></option>' +
         types.map(t => `<option value="${t}">${translateType(t)}</option>`).join('');
+
+    translateDom();
 }
 
 function logisticsKeyCompare(a, b) {
