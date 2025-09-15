@@ -560,7 +560,7 @@ function initUI() {
     });
 
     fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`)
-        .then(r => r.json())             
+        .then(r => r.json())
         .then(data => {
             products = data;
             renderTable();
@@ -1018,16 +1018,14 @@ function populateDropdowns() {
     const selectedBrand = brandFilter.value;
     const selectedType = typeFilter.value;
 
-    // Brandy necháváme tak, jak jsou
     const brands = [...new Set(products.map(p => p.brand))];
-    brandFilter.innerHTML = '<option value="" data-i18n="brand_filter"></option>' +
+    brandFilter.innerHTML = `<option value="">${translations[currentLang].filter_brand}</option>` +
         brands.map(b => `<option value="${b}" ${b === selectedBrand ? 'selected' : ''}>${b}</option>`).join('');
 
-    // Typy řadíme podle překladu
-    const types = [...new Set(products.map(p => p.type))]
-        .sort((a, b) => translateType(a).localeCompare(translateType(b), currentLang, { sensitivity: 'base' }));
-
-    typeFilter.innerHTML = '<option value="" data-i18n="type_filter"></option>' +
+    const types = [...new Set(products.map(p => p.type))].sort((a, b) =>
+        translateType(a).localeCompare(translateType(b), currentLang, { sensitivity: 'base' })
+    );
+    typeFilter.innerHTML = `<option value="">${translations[currentLang].filter_type}</option>` +
         types.map(t => `<option value="${t}" ${t === selectedType ? 'selected' : ''}>${translateType(t)}</option>`).join('');
 }
 
