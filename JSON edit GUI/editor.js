@@ -567,8 +567,6 @@ function initUI() {
             document.getElementById('product-table-section').style.display = 'block';
         });
 
-    updateLogisticsKeyFilter();
-
     document.getElementById('toggle-discontinued').addEventListener('click', () => {
         showDiscontinued = !showDiscontinued;
         updateToggleDiscontinuedText();
