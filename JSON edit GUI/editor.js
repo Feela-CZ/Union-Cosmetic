@@ -565,6 +565,9 @@ function initUI() {
             products = data;
             renderTable();
             document.getElementById('product-table-section').style.display = 'block';
+            populateDropdowns();
+            populateTypeSelect();
+            translateDom();
         });
 
     updateLogisticsKeyFilter();
