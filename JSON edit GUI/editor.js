@@ -1339,23 +1339,28 @@ function populateLogisticsKeySelect() {
 function updateLogisticsKeyFilter() {
     const brand = document.getElementById('brand-filter').value;
     const logisticsKeyFilter = document.getElementById('logistics-key-filter');
+    const selectedKey = logisticsKeyFilter.value;
 
     if (brand && logisticsData[brand]) {
         const keys = Object.keys(logisticsData[brand]);
         keys.sort(logisticsKeyCompare);
 
-        logisticsKeyFilter.innerHTML = `<option value="">${translations[currentLang].filter_logistics_key}</option>` +
-            keys.map(key => `<option value="${key}">${key}</option>`).join('');
+        logisticsKeyFilter.innerHTML =
+            `<option value="">${translations[currentLang].filter_logistics_key}</option>` +
+            keys.map(key =>
+                `<option value="${key}" ${key === selectedKey ? 'selected' : ''}>${key}</option>`
+            ).join('');
+
         logisticsKeyFilter.style.display = 'inline-block';
         logisticsKeyFilter.disabled = false;
     } else {
-        logisticsKeyFilter.innerHTML = `<option value="">${translations[currentLang].filter_logistics_key}</option>`;
+        logisticsKeyFilter.innerHTML =
+            `<option value="">${translations[currentLang].filter_logistics_key}</option>`;
         logisticsKeyFilter.style.display = 'none';
         logisticsKeyFilter.value = '';
         logisticsKeyFilter.disabled = true;
     }
 }
-
 function openLogisticsEditModal(brand, key, index = null) {
     currentLogisticsBrand = brand;
     currentLogisticsKey = key;
