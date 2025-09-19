@@ -323,8 +323,13 @@ async function apiPut(name, data) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     });
+
     if (!res.ok) throw new Error(await res.text() || res.statusText);
-    return res.json().catch(() => ({ ok: true }));
+    try {
+        return await res.json();
+    } catch {
+        return { ok: true };
+    }
 }
 
 async function saveProductsToRepo() {
