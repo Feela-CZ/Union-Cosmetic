@@ -358,21 +358,42 @@ async function saveLogisticsToRepo() {
 
 function translateType(type) {
     if (!type) return '';
-    return translations[currentLang].product_types[type] || type;
+    try {
+        return translations[currentLang]?.product_types?.[type] || type;
+    } catch {
+        return String(type);
+    }
 }
 
-fetch(`${window.API_BASE}/api/logistics?ts=${Date.now()}`)
-    .then(r => r.json())
-    .then(data => {
-        logisticsData = data;
-        Object.keys(logisticsData || {}).forEach(br => {
-            Object.keys(logisticsData[br] || {}).forEach(k => {
-                const pal = logisticsData[br][k]?.PALLET;
-                if (pal && 'carton_ean' in pal) delete pal.carton_ean;
-            });
+const LOCAL_MODE = location.hostname === "127.0.0.1" || location.hostname === "localhost";
+
+const productsUrl = LOCAL_MODE 
+    ? "../Order Sheet/products.json?ts=" + Date.now()
+    : `${window.API_BASE}/api/products?ts=${Date.now()}`;
+
+const logisticsUrl = LOCAL_MODE 
+    ? "logistics.json?ts=" + Date.now()
+    : `${window.API_BASE}/api/logistics?ts=${Date.now()}`;
+
+Promise.all([
+    fetch(productsUrl).then(r => r.json()),
+    fetch(logisticsUrl).then(r => r.json())
+]).then(([productsData, logisticsDataRaw]) => {
+    products = productsData;
+    logisticsData = logisticsDataRaw;
+
+    // očista logisticsData
+    Object.keys(logisticsData || {}).forEach(br => {
+        Object.keys(logisticsData[br] || {}).forEach(k => {
+            const pal = logisticsData[br][k]?.PALLET;
+            if (pal && 'carton_ean' in pal) delete pal.carton_ean;
         });
-        initUI();
     });
+
+    initUI();
+    renderTable();
+    document.getElementById('product-table-section').style.display = 'block';
+}).catch(err => console.error("Chyba při načítání dat:", err));
 
 function fillKeysSelect(brand, selectedKey = null) {
     const chooseKey = document.getElementById('choose-key');
@@ -564,13 +585,9 @@ function initUI() {
         renderTable();
     });
 
-    fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`)
-        .then(r => r.json())
-        .then(data => {
-            products = data;
-            renderTable();
-            document.getElementById('product-table-section').style.display = 'block';
-        });
+    const url = LOCAL_MODE
+        ? "products.json?ts=" + Date.now()
+        : `${window.API_BASE}/api/products?ts=${Date.now()}`;
 
     updateLogisticsKeyFilter();
 
@@ -580,6 +597,7 @@ function initUI() {
         renderTable();
     });
     updateToggleDiscontinuedText();
+    updateUITexts();
 }
 
 function setLang(lang) {

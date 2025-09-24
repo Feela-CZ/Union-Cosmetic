@@ -220,9 +220,17 @@
             </form>
         </div>
     </div>
+
     <script>
-        window.API_BASE = "https://union-cosmetic.filipluchesi.workers.dev";
+        if (location.hostname === "127.0.0.1" || location.hostname === "localhost") {
+            window.LOCAL_MODE = true;
+            window.API_BASE = ".";
+        } else {
+            window.LOCAL_MODE = false;
+            window.API_BASE = "https://union-cosmetic.filipluchesi.workers.dev";
+        }
     </script>
+
     <script src="editor.js"></script>
     <script src="xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
