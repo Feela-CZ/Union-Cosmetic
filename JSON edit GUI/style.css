@@ -315,7 +315,7 @@ button.logistics-partial {
 
 .edit-product-grid {
     display: grid;
-    grid-template-columns: 2fr minmax(180px, 1fr) minmax(180px, 1fr);
+    grid-template-columns: 2fr 0.7fr 0.7fr;
     gap: 15px;
     max-width: 80vw;
 }
@@ -433,6 +433,11 @@ button.logistics-partial {
 
 .edit-footer .confirm-button:hover {
     background-color: #0056b3;
+}
+
+#modal .modal-content {
+    width: auto;        /* zruší pevné 500px jen tady */
+    max-width: 60vw;    /* limit, aby modal nepřerostl viewport */
 }
 
 .lightbox {
