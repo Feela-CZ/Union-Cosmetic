@@ -121,6 +121,7 @@ const translations = {
         show_discontinued: "Show discontinued",
         hide_discontinued: "Hide discontinued",
         carton_ean: "Carton EAN",
+        download_photo: "Stáhnout fotku",
         product_types: {
             "Accessories": "Accessories",
             "Balsam": "Balsam",
@@ -268,6 +269,7 @@ const translations = {
         show_discontinued: "Zobrazit ukončené",
         hide_discontinued: "Skrýt ukončené",
         carton_ean: "EAN kartonu",
+        download_photo: "Stáhnout fotku",
         product_types: {
             "Accessories": "Doplňky",
             "Balsam": "Balzám",
@@ -367,11 +369,11 @@ function translateType(type) {
 
 const LOCAL_MODE = location.hostname === "127.0.0.1" || location.hostname === "localhost";
 
-const productsUrl = LOCAL_MODE 
+const productsUrl = LOCAL_MODE
     ? "../Order Sheet/products.json?ts=" + Date.now()
     : `${window.API_BASE}/api/products?ts=${Date.now()}`;
 
-const logisticsUrl = LOCAL_MODE 
+const logisticsUrl = LOCAL_MODE
     ? "logistics.json?ts=" + Date.now()
     : `${window.API_BASE}/api/logistics?ts=${Date.now()}`;
 
@@ -451,8 +453,23 @@ function initUI() {
         });
     });
 
-    window.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal')) {
+    let mouseDownInside = false;
+
+    document.addEventListener('mousedown', (e) => {
+        // pokud začal klik uvnitř modalu, zapamatujeme si
+        if (e.target.closest('.modal-content')) {
+            mouseDownInside = true;
+        } else {
+            mouseDownInside = false;
+        }
+    });
+
+    window.addEventListener('mouseup', (e) => {
+        // zavři modal jen když klik skončil přímo na overlay a nezačal uvnitř
+        if (
+            e.target.classList.contains('modal') &&
+            !mouseDownInside
+        ) {
             e.target.style.display = 'none';
         }
     });
@@ -1197,6 +1214,46 @@ function editProduct(index) {
     document.getElementById('discontinued').checked = product.discontinued === true;
     document.getElementById('discontinued_date').value = product.discontinued_date;
     document.getElementById('modal').style.display = 'block';
+
+    const photoEl = document.getElementById('product-photo');
+    if (product.id) {
+        photoEl.src = `../Order%20sheet/img/${product.id}.jpg`;
+        photoEl.onerror = () => {
+            photoEl.src = '../Order%20sheet/img/no-image.jpg';
+        };
+    } else {
+        photoEl.src = '../Order%20sheet/img/no-image.jpg';
+    }
+
+    // Kliknutí na miniaturu = otevřít plnou fotku v lightboxu
+    photoEl.onclick = () => {
+        if (photoEl.src && !photoEl.src.includes('no-image')) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            lightboxImg.src = photoEl.src;
+            lightbox.style.display = 'flex';
+        }
+    };
+
+    // Zavření lightboxu kliknutím
+    document.getElementById('lightbox').onclick = () => {
+        document.getElementById('lightbox').style.display = 'none';
+    };
+
+    // Tlačítko stáhnout fotku
+    const downloadBtn = document.getElementById('download-photo-btn');
+    downloadBtn.onclick = () => {
+        if (!photoEl.src || photoEl.src.includes('no-image')) {
+            alert('Fotka není k dispozici');
+            return;
+        }
+        const a = document.createElement('a');
+        a.href = photoEl.src;
+        a.download = `${product.id}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
 }
 
 let deleteIndex = null;

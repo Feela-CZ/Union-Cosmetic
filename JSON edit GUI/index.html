@@ -65,55 +65,84 @@
         <div class="modal-content">
             <span class="close-modal">&times;</span>
             <h2 data-i18n="edit_product_title"></h2>
-            <form id="product-form">
-                <label data-i18n="label_brand"></label>
-                <select id="brand">
-                    <option value="" data-i18n="select_brand"></option>
-                    <option value="Lilien">Lilien</option>
-                    <option value="Naturalis">Naturalis</option>
-                    <option value="Twister">Twister</option>
-                    <option value="Natava">Natava</option>
-                </select>
-                <label data-i18n="label_type"></label>
-                <select id="type">
-                    <option value="" data-i18n="select_type"></option>
-                </select>
-                <label data-i18n="label_id"></label> <input type="text" id="id">
-                <label data-i18n="label_hs"></label> <input type="text" id="hs">
-                <label for="name_en">Name (EN)</label> <input type="text" id="name_en">
-                <label for="name_cs">Name (CZ)</label> <input type="text" id="name_cs">
-                <label data-i18n="label_volume"></label>
-                <div id="volume-wrapper">
-                    <input type="number" id="volume-number">
-                    <select id="volume-unit">
-                        <option value="ml">ml</option>
-                        <option value="g">g</option>
-                        <option value="pc">pc</option>
+            <form id="product-form" class="edit-product-grid">
+                <!-- Sloupec 1 -->
+                <div class="edit-col">
+                    <label data-i18n="label_brand"></label>
+                    <select id="brand">
+                        <option value="" data-i18n="select_brand"></option>
+                        <option value="Lilien">Lilien</option>
+                        <option value="Naturalis">Naturalis</option>
+                        <option value="Twister">Twister</option>
+                        <option value="Natava">Natava</option>
+                    </select>
+
+                    <label data-i18n="label_type"></label>
+                    <select id="type">
+                        <option value="" data-i18n="select_type"></option>
+                    </select>
+
+                    <label data-i18n="label_id"></label> <input type="text" id="id">
+                    <label data-i18n="label_hs"></label> <input type="text" id="hs">
+                    <label for="name_en">Name (EN)</label> <input type="text" id="name_en">
+                    <label for="name_cs">Name (CZ)</label> <input type="text" id="name_cs">
+                </div>
+
+                <!-- Sloupec 2 -->
+                <div class="edit-col">
+                    <label data-i18n="label_volume"></label>
+                    <div id="volume-wrapper">
+                        <input type="number" id="volume-number">
+                        <select id="volume-unit">
+                            <option value="ml">ml</option>
+                            <option value="g">g</option>
+                            <option value="pc">pc</option>
+                        </select>
+                    </div>
+
+                    <label data-i18n="label_price"></label> <input type="number" id="price" step="any">
+                    <label data-i18n="label_pack"></label> <input type="number" id="pack">
+                    <label data-i18n="label_boxes_per_layer"></label> <input type="number" id="boxes_per_layer">
+                    <label data-i18n="label_boxes_per_pallet"></label> <input type="number" id="boxes_per_pallet">
+
+                    <label data-i18n="label_logistics_key"></label>
+                    <select id="logistics-key">
+                        <option value="" data-i18n="select_key"></option>
                     </select>
                 </div>
-                <label data-i18n="label_price"></label> <input type="number" id="price" step="any">
-                <label data-i18n="label_pack"></label> <input type="number" id="pack">
-                <label data-i18n="label_boxes_per_layer"></label> <input type="number" id="boxes_per_layer">
-                <label data-i18n="label_boxes_per_pallet"></label> <input type="number" id="boxes_per_pallet">
-                <label data-i18n="label_logistics_key"></label>
-                <select id="logistics-key">
-                    <option value="" data-i18n="select_key"></option>
-                </select>
 
-                <div style="display: flex; align-items: center; gap: 18px; margin-top: 10px; margin-bottom: 2px;">
-                    <label style="display: flex; align-items: center; gap: 6px; margin: 0;">
-                        <input type="checkbox" id="new"> <span data-i18n="label_new"></span>
-                    </label>
-                    <input type="date" id="new_date">
-
-                    <label style="display: flex; align-items: center; gap: 6px; margin: 0;">
-                        <input type="checkbox" id="discontinued"> <span data-i18n="label_discontinued"></span>
-                    </label>
-                    <input type="date" id="discontinued_date">
+                <!-- Sloupec 3 -->
+                <div class="photo-wrapper">
+                    <div class="photo-placeholder">
+                        <img id="product-photo" src="" alt="Product photo"
+                            style="max-width:100%; max-height:200px; object-fit:contain; cursor:pointer;">
+                    </div>
+                    <button type="button" id="download-photo-btn" data-i18n="download_photo"
+                        class="photo-download-btn"></button>
                 </div>
 
-                <input type="hidden" id="product-index">
-                <button type="submit" style="margin-top: 10px;" data-i18n="save"></button>
+                <!-- Patička -->
+                <div class="edit-footer">
+                    <div class="status-options">
+                        <div class="status-row">
+                            <label>
+                                <input type="checkbox" id="new"> <span data-i18n="label_new"></span>
+                            </label>
+                            <input type="date" id="new_date">
+                        </div>
+                        <div class="status-row">
+                            <label>
+                                <input type="checkbox" id="discontinued"> <span data-i18n="label_discontinued"></span>
+                            </label>
+                            <input type="date" id="discontinued_date">
+                        </div>
+                    </div>
+
+                    <div>
+                        <input type="hidden" id="product-index">
+                        <button type="submit" class="confirm-button" data-i18n="save"></button>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
@@ -234,6 +263,9 @@
     <script src="editor.js"></script>
     <script src="xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
+    <div id="lightbox" class="lightbox">
+        <img id="lightbox-img" src="" alt="Large view">
+    </div>
 </body>
 
 </html>

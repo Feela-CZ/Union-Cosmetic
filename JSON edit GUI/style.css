@@ -28,7 +28,8 @@ h4 {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-#product-table th, #product-table td {
+#product-table th,
+#product-table td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: center;
@@ -38,6 +39,7 @@ h4 {
     background-color: #007bff;
     color: white;
 }
+
 #product-table th.sortable {
     background-color: #007bff;
     cursor: pointer;
@@ -127,6 +129,7 @@ button:hover {
     color: #888;
     transition: color 0.15s;
 }
+
 .close-modal:hover {
     color: #333;
 }
@@ -211,8 +214,10 @@ button.logistics-partial {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
-    column-gap: 32px;   /* místo gap: zachová „funkčnost do všech směrů“ kromě spodního */
-    row-gap: 0;         /* žádný svislý gap mezi řádky sloupců */
+    column-gap: 32px;
+    /* místo gap: zachová „funkčnost do všech směrů“ kromě spodního */
+    row-gap: 0;
+    /* žádný svislý gap mezi řádky sloupců */
 }
 
 #logistics-fields .logistics-fields-col {
@@ -261,7 +266,7 @@ button.logistics-partial {
     margin-bottom: 5px;
     font-size: 1.08em;
     font-weight: bold;
-    color: #007bff;    
+    color: #007bff;
     border-bottom: 1px solid #e3e3e3;
     padding-bottom: 2px;
 }
@@ -296,7 +301,7 @@ button.logistics-partial {
 }
 
 #lang-switcher {
-   text-align: right;
+    text-align: right;
 }
 
 #product-table.hide-discontinued-cols th.col-discontinued,
@@ -308,26 +313,162 @@ button.logistics-partial {
     margin-top: 25px
 }
 
-/* Responsivita pro menší obrazovky */
-@media (max-width: 900px) {
-    #logistics-fields {
-        flex-direction: column;
-        column-gap: 0;
-    }
-    #logistics-fields .logistics-fields-col {
-        min-width: unset;
-    }
+.edit-product-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
 }
 
-#logistics-edit-modal .modal-content .btn {
-    margin-top: 10px;
+.edit-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-.close-logistics-modal {
-    float: right;
-    cursor: pointer;
-    font-size: 28px;
+.edit-col label {
     font-weight: bold;
+    margin-top: 5px;
+}
+
+.photo-placeholder {
+    width: 100%;
+    height: 200px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #777;
+    font-style: italic;
+    background: #fafafa;
+    position: relative;
+}
+
+.edit-footer {
+    grid-column: 1 / span 3;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 20px;
+    gap: 20px;
+}
+
+.status-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.photo-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.photo-placeholder {
+    width: 100%;
+    height: 200px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #777;
+    font-style: italic;
+    background: #fafafa;
+}
+
+#product-photo {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    cursor: pointer;
+    /* pacička */
+}
+
+.photo-download-btn {
+    margin-top: 6px;
+    padding: 6px 14px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    /* stejné jako placeholder */
+}
+
+.photo-download-btn:hover {
+    background-color: #0056b3;
+}
+
+.edit-footer {
+    display: flex;
+    justify-content: space-between;
+    /* status options vlevo, uložit vpravo */
+    align-items: flex-end;
+    margin-top: 20px;
+}
+
+.edit-footer .confirm-button {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    align-self: flex-end;
+    /* zarovnání ke spodku */
+}
+
+.edit-footer .confirm-button:hover {
+    background-color: #0056b3;
+}
+
+.lightbox {
+    display: none;
+    /* defaultně skryté */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+}
+
+.lightbox img {
+    max-width: 90%;
+    max-height: 90%;
+    box-shadow: 0 0 10px #000;
+    border-radius: 4px;
+    background: white;
+    padding: 4px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @media (max-width: 900px) {
@@ -337,13 +478,16 @@ button.logistics-partial {
         max-width: unset;
         padding: 10vw 2vw;
     }
+
     #logistics-fields .logistics-fields-row {
         flex-direction: column;
         gap: 0;
     }
+
     #logistics-fields .logistics-fields-col {
         min-width: unset;
     }
+
     #logistics-fields h4 {
         font-size: 1em;
     }
