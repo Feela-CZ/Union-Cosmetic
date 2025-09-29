@@ -121,7 +121,10 @@ const translations = {
         show_discontinued: "Show discontinued",
         hide_discontinued: "Hide discontinued",
         carton_ean: "Carton EAN",
-        download_photo: "Stáhnout fotku",
+        download_photo: "Download photo",
+        add_product_title: "Add product",
+        upload_photo: "Upload photo",
+        dragdrop_photo: "Drag & Drop",
         product_types: {
             "Accessories": "Accessories",
             "Balsam": "Balsam",
@@ -270,6 +273,9 @@ const translations = {
         hide_discontinued: "Skrýt ukončené",
         carton_ean: "EAN kartonu",
         download_photo: "Stáhnout fotku",
+        upload_photo: "Nahrát fotku",
+        dragdrop_photo: "Přetáhni sem pro nahrání",
+        add_product_title: "Přidat produkt",
         product_types: {
             "Accessories": "Doplňky",
             "Balsam": "Balzám",
@@ -418,6 +424,43 @@ function initUI() {
 
     document.getElementById('add-product').addEventListener('click', openAddModal);
     document.getElementById('product-form').addEventListener('submit', saveProduct);
+    document.getElementById('add-product-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        initAddPhotoUpload();
+
+        const newProduct = {
+            brand: document.getElementById('add-brand').value.trim(),
+            type: document.getElementById('add-type').value.trim(),
+            id: document.getElementById('add-id').value.trim(),
+            hs: document.getElementById('add-hs').value.trim(),
+            name_en: document.getElementById('add-name_en').value.trim(),
+            name_cs: document.getElementById('add-name_cs').value.trim(),
+            volume: {
+                number: document.getElementById('add-volume-number').value.trim(),
+                unit: document.getElementById('add-volume-unit').value.trim(),
+            },
+            price: document.getElementById('add-price').value.trim(),
+            pack: document.getElementById('add-pack').value.trim(),
+            boxes_per_layer: document.getElementById('add-boxes_per_layer').value.trim(),
+            boxes_per_pallet: document.getElementById('add-boxes_per_pallet').value.trim(),
+            logistics_key: document.getElementById('add-logistics-key').value.trim(),
+            new: document.getElementById('add-new').checked,
+            new_date: document.getElementById('add-new_date').value,
+            discontinued: document.getElementById('add-discontinued').checked,
+            discontinued_date: document.getElementById('add-discontinued_date').value,
+            photo: document.getElementById('add-product-photo').src || ""
+        };
+
+        // uložení do datové struktury
+        products.push(newProduct);
+        saveProductsToLocalStorage();
+
+        // překreslení tabulky
+        renderTable();
+
+        // zavřeme modal
+        document.getElementById('add-modal').style.display = 'none';
+    });
     document.getElementById('search-input').addEventListener('input', renderTable);
     document.getElementById('brand-filter').addEventListener('change', function () {
         updateLogisticsKeyFilter();
@@ -615,6 +658,7 @@ function initUI() {
     });
     updateToggleDiscontinuedText();
     updateUITexts();
+    initAddPhotoUpload();
 }
 
 function setLang(lang) {
@@ -1064,20 +1108,85 @@ function populateDropdowns() {
 
 function openAddModal() {
     editIndex = null;
-    document.getElementById('product-form').reset();
-    populateTypeSelect();
-    populateLogisticsKeySelect();
-    if (document.getElementById('new').checked) {
+    // resetujeme celý add-form
+    document.getElementById('add-product-form').reset();
+
+    // naplníme selecty (brand je přímo v HTML, type + logistics se plní dynamicky)
+    populateTypeSelect('add-type');
+    populateLogisticsKeySelect('add-logistics-key');
+
+    // výchozí datum pro "nový produkt"
+    if (document.getElementById('add-new').checked) {
         const today = new Date().toISOString().split('T')[0];
-        document.getElementById('new_date').value = today;
+        document.getElementById('add-new_date').value = today;
     } else {
-        document.getElementById('new_date').value = '';
+        document.getElementById('add-new_date').value = '';
     }
-    document.getElementById('modal').style.display = 'block';
+
+    // reset fotky na placeholder
+    const addPhoto = document.getElementById('add-product-photo');
+    addPhoto.src = "";
+    addPhoto.alt = "No photo";
+
+    // zobrazíme nový modal
+    document.getElementById('add-modal').style.display = 'block';
 }
 
-function closeModal() {
-    document.getElementById('modal').style.display = 'none';
+function initAddPhotoUpload() {
+    const dropzone = document.getElementById('add-photo-dropzone');
+    const input = document.getElementById('add-photo-input');
+    const img = document.getElementById('add-product-photo');
+    const placeholder = document.getElementById('add-photo-placeholder-text');
+    const uploadBtn = document.getElementById('add-upload-photo-btn');
+
+    if (!dropzone || !input || !img || !placeholder || !uploadBtn) return;
+
+    // Klik na tlačítko -> otevře file input
+    uploadBtn.addEventListener('click', () => {
+        input.click();
+    });
+
+    // Klik na dropzone -> taky otevře file input
+    dropzone.addEventListener('click', () => {
+        input.click();
+    });
+
+    // Když se vybere soubor
+    input.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                img.src = ev.target.result;
+                img.style.display = 'block';
+                placeholder.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Drag & drop
+    dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+    });
+    dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('dragover');
+    });
+    dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                img.src = ev.target.result;
+                img.style.display = 'block';
+                placeholder.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 }
 
 let pendingProduct = null;

@@ -147,6 +147,113 @@
         </div>
     </div>
 
+    <div id="add-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 data-i18n="add_product_title"></h2>
+            <form id="add-product-form" class="edit-product-grid">
+                <!-- Sloupec 1 -->
+                <div class="edit-col">
+                    <label data-i18n="label_brand"></label>
+                    <select id="add-brand">
+                        <option value="" data-i18n="select_brand"></option>
+                        <option value="Lilien">Lilien</option>
+                        <option value="Naturalis">Naturalis</option>
+                        <option value="Twister">Twister</option>
+                        <option value="Natava">Natava</option>
+                    </select>
+
+                    <label data-i18n="label_type"></label>
+                    <select id="add-type">
+                        <option value="" data-i18n="select_type"></option>
+                    </select>
+
+                    <label data-i18n="label_id"></label>
+                    <input type="text" id="add-id">
+
+                    <label data-i18n="label_hs"></label>
+                    <input type="text" id="add-hs">
+
+                    <label for="add-name_en">Name (EN)</label>
+                    <input type="text" id="add-name_en">
+
+                    <label for="add-name_cs">Name (CZ)</label>
+                    <input type="text" id="add-name_cs">
+                </div>
+
+                <!-- Sloupec 2 -->
+                <div class="edit-col">
+                    <label data-i18n="label_volume"></label>
+                    <div id="add-volume-wrapper">
+                        <input type="number" id="add-volume-number">
+                        <select id="add-volume-unit">
+                            <option value="ml">ml</option>
+                            <option value="g">g</option>
+                            <option value="pc">pc</option>
+                        </select>
+                    </div>
+
+                    <label data-i18n="label_price"></label>
+                    <input type="number" id="add-price" step="any">
+
+                    <label data-i18n="label_pack"></label>
+                    <input type="number" id="add-pack">
+
+                    <label data-i18n="label_boxes_per_layer"></label>
+                    <input type="number" id="add-boxes_per_layer">
+
+                    <label data-i18n="label_boxes_per_pallet"></label>
+                    <input type="number" id="add-boxes_per_pallet">
+
+                    <label data-i18n="label_logistics_key"></label>
+                    <select id="add-logistics-key">
+                        <option value="" data-i18n="select_key"></option>
+                    </select>
+                </div>
+
+                <!-- Sloupec 3 -->
+                <div class="photo-wrapper">
+                    <div class="photo-placeholder" id="add-photo-dropzone">
+                        <img id="add-product-photo" src="" alt="No photo"
+                            style="max-width:100%; max-height:200px; object-fit:contain; display:none;">
+                        <!-- nový samostatný klíč -->
+                        <span id="add-photo-placeholder-text" data-i18n="dragdrop_photo">
+                            Drag & Drop or click to upload
+                        </span>
+                        <input type="file" id="add-photo-input" accept="image/*" style="display:none;">
+                    </div>
+                    <!-- tlačítko má jiný klíč -->
+                    <button type="button" id="add-upload-photo-btn" class="photo-download-btn" data-i18n="upload_photo">
+                        Upload photo
+                    </button>
+                </div>
+
+                <!-- Patička -->
+                <div class="edit-footer">
+                    <div class="status-options">
+                        <div class="status-row">
+                            <label>
+                                <input type="checkbox" id="add-new"> <span data-i18n="label_new"></span>
+                            </label>
+                            <input type="date" id="add-new_date">
+                        </div>
+                        <div class="status-row">
+                            <label>
+                                <input type="checkbox" id="add-discontinued"> <span
+                                    data-i18n="label_discontinued"></span>
+                            </label>
+                            <input type="date" id="add-discontinued_date">
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="confirm-button" data-i18n="save"></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div id="confirm-delete-modal" class="modal">
         <div class="modal-content">
             <h2 data-i18n="confirm_delete_title"></h2>
