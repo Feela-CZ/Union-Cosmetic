@@ -707,6 +707,7 @@ function setLang(lang) {
     updateUITexts();
     updateToggleDiscontinuedText();
     renderTable();
+    updateExportLogisticsModalTexts();
 }
 
 function updateUITexts() {
@@ -1119,14 +1120,6 @@ function downloadXML(xmlStr, fileName) {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }, 100);
-}
-
-if (typeof setLang === 'function') {
-    const origSetLang = setLang;
-    setLang = function (lang) {
-        origSetLang(lang);
-        updateExportLogisticsModalTexts();
-    }
 }
 
 function populateDropdowns() {
