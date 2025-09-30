@@ -494,6 +494,10 @@ function initUI() {
         fillKeysSelect(this.value);
     });
 
+    document.getElementById('brand').addEventListener('change', function () {
+        populateTypeSelect();
+    });
+
     document.querySelectorAll('.close-modal').forEach(el => {
         el.addEventListener('click', () => {
             const m = el.closest('.modal');
