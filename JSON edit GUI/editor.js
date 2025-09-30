@@ -1479,8 +1479,11 @@ function populateTypeSelect(selectId = 'type') {
     const typeSelect = document.getElementById(selectId);
     if (!typeSelect) return;
 
-    const types = Object.keys(translations[lang].product_types).sort();
-    typeSelect.innerHTML = '<option value="">-- select type --</option>' +
+    const types = Object.keys(translations[currentLang].product_types).sort((a, b) =>
+        translateType(a).localeCompare(translateType(b), currentLang, { sensitivity: 'base' })
+    );
+
+    typeSelect.innerHTML = `<option value="">${translations[currentLang].select_type}</option>` +
         types.map(t => `<option value="${t}">${translateType(t)}</option>`).join('');
 }
 
