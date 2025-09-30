@@ -127,7 +127,6 @@ const translations = {
         dragdrop_photo: "Drag & Drop - same name as EAN!!!",
         product_types: {
             "Accessories": "Accessories",
-            "Balsam": "Balsam",
             "Bath Ball": "Bath Ball",
             "Bath Essence": "Bath Essence",
             "Bath Foam": "Bath Foam",
@@ -159,7 +158,7 @@ const translations = {
             "Shampoo": "Shampoo",
             "Shower Gel": "Shower Gel",
             "Skin Oil": "Skin Oil",
-            "Solid Balsam": "Solid Balsam",
+            "Solid Balsam": "Solid Hair Balsam",
             "Solid Body Butters": "Solid Body Butters",
             "Solid Deodorant": "Solid Deodorant",
             "Solid Shampoo": "Solid Shampoo",
@@ -278,7 +277,6 @@ const translations = {
         add_product_title: "Přidat produkt",
         product_types: {
             "Accessories": "Doplňky",
-            "Balsam": "Balzám",
             "Bath Ball": "Koupelová koule",
             "Bath Essence": "Esence do koupele",
             "Bath Foam": "Pěna do koupele",
@@ -310,7 +308,7 @@ const translations = {
             "Shampoo": "Šampon",
             "Shower Gel": "Sprchový gel",
             "Skin Oil": "Pleťový olej",
-            "Solid Balsam": "Tuhý balzám",
+            "Solid Balsam": "Tuhý vlasový balzám",
             "Solid Body Butter": "Tuhé tělové máslo",
             "Solid Deodorant": "Tuhý deodorant",
             "Solid Shampoo": "Tuhý šampon",
