@@ -158,8 +158,8 @@ const translations = {
             "Shampoo": "Shampoo",
             "Shower Gel": "Shower Gel",
             "Skin Oil": "Skin Oil",
-            "Solid Balsam": "Solid Hair Balsam",
-            "Solid Body Butters": "Solid Body Butters",
+            "Solid Hair Balsam": "Solid Hair Balsam",
+            "Solid Body Butter": "Solid Body Butter",
             "Solid Deodorant": "Solid Deodorant",
             "Solid Shampoo": "Solid Shampoo",
             "Solid Soap": "Solid Soap",
@@ -308,7 +308,7 @@ const translations = {
             "Shampoo": "Šampon",
             "Shower Gel": "Sprchový gel",
             "Skin Oil": "Pleťový olej",
-            "Solid Balsam": "Tuhý vlasový balzám",
+            "Solid Hair Balsam": "Tuhý vlasový balzám",
             "Solid Body Butter": "Tuhé tělové máslo",
             "Solid Deodorant": "Tuhý deodorant",
             "Solid Shampoo": "Tuhý šampon",
@@ -1479,11 +1479,8 @@ function populateTypeSelect(selectId = 'type') {
     const typeSelect = document.getElementById(selectId);
     if (!typeSelect) return;
 
-    const types = Object.keys(translations[currentLang].product_types).sort((a, b) =>
-        translateType(a).localeCompare(translateType(b), currentLang, { sensitivity: 'base' })
-    );
-
-    typeSelect.innerHTML = `<option value="">${translations[currentLang].select_type}</option>` +
+    const types = Object.keys(translations[lang].product_types).sort();
+    typeSelect.innerHTML = '<option value="">-- select type --</option>' +
         types.map(t => `<option value="${t}">${translateType(t)}</option>`).join('');
 }
 
