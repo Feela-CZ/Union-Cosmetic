@@ -498,6 +498,9 @@ function initUI() {
         populateTypeSelect();
     });
 
+    populateTypeSelect();
+    populateTypeSelect('add-type');
+
     document.querySelectorAll('.close-modal').forEach(el => {
         el.addEventListener('click', () => {
             const m = el.closest('.modal');
@@ -1474,8 +1477,8 @@ function showLogistics(index) {
     };
 }
 
-function populateTypeSelect() {
-    const typeSelect = document.getElementById('type');
+function populateTypeSelect(selectId = 'type') {
+    const typeSelect = document.getElementById(selectId);
     if (!typeSelect) return;
 
     const types = [...new Set(products.map(p => p.type))].sort();
