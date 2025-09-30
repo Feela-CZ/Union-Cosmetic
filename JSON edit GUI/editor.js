@@ -434,41 +434,11 @@ function initUI() {
     document.getElementById('add-product-form').addEventListener('submit', async function (event) {
         event.preventDefault();
 
-        // --- VALIDACE ---
-        // EAN musí mít přesně 13 číslic
-        const eanVal = document.getElementById('add-id').value.trim();
-        if (!/^\d{13}$/.test(eanVal)) {
-            alert("EAN musí mít přesně 13 číslic.");
-            return;
-        }
-
-        // HS kód – pokud není prázdný, musí být jen číslice
-        const hsVal = document.getElementById('add-hs').value.trim();
-        if (hsVal !== "" && !/^\d+$/.test(hsVal)) {
-            alert("HS kód smí obsahovat jen číslice.");
-            return;
-        }
-
-        // Pack / Boxes – jen číslice
-        const numericFields = [
-            { id: "add-pack", label: "Počet balení" },
-            { id: "add-boxes_per_layer", label: "Krabic na vrstvu" },
-            { id: "add-boxes_per_pallet", label: "Krabic na paletě" }
-        ];
-        for (const field of numericFields) {
-            const val = document.getElementById(field.id).value.trim();
-            if (val !== "" && !/^\d+$/.test(val)) {
-                alert(`${field.label} smí obsahovat jen číslice.`);
-                return;
-            }
-        }
-        // --- KONEC VALIDACE ---
-
         const newProduct = {
             brand: document.getElementById('add-brand').value.trim(),
             type: document.getElementById('add-type').value.trim(),
-            id: eanVal,
-            hs: hsVal,
+            id: document.getElementById('add-id').value.trim(),
+            hs: document.getElementById('add-hs').value.trim(),
             name_en: document.getElementById('add-name_en').value.trim(),
             name_cs: document.getElementById('add-name_cs').value.trim(),
             volume: {
@@ -1509,10 +1479,8 @@ function populateTypeSelect(selectId = 'type') {
     const typeSelect = document.getElementById(selectId);
     if (!typeSelect) return;
 
-    const types = Object.keys(translations[currentLang].product_types).sort((a, b) =>
-        translateType(a).localeCompare(translateType(b), currentLang, { sensitivity: 'base' })
-    );
-    typeSelect.innerHTML = '<option value="">' + translations[currentLang].select_type + '</option>' +
+    const types = Object.keys(translations[lang].product_types).sort();
+    typeSelect.innerHTML = '<option value="">-- select type --</option>' +
         types.map(t => `<option value="${t}">${translateType(t)}</option>`).join('');
 }
 
