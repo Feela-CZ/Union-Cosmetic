@@ -124,7 +124,7 @@ const translations = {
         download_photo: "Download photo",
         add_product_title: "Add product",
         upload_photo: "Upload photo",
-        dragdrop_photo: "Drag & Drop",
+        dragdrop_photo: "Drag & Drop - same name as EAN!!!",
         product_types: {
             "Accessories": "Accessories",
             "Balsam": "Balsam",
@@ -274,7 +274,7 @@ const translations = {
         carton_ean: "EAN kartonu",
         download_photo: "Stáhnout fotku",
         upload_photo: "Nahrát fotku",
-        dragdrop_photo: "Přetáhni sem pro nahrání",
+        dragdrop_photo: "Přetáhni sem pro nahrání (název totožný s EAN!!!)",
         add_product_title: "Přidat produkt",
         product_types: {
             "Accessories": "Doplňky",
@@ -373,6 +373,15 @@ function translateType(type) {
     }
 }
 
+function trimInputOnChange(input) {
+    input.addEventListener("input", () => {
+        input.value = input.value.trimStart(); // průběžně odmazává mezery na začátku
+    });
+    input.addEventListener("blur", () => {
+        input.value = input.value.trim(); // při opuštění inputu zůstane ořezané
+    });
+}
+
 const LOCAL_MODE = location.hostname === "127.0.0.1" || location.hostname === "localhost";
 
 const productsUrl = LOCAL_MODE
@@ -424,9 +433,8 @@ function initUI() {
 
     document.getElementById('add-product').addEventListener('click', openAddModal);
     document.getElementById('product-form').addEventListener('submit', saveProduct);
-    document.getElementById('add-product-form').addEventListener('submit', function (event) {
+    document.getElementById('add-product-form').addEventListener('submit', async function (event) {
         event.preventDefault();
-        initAddPhotoUpload();
 
         const newProduct = {
             brand: document.getElementById('add-brand').value.trim(),
@@ -451,14 +459,11 @@ function initUI() {
             photo: document.getElementById('add-product-photo').src || ""
         };
 
-        // uložení do datové struktury
         products.push(newProduct);
-        saveProductsToLocalStorage();
 
-        // překreslení tabulky
+        await saveProductsToRepo();
+
         renderTable();
-
-        // zavřeme modal
         document.getElementById('add-modal').style.display = 'none';
     });
     document.getElementById('search-input').addEventListener('input', renderTable);
@@ -659,6 +664,7 @@ function initUI() {
     updateToggleDiscontinuedText();
     updateUITexts();
     initAddPhotoUpload();
+    initInputValidations();
 }
 
 function setLang(lang) {
@@ -1752,6 +1758,53 @@ function openLogisticsEditModal(brand, key, index = null) {
             }
         }
     }
+}
+
+function initInputValidations() {
+    // ID/EAN – jen číslice, 13 znaků
+    const eanInputs = [document.getElementById("add-id"), document.getElementById("id")];
+    eanInputs.forEach(input => {
+        if (!input) return;
+        trimInputOnChange(input);
+        input.addEventListener("input", () => {
+            input.value = input.value.replace(/\D/g, ""); // jen číslice
+            if (input.value.length > 13) {
+                input.value = input.value.slice(0, 13);
+            }
+        });
+        input.addEventListener("blur", () => {
+            if (input.value.length !== 13) {
+                alert("EAN musí mít přesně 13 číslic.");
+            }
+        });
+    });
+
+    // HS kód – jen číslice
+    const hsInputs = [document.getElementById("add-hs"), document.getElementById("hs")];
+    hsInputs.forEach(input => {
+        if (!input) return;
+        trimInputOnChange(input);
+        input.addEventListener("input", () => {
+            input.value = input.value.replace(/\D/g, "");
+        });
+    });
+
+    // Pack / Boxes per layer / Boxes per pallet – jen číslice
+    const numericInputs = [
+        document.getElementById("add-pack"),
+        document.getElementById("add-boxes_per_layer"),
+        document.getElementById("add-boxes_per_pallet"),
+        document.getElementById("pack"),
+        document.getElementById("boxes_per_layer"),
+        document.getElementById("boxes_per_pallet")
+    ];
+    numericInputs.forEach(input => {
+        if (!input) return;
+        trimInputOnChange(input);
+        input.addEventListener("input", () => {
+            input.value = input.value.replace(/\D/g, "");
+        });
+    });
 }
 
 function updateLogisticsModalContent(brand, key) {
