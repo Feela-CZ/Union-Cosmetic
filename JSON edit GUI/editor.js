@@ -563,7 +563,7 @@ function initUI() {
         }
     });
 
-    document.getElementById('add-logistics-key').addEventListener('click', function () {
+    document.getElementById('add-logistics-key-btn').addEventListener('click', function () {
         const modal = document.getElementById('add-logistics-key-modal');
         const brandSelect = document.getElementById('add-logistics-brand');
         const keyInput = document.getElementById('add-logistics-key-name');
@@ -628,6 +628,49 @@ function initUI() {
         el.addEventListener('click', () => {
             document.getElementById('add-logistics-key-modal').style.display = 'none';
         });
+    });
+
+    // Po změně značky v Add Product modalu -> doplnit klíče
+    document.getElementById('add-brand').addEventListener('change', function () {
+        const brand = this.value.trim();
+        const keySelect = document.getElementById('add-logistics-key');
+        const packInput = document.getElementById('add-pack');
+        const layerInput = document.getElementById('add-boxes_per_layer');
+        const palletInput = document.getElementById('add-boxes_per_pallet');
+
+        keySelect.innerHTML = '<option value="">-- vyber klíč --</option>';
+        packInput.value = "";
+        layerInput.value = "";
+        palletInput.value = "";
+
+        if (brand && logisticsData[brand]) {
+            Object.keys(logisticsData[brand]).sort(logisticsKeyCompare).forEach(key => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = key;
+                keySelect.appendChild(opt);
+            });
+        }
+    });
+
+    // Po výběru klíče -> doplnit logistická pole
+    document.getElementById('add-logistics-key').addEventListener('change', function () {
+        const brand = document.getElementById('add-brand').value.trim();
+        const key = this.value.trim();
+        const packInput = document.getElementById('add-pack');
+        const layerInput = document.getElementById('add-boxes_per_layer');
+        const palletInput = document.getElementById('add-boxes_per_pallet');
+
+        packInput.value = "";
+        layerInput.value = "";
+        palletInput.value = "";
+
+        if (brand && key && logisticsData[brand]?.[key]) {
+            const data = logisticsData[brand][key];
+            packInput.value = data?.CARTON?.nr_of_items ?? "";
+            layerInput.value = data?.LAYER?.nr_of_cartons ?? "";
+            palletInput.value = data?.PALLET?.nr_of_cartons ?? "";
+        }
     });
 
     document.getElementById('choose-logistics-form').addEventListener('submit', function (e) {
@@ -1141,28 +1184,32 @@ function populateDropdowns() {
 }
 
 function openAddModal() {
-    editIndex = null;
-    // resetujeme celý add-form
-    document.getElementById('add-product-form').reset();
+    const brandSelect = document.getElementById('add-brand');
+    const keySelect = document.getElementById('add-logistics-key');
+    const packInput = document.getElementById('add-pack');
+    const layerInput = document.getElementById('add-boxes_per_layer');
+    const palletInput = document.getElementById('add-boxes_per_pallet');
 
-    // naplníme selecty (brand je přímo v HTML, type + logistics se plní dynamicky)
-    populateTypeSelect('add-type');
-    populateLogisticsKeySelect('add-logistics-key');
+    // Vyčistíme select i hodnoty polí
+    keySelect.innerHTML = '<option value="">-- vyber klíč --</option>';
+    packInput.value = "";
+    layerInput.value = "";
+    palletInput.value = "";
 
-    // výchozí datum pro "nový produkt"
-    if (document.getElementById('add-new').checked) {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('add-new_date').value = today;
-    } else {
-        document.getElementById('add-new_date').value = '';
+    // Naplníme klíče jen když je vybraný brand
+    const brand = brandSelect.value.trim();
+    if (brand && logisticsData[brand]) {
+        Object.keys(logisticsData[brand])
+            .sort(logisticsKeyCompare) // pokud máš funkci na řazení
+            .forEach(key => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = key;
+                keySelect.appendChild(opt);
+            });
     }
 
-    // reset fotky na placeholder
-    const addPhoto = document.getElementById('add-product-photo');
-    addPhoto.src = "";
-    addPhoto.alt = "No photo";
-
-    // zobrazíme nový modal
+    // A nakonec zobrazíme modal
     document.getElementById('add-modal').style.display = 'block';
 }
 
