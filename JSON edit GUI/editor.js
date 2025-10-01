@@ -431,51 +431,25 @@ function initUI() {
 
     document.getElementById('add-product').addEventListener('click', openAddModal);
     document.getElementById('product-form').addEventListener('submit', saveProduct);
-    async function savePhotoToRepo(file, ean) {
-        if (!file) return;
-
-        const reader = new FileReader();
-        return new Promise((resolve, reject) => {
-            reader.onload = async (event) => {
-                const base64Data = event.target.result.split(',')[1]; // jen base64 část
-
-                try {
-                    const response = await fetch('/api/save-to-repo', { // stejný endpoint jako saveProductsToRepo
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            path: `Order sheet/img/${ean}.jpg`,
-                            content: base64Data,
-                            encoding: 'base64'
-                        })
-                    });
-
-                    if (!response.ok) throw new Error('Upload selhal');
-                    resolve();
-                } catch (err) {
-                    reject(err);
-                }
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
     document.getElementById('add-product-form').addEventListener('submit', async function (event) {
         event.preventDefault();
 
         // --- VALIDACE ---
+        // EAN musí mít přesně 13 číslic
         const eanVal = document.getElementById('add-id').value.trim();
         if (!/^\d{13}$/.test(eanVal)) {
             alert("EAN musí mít přesně 13 číslic.");
             return;
         }
 
+        // HS kód – pokud není prázdný, musí být jen číslice
         const hsVal = document.getElementById('add-hs').value.trim();
         if (hsVal !== "" && !/^\d+$/.test(hsVal)) {
             alert("HS kód smí obsahovat jen číslice.");
             return;
         }
 
+        // Pack / Boxes – jen číslice
         const numericFields = [
             { id: "add-pack", label: "Počet balení" },
             { id: "add-boxes_per_layer", label: "Krabic na vrstvu" },
@@ -490,11 +464,6 @@ function initUI() {
         }
         // --- KONEC VALIDACE ---
 
-        // vezmeme nahraný soubor
-        const fileInput = document.getElementById('add-photo-input');
-        const file = fileInput.files[0];
-
-        // vytvoříme nový produkt
         const newProduct = {
             brand: document.getElementById('add-brand').value.trim(),
             type: document.getElementById('add-type').value.trim(),
@@ -502,8 +471,10 @@ function initUI() {
             hs: hsVal,
             name_en: document.getElementById('add-name_en').value.trim(),
             name_cs: document.getElementById('add-name_cs').value.trim(),
-            volume: document.getElementById('add-volume-number').value.trim() + ' ' +
-                document.getElementById('add-volume-unit').value.trim(),
+            volume: {
+                number: document.getElementById('add-volume-number').value.trim(),
+                unit: document.getElementById('add-volume-unit').value.trim(),
+            },
             price: document.getElementById('add-price').value.trim(),
             pack: document.getElementById('add-pack').value.trim(),
             boxes_per_layer: document.getElementById('add-boxes_per_layer').value.trim(),
@@ -513,20 +484,77 @@ function initUI() {
             new_date: document.getElementById('add-new_date').value,
             discontinued: document.getElementById('add-discontinued').checked,
             discontinued_date: document.getElementById('add-discontinued_date').value,
-            photo: `img/${eanVal}.jpg` // jen cesta, ne base64
+            photo: document.getElementById('add-product-photo').src || ""
         };
 
-        // přidáme produkt do seznamu
         products.push(newProduct);
 
-        // nejdřív uložíme fotku
-        await savePhotoToRepo(file, eanVal);
-
-        // potom JSON
         await saveProductsToRepo();
 
         renderTable();
         document.getElementById('add-modal').style.display = 'none';
+    });
+    document.getElementById('search-input').addEventListener('input', renderTable);
+    document.getElementById('brand-filter').addEventListener('change', function () {
+        updateLogisticsKeyFilter();
+        renderTable();
+    });
+    document.getElementById('logistics-key-filter').addEventListener('change', renderTable);
+    document.getElementById('type-filter').addEventListener('change', renderTable);
+
+    document.getElementById('choose-logistics-key-btn').addEventListener('click', function () {
+        const selectedBrand = currentLogisticsBrand;
+        const selectedKey = currentLogisticsKey;
+        const chooseBrand = document.getElementById('choose-brand');
+        chooseBrand.innerHTML = '';
+        Object.keys(logisticsData).forEach(brand => {
+            const option = document.createElement('option');
+            option.value = brand;
+            option.textContent = brand;
+            if (brand === selectedBrand) option.selected = true;
+            chooseBrand.appendChild(option);
+        });
+        fillKeysSelect(selectedBrand, selectedKey);
+        document.getElementById('choose-logistics-modal').style.display = 'block';
+    });
+
+    document.getElementById('choose-brand').addEventListener('change', function () {
+        fillKeysSelect(this.value);
+    });
+
+    document.getElementById('brand').addEventListener('change', function () {
+        populateTypeSelect();
+    });
+
+    populateTypeSelect();
+    populateTypeSelect('add-type');
+
+    document.querySelectorAll('.close-modal').forEach(el => {
+        el.addEventListener('click', () => {
+            const m = el.closest('.modal');
+            if (m) m.style.display = 'none';
+        });
+    });
+
+    let mouseDownInside = false;
+
+    document.addEventListener('mousedown', (e) => {
+        // pokud začal klik uvnitř modalu, zapamatujeme si
+        if (e.target.closest('.modal-content')) {
+            mouseDownInside = true;
+        } else {
+            mouseDownInside = false;
+        }
+    });
+
+    window.addEventListener('mouseup', (e) => {
+        // zavři modal jen když klik skončil přímo na overlay a nezačal uvnitř
+        if (
+            e.target.classList.contains('modal') &&
+            !mouseDownInside
+        ) {
+            e.target.style.display = 'none';
+        }
     });
 
     document.addEventListener('keydown', (e) => {
