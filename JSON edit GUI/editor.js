@@ -625,6 +625,19 @@ function initUI() {
         });
     });
 
+    // Zavření add-modal klikem na křížek
+    document.getElementById('add-close').addEventListener('click', function () {
+        document.getElementById('add-modal').style.display = 'none';
+    });
+
+    // Zavření add-modal klikem mimo obsah
+    window.addEventListener('click', function (event) {
+        const modal = document.getElementById('add-modal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
     document.getElementById('choose-logistics-form').addEventListener('submit', function (e) {
         e.preventDefault();
         const selectedBrand = document.getElementById('choose-brand').value;
