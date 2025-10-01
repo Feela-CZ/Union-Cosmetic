@@ -535,44 +535,21 @@ function initUI() {
         }
     });
 
-    document.getElementById('add-brand').addEventListener('change', function () {
-        const brand = this.value.trim();
-        const logisticsSelect = document.getElementById('add-logistics-key');
-        logisticsSelect.innerHTML = '<option value="">-- vyber klíč --</option>';
+    document.getElementById('add-logistics-key').addEventListener('click', function () {
+        const modal = document.getElementById('add-logistics-key-modal');
+        const brandSelect = document.getElementById('add-logistics-brand');
+        const keyInput = document.getElementById('add-logistics-key-name');
 
-        if (brand && logisticsData[brand]) {
-            Object.keys(logisticsData[brand]).forEach(key => {
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = key;
-                logisticsSelect.appendChild(option);
-            });
-            logisticsSelect.disabled = false;
-        } else {
-            logisticsSelect.disabled = true;
-        }
+        brandSelect.innerHTML = '';
+        Object.keys(logisticsData || {}).forEach(brand => {
+            const opt = document.createElement('option');
+            opt.value = brand;
+            opt.textContent = brand;
+            brandSelect.appendChild(opt);
+        });
 
-        // při změně značky zároveň vymažeme hodnoty pack/boxes
-        document.getElementById('add-pack').value = '';
-        document.getElementById('add-boxes_per_layer').value = '';
-        document.getElementById('add-boxes_per_pallet').value = '';
-    });
-
-    // Při změně logistického klíče automaticky vyplníme pack/boxes
-    document.getElementById('add-logistics-key').addEventListener('change', function () {
-        const brand = document.getElementById('add-brand').value.trim();
-        const key = this.value;
-
-        if (brand && key && logisticsData[brand] && logisticsData[brand][key]) {
-            const logisticsInfo = logisticsData[brand][key];
-            document.getElementById('add-pack').value = logisticsInfo.pack || '';
-            document.getElementById('add-boxes_per_layer').value = logisticsInfo.boxes_per_layer || '';
-            document.getElementById('add-boxes_per_pallet').value = logisticsInfo.boxes_per_pallet || '';
-        } else {
-            document.getElementById('add-pack').value = '';
-            document.getElementById('add-boxes_per_layer').value = '';
-            document.getElementById('add-boxes_per_pallet').value = '';
-        }
+        keyInput.value = '';
+        modal.style.display = 'block';
     });
 
     document.getElementById('add-logistics-key-form').addEventListener('submit', function (e) {
@@ -623,19 +600,6 @@ function initUI() {
         el.addEventListener('click', () => {
             document.getElementById('add-logistics-key-modal').style.display = 'none';
         });
-    });
-
-    // Zavření add-modal klikem na křížek
-    document.getElementById('add-close').addEventListener('click', function () {
-        document.getElementById('add-modal').style.display = 'none';
-    });
-
-    // Zavření add-modal klikem mimo obsah
-    window.addEventListener('click', function (event) {
-        const modal = document.getElementById('add-modal');
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
     });
 
     document.getElementById('choose-logistics-form').addEventListener('submit', function (e) {
