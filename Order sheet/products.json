@@ -1090,19 +1090,20 @@
   {
     "brand": "Lilien",
     "type": "Liquid Soap",
-    "id": 8595196902976,
-    "hs": 34012090,
+    "id": "8595196902976",
+    "hs": "34012090",
     "name": "Lilien cream soap Olive Milk",
+    "csName": "Lilien krémové tekuté mýdlo - Oliva",
     "volume": "5000 ml",
     "price": 2.59,
     "pack": 1,
     "boxes_per_layer": 32,
     "boxes_per_pallet": 96,
+    "key": "5000",
     "new": false,
     "new_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Lilien krémové tekuté mýdlo - Oliva"
+    "discontinued": false,
+    "discontinued_date": ""
   },
   {
     "brand": "Lilien",
