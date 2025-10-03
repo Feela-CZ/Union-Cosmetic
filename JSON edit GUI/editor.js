@@ -1343,11 +1343,18 @@ async function saveProductFinal(product) {
     }
 
     renderTable();
-    closeModal();
+    closeModal("product-modal");
 
     // auto-commit do GitHubu po uložení produktu
     try { await saveProductsToRepo(); }
     catch (e) { alert('Uložení products.json selhalo: ' + e.message); }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = "none";
+    }
 }
 
 document.getElementById('reset-filters').addEventListener('click', () => {
