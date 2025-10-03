@@ -1351,8 +1351,7 @@ async function saveProductFinal(product) {
 }
 
 function closeModal() {
-    const openModals = document.querySelectorAll(".modal, .small-modal");
-    openModals.forEach(modal => modal.style.display = "none");
+    document.getElementById('modal').style.display = 'none';
 }
 
 document.getElementById('reset-filters').addEventListener('click', () => {
