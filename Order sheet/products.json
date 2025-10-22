@@ -2680,19 +2680,20 @@
   {
     "brand": "Twister",
     "type": "Washing Gel",
-    "id": 8596048004886,
-    "hs": 34025090,
-    "name": "Twister Washing Gel Black ",
+    "id": "8596048004886",
+    "hs": "34025090",
+    "name": "Twister Washing Gel Black",
+    "csName": "Twister tekutý prací gel - Stable Form - na tmavé prádlo",
     "volume": "1500 ml",
     "price": 1.49,
     "pack": 8,
     "boxes_per_layer": 10,
     "boxes_per_pallet": 50,
+    "key": "1500",
     "new": false,
     "new_date": "",
-    "key": 1500,
-    "carton_ean": 8596048004923,
-    "csName": "Twister tekutý prací gel - Stable Form - na tmavé prádlo 1,"
+    "discontinued": false,
+    "discontinued_date": ""
   },
   {
     "brand": "Twister",
