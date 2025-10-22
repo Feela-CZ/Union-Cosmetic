@@ -2662,19 +2662,20 @@
   {
     "brand": "Twister",
     "type": "Washing Gel",
-    "id": 8596048004855,
-    "hs": 34025090,
-    "name": "Twister Washing Gel Colour ",
+    "id": "8596048004855",
+    "hs": "34025090",
+    "name": "Twister Washing Gel Colour",
+    "csName": "Twister tekutý prací gel - Fix & Sport - na barevné prádlo",
     "volume": "1500 ml",
     "price": 1.49,
     "pack": 8,
     "boxes_per_layer": 10,
     "boxes_per_pallet": 50,
+    "key": "1500",
     "new": false,
     "new_date": "",
-    "key": 1500,
-    "carton_ean": 8596048004893,
-    "csName": "Twister tekutý prací gel - Fix & Sport - na barevné prádlo 1,"
+    "discontinued": false,
+    "discontinued_date": ""
   },
   {
     "brand": "Twister",
