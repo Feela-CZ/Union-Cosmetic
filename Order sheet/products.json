@@ -2698,19 +2698,20 @@
   {
     "brand": "Twister",
     "type": "Washing Gel",
-    "id": 8596048004879,
-    "hs": 34025090,
+    "id": "8596048004879",
+    "hs": "34025090",
     "name": "Twister Washing Gel Universal",
+    "csName": "Twister tekutý prací gel - Power Care - na všechny druhy prádla",
     "volume": "1500 ml",
     "price": 1.49,
     "pack": 8,
     "boxes_per_layer": 10,
     "boxes_per_pallet": 50,
+    "key": "1500",
     "new": false,
     "new_date": "",
-    "key": 1500,
-    "carton_ean": 8596048004916,
-    "csName": "Twister tekutý prací gel - Power Care - na všechny druhy prádla 1,"
+    "discontinued": false,
+    "discontinued_date": ""
   },
   {
     "brand": "Twister",
