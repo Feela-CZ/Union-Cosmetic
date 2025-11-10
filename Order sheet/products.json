@@ -1988,19 +1988,20 @@
   {
     "brand": "Naturalis",
     "type": "Body Butter",
-    "id": 8596048000741,
-    "hs": 33049900,
+    "id": "8596048000741",
+    "hs": "33049900",
     "name": "Naturalis body butter Coconut",
+    "csName": "Naturalis tělové máslo s Kokosovým olejem",
     "volume": "300 g",
     "price": 1.66,
     "pack": 12,
     "boxes_per_layer": 12,
     "boxes_per_pallet": 120,
+    "key": "300g",
     "new": false,
     "new_date": "",
-    "key": "300g",
-    "carton_ean": 8596048000789,
-    "csName": "Naturalis tělové máslo s Kokosovým olejem"
+    "discontinued": true,
+    "discontinued_date": "2025-11-10"
   },
   {
     "brand": "Naturalis",
