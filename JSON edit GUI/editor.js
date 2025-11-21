@@ -483,11 +483,16 @@ function initUI() {
             new: document.getElementById('add-new').checked,
             new_date: document.getElementById('add-new_date').value,
             discontinued: document.getElementById('add-discontinued').checked,
-            discontinued_date: document.getElementById('add-discontinued_date').value,
-            photo: document.getElementById('add-product-photo').src || ""
+            discontinued_date: document.getElementById('add-discontinued_date').value
         };
 
         products.push(newProduct);
+
+        const fileInput = document.getElementById("add-photo-input");
+        if (fileInput && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            await saveImageToRepo(file, newProduct.id);
+        }
 
         await saveProductsToRepo();
 
@@ -854,7 +859,7 @@ function renderTable() {
         <td>${product.id}</td>
         <td>${product.hs}</td>
         <td>${(currentLang === 'cs' && product.csName) ? product.csName : product.name}</td>
-        <td>${product.volume}</td>
+        <td>${product.volume ? product.volume.number + " " + product.volume.unit : ""}</td>
         <td>${product.price}</td>
         <td>${product.new ? '✅' : ''}</td>
         <td>${product.new_date || ''}</td>
@@ -1310,7 +1315,10 @@ function saveProduct(event) {
         hs,
         name: nameEn,
         csName: nameCs,
-        volume: volumeNumber + ' ' + volumeUnit,
+        volume: {
+            number: volumeNumber,
+            unit: volumeUnit
+        },
         price: parseFloat(price),
         pack: parseInt(pack),
         boxes_per_layer: parseInt(boxesPerLayer),
@@ -1342,12 +1350,41 @@ async function saveProductFinal(product) {
         products.push(product);
     }
 
+    const fileInput = document.getElementById("photo-input");
+    if (fileInput && fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        await saveImageToRepo(file, product.id);
+    }
+
     renderTable();
     closeModal();
 
     // auto-commit do GitHubu po uložení produktu
     try { await saveProductsToRepo(); }
     catch (e) { alert('Uložení products.json selhalo: ' + e.message); }
+}
+
+async function saveImageToRepo(file, productId) {
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+
+    return new Promise((resolve, reject) => {
+        reader.onload = async () => {
+            try {
+                const arrayBuffer = reader.result;
+                const bytes = new Uint8Array(arrayBuffer);
+
+                await saveFileToRepo(
+                    `Ordersheet/img/${productId}.jpg`,
+                    bytes
+                );
+                resolve();
+            } catch (e) {
+                reject(e);
+            }
+        };
+        reader.onerror = reject;
+    });
 }
 
 function closeModal() {
@@ -1396,9 +1433,9 @@ function editProduct(index) {
     document.getElementById('hs').value = product.hs;
     document.getElementById('name_en').value = product.name || '';
     document.getElementById('name_cs').value = product.csName || '';
-    const [volValue, volUnit] = (product.volume || '').split(' ');
-    document.getElementById('volume-number').value = volValue || '';
-    document.getElementById('volume-unit').value = volUnit || 'ml';
+    const vol = product.volume || { number: "", unit: "" };
+    document.getElementById('volume-number').value = vol.number || '';
+    document.getElementById('volume-unit').value = vol.unit || '';
     document.getElementById('price').value = product.price;
     document.getElementById('pack').value = product.pack;
     document.getElementById('boxes_per_layer').value = product.boxes_per_layer;
