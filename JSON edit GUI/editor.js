@@ -1447,13 +1447,28 @@ function editProduct(index) {
     document.getElementById('modal').style.display = 'block';
 
     const photoEl = document.getElementById('product-photo');
+    const downloadBtn = document.getElementById('download-photo-btn');
+    const uploadBtn = document.getElementById('edit-upload-photo-btn');
+    const editPhotoInput = document.getElementById('edit-photo-input');
+
+    function updatePhotoButtons(hasPhoto) {
+        if (downloadBtn) downloadBtn.style.display = hasPhoto ? 'inline-block' : 'none';
+        if (uploadBtn) uploadBtn.style.display = hasPhoto ? 'none' : 'inline-block';
+    }
+
     if (product.id) {
         photoEl.src = `../Order%20sheet/img/${product.id}.jpg`;
         photoEl.onerror = () => {
             photoEl.src = '../Order%20sheet/img/no-image.jpg';
+            updatePhotoButtons(false);
+        };
+        photoEl.onload = () => {
+            const hasPhoto = !photoEl.src.includes('no-image.jpg');
+            updatePhotoButtons(hasPhoto);
         };
     } else {
         photoEl.src = '../Order%20sheet/img/no-image.jpg';
+        updatePhotoButtons(false);
     }
 
     // Kliknutí na miniaturu = otevřít plnou fotku v lightboxu
@@ -1472,19 +1487,38 @@ function editProduct(index) {
     };
 
     // Tlačítko stáhnout fotku
-    const downloadBtn = document.getElementById('download-photo-btn');
-    downloadBtn.onclick = () => {
-        if (!photoEl.src || photoEl.src.includes('no-image')) {
-            alert('Fotka není k dispozici');
-            return;
-        }
-        const a = document.createElement('a');
-        a.href = photoEl.src;
-        a.download = `${product.id}.jpg`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    };
+    if (downloadBtn) {
+        downloadBtn.onclick = () => {
+            if (!photoEl.src || photoEl.src.includes('no-image')) {
+                alert('Fotka není k dispozici');
+                return;
+            }
+            const a = document.createElement('a');
+            a.href = photoEl.src;
+            a.download = `${product.id}.jpg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        };
+    }
+
+    // Tlačítko nahrát fotku + file input
+    if (uploadBtn && editPhotoInput && product.id) {
+        uploadBtn.onclick = () => {
+            editPhotoInput.click();
+        };
+
+        editPhotoInput.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                await saveImageToRepo(file, product.id);
+                photoEl.src = `../Order%20sheet/img/${product.id}.jpg?ts=${Date.now()}`;
+            } catch (err) {
+                alert('Nahrání fotky selhalo: ' + (err.message || err));
+            }
+        };
+    }
 }
 
 let deleteIndex = null;
