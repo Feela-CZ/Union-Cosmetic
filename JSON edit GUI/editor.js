@@ -347,6 +347,14 @@ async function saveProductsToRepo() {
     }
 }
 
+async function saveFileToRepo(path, bytes) {
+    // path: "Ordersheet/img/1234567891234.jpg"
+    // bytes: Uint8Array
+
+    // Přímé nahrání souboru do GitHub repozitáře
+    await uploadFileToGitHub(path, bytes);
+}
+
 async function saveLogisticsToRepo() {
     try {
         await apiPut('logistics', logisticsData);
