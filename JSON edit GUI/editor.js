@@ -1467,34 +1467,23 @@ function editProduct(index) {
 
     (async () => {
         if (!product.id) {
-            photoEl.src = '../Order%20sheet/img/no-image.jpg';
+            photoEl.src = 'Order%20sheet/img/no-image.jpg';
             updatePhotoButtons(false);
             return;
         }
 
-        const baseJpg = `../Order%20sheet/img/${product.id}.jpg`;
-        const basePng = `../Order%20sheet/img/${product.id}.png`;
+        const baseJpg = `Order%20sheet/img/${product.id}.jpg`;
 
-        let exists = await checkImageExists(baseJpg);
+        const exists = await checkImageExists(baseJpg);
 
         if (exists) {
             photoEl.src = baseJpg + '?ts=' + Date.now();
             updatePhotoButtons(true);
-            return;
+        } else {
+            photoEl.src = 'Order%20sheet/img/no-image.jpg';
+            updatePhotoButtons(false);
         }
-
-        exists = await checkImageExists(basePng);
-
-        if (exists) {
-            photoEl.src = basePng + '?ts=' + Date.now();
-            updatePhotoButtons(true);
-            return;
-        }
-
-        photoEl.src = '../Order%20sheet/img/no-image.jpg';
-        updatePhotoButtons(false);
     })();
-
     // Kliknutí na miniaturu = otevřít plnou fotku v lightboxu
     photoEl.onclick = () => {
         if (photoEl.src && !photoEl.src.includes('no-image')) {
