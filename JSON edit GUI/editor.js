@@ -1456,20 +1456,44 @@ function editProduct(index) {
         if (uploadBtn) uploadBtn.style.display = hasPhoto ? 'none' : 'inline-block';
     }
 
-    if (product.id) {
-        photoEl.src = `../Order%20sheet/img/${product.id}.jpg`;
-        photoEl.onerror = () => {
+    async function checkImageExists(url) {
+        try {
+            const res = await fetch(url + '?check=' + Date.now(), { method: 'HEAD' });
+            return res.ok;
+        } catch {
+            return false;
+        }
+    }
+
+    (async () => {
+        if (!product.id) {
             photoEl.src = '../Order%20sheet/img/no-image.jpg';
             updatePhotoButtons(false);
-        };
-        photoEl.onload = () => {
-            const hasPhoto = !photoEl.src.includes('no-image.jpg');
-            updatePhotoButtons(hasPhoto);
-        };
-    } else {
+            return;
+        }
+
+        const baseJpg = `../Order%20sheet/img/${product.id}.jpg`;
+        const basePng = `../Order%20sheet/img/${product.id}.png`;
+
+        let exists = await checkImageExists(baseJpg);
+
+        if (exists) {
+            photoEl.src = baseJpg + '?ts=' + Date.now();
+            updatePhotoButtons(true);
+            return;
+        }
+
+        exists = await checkImageExists(basePng);
+
+        if (exists) {
+            photoEl.src = basePng + '?ts=' + Date.now();
+            updatePhotoButtons(true);
+            return;
+        }
+
         photoEl.src = '../Order%20sheet/img/no-image.jpg';
         updatePhotoButtons(false);
-    }
+    })();
 
     // Kliknutí na miniaturu = otevřít plnou fotku v lightboxu
     photoEl.onclick = () => {
