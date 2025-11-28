@@ -348,11 +348,20 @@ async function saveProductsToRepo() {
 }
 
 async function saveFileToRepo(path, bytes) {
-    // path: "Ordersheet/img/1234567891234.jpg"
-    // bytes: Uint8Array
+    const base64 = btoa(String.fromCharCode(...bytes));
 
-    // Přímé nahrání souboru do GitHub repozitáře
-    await uploadFileToGitHub(path, bytes);
+    const res = await fetch(`${window.API_BASE}/api/upload-image`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            path,
+            content: base64
+        })
+    });
+
+    if (!res.ok) {
+        throw new Error("Upload failed: " + (await res.text()));
+    }
 }
 
 async function saveLogisticsToRepo() {
@@ -1383,7 +1392,7 @@ async function saveImageToRepo(file, productId) {
                 const bytes = new Uint8Array(arrayBuffer);
 
                 await saveFileToRepo(
-                    `Ordersheet/img/${productId}.jpg`,
+                    `Order sheet/img/${productId}.jpg`,
                     bytes
                 );
                 resolve();
