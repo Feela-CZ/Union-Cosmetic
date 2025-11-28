@@ -347,8 +347,17 @@ async function saveProductsToRepo() {
     }
 }
 
+function uint8ToBase64(uint8) {
+    let binary = "";
+    const len = uint8.length;
+    for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(uint8[i]);
+    }
+    return btoa(binary);
+}
+
 async function saveFileToRepo(path, bytes) {
-    const base64 = btoa(String.fromCharCode(...bytes));
+    const base64 = uint8ToBase64(bytes);
 
     const res = await fetch(`${window.API_BASE}/api/upload-image`, {
         method: "PUT",
