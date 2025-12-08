@@ -409,7 +409,7 @@ function trimInputOnChange(input) {
 const LOCAL_MODE = location.hostname === "127.0.0.1" || location.hostname === "localhost";
 
 const productsUrl = LOCAL_MODE
-    ? "../Order Sheet/products.json?ts=" + Date.now()
+    ? "../OrderSheet/products.json?ts=" + Date.now()
     : `${window.API_BASE}/api/products?ts=${Date.now()}`;
 
 const logisticsUrl = LOCAL_MODE
@@ -1401,7 +1401,7 @@ async function saveImageToRepo(file, productId) {
                 const bytes = new Uint8Array(arrayBuffer);
 
                 await saveFileToRepo(
-                    `Order sheet/img/${productId}.jpg`,
+                    `Ordersheet/img/${productId}.jpg`,
                     bytes
                 );
                 resolve();
@@ -1493,12 +1493,12 @@ function editProduct(index) {
 
     (async () => {
         if (!product.id) {
-            photoEl.src = 'Order%20sheet/img/no-image.jpg';
+            photoEl.src = 'OrderSheet/img/no-image.jpg';
             updatePhotoButtons(false);
             return;
         }
 
-        const baseJpg = `https://feela-cz.github.io/Union-Cosmetic/Order%20sheet/img/${product.id}.jpg`;
+        const baseJpg = `https://feela-cz.github.io/Union-Cosmetic/OrderSheet/img/${product.id}.jpg`;
 
         const exists = await checkImageExists(baseJpg);
 
@@ -1552,7 +1552,7 @@ function editProduct(index) {
             if (!file) return;
             try {
                 await saveImageToRepo(file, product.id);
-                photoEl.src = `https://feela-cz.github.io/Union-Cosmetic/Order%20sheet/img/${product.id}.jpg?ts=${Date.now()}`;
+                photoEl.src = `https://feela-cz.github.io/Union-Cosmetic/OrderSheet/img/${product.id}.jpg?ts=${Date.now()}`;
             } catch (err) {
                 alert('Nahrání fotky selhalo: ' + (err.message || err));
             }
