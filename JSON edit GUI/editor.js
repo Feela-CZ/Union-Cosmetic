@@ -1498,7 +1498,7 @@ function editProduct(index) {
             return;
         }
 
-        const baseJpg = `Order%20sheet/img/${product.id}.jpg`;
+        const baseJpg = `https://raw.githubusercontent.com/Feela-CZ/Union-Cosmetic/main/Order%20sheet/img/${product.id}.jpg`;
 
         const exists = await checkImageExists(baseJpg);
 
@@ -1506,7 +1506,7 @@ function editProduct(index) {
             photoEl.src = baseJpg + '?ts=' + Date.now();
             updatePhotoButtons(true);
         } else {
-            photoEl.src = 'Order%20sheet/img/no-image.jpg';
+            photoEl.src = 'https://raw.githubusercontent.com/Feela-CZ/Union-Cosmetic/main/Order%20sheet/img/no-image.jpg';
             updatePhotoButtons(false);
         }
     })();
@@ -1552,7 +1552,7 @@ function editProduct(index) {
             if (!file) return;
             try {
                 await saveImageToRepo(file, product.id);
-                photoEl.src = `../Order%20sheet/img/${product.id}.jpg?ts=${Date.now()}`;
+                photoEl.src = `https://raw.githubusercontent.com/Feela-CZ/Union-Cosmetic/main/Order%20sheet/img/${product.id}.jpg?ts=${Date.now()}`;
             } catch (err) {
                 alert('Nahrání fotky selhalo: ' + (err.message || err));
             }
