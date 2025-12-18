@@ -5986,7 +5986,7 @@
     "key": "500",
     "new": true,
     "new_date": "",
-    "discontinued": true,
-    "discontinued_date": "2025-12-18"
+    "discontinued": false,
+    "discontinued_date": ""
   }
 ]
