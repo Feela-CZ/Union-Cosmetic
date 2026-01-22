@@ -5988,5 +5988,26 @@
     "new_date": "",
     "discontinued": false,
     "discontinued_date": ""
+  },
+  {
+    "brand": "Sunnoré",
+    "type": "Sun Care",
+    "id": "8596048013505",
+    "hs": "33049900",
+    "name": "SUNNORÉ SUN MILK SPF 20",
+    "csName": "SUNNORÉ OPALOVACÍ MLÉKO SPF 20",
+    "volume": {
+      "number": "200",
+      "unit": "ml"
+    },
+    "price": 2.59,
+    "pack": 14,
+    "boxes_per_layer": 27,
+    "boxes_per_pallet": 189,
+    "key": "200D",
+    "new": true,
+    "new_date": "22.01.2026",
+    "discontinued": false,
+    "discontinued_date": ""
   }
 ]
