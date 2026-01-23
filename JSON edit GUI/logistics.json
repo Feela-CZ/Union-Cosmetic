@@ -1121,6 +1121,34 @@
         "nr_of_items": 700,
         "nr_of_layers": 5
       }
+    },
+    "": {
+      "ITEM": {
+        "length": "6.0 cm",
+        "width": "5.0 cm",
+        "height": "22.0 cm",
+        "weight": "0.57 kg"
+      },
+      "CARTON": {
+        "length": "26.5 cm",
+        "width": "20.5 cm",
+        "height": "23.0 cm",
+        "weight": "8.8 kg",
+        "nr_of_items": 15
+      },
+      "LAYER": {
+        "nr_of_items": 270,
+        "nr_of_cartons": 18
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "153.0 cm",
+        "weight": "970.0 kg",
+        "nr_of_cartons": 108,
+        "nr_of_items": 1620,
+        "nr_of_layers": 6
+      }
     }
   },
   "Twister": {
