@@ -1941,9 +1941,10 @@
   {
     "brand": "Naturalis",
     "type": "Shampoo",
-    "id": 8596048006361,
-    "hs": null,
+    "id": "8596048006361",
+    "hs": "33051000",
     "name": "Naturalis shampoo THISTLE - Natural Balance",
+    "csName": "Naturalis vlasový šampon - Bodlák",
     "volume": {
       "number": "500",
       "unit": "ml"
@@ -1952,11 +1953,11 @@
     "pack": 15,
     "boxes_per_layer": 18,
     "boxes_per_pallet": 108,
+    "key": "",
     "new": false,
     "new_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Naturalis vlasový šampon - Bodlák"
+    "discontinued": false,
+    "discontinued_date": ""
   },
   {
     "brand": "Naturalis",
