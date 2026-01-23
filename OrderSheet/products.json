@@ -1953,7 +1953,7 @@
     "pack": 15,
     "boxes_per_layer": 18,
     "boxes_per_pallet": 108,
-    "key": "",
+    "key": "500",
     "new": false,
     "new_date": "",
     "discontinued": false,
@@ -5968,27 +5968,6 @@
     "key": null,
     "carton_ean": "8596048006033",
     "csName": "NATAVA olejové koule do koupele - Dárková sada  4×"
-  },
-  {
-    "brand": "Lilien",
-    "type": "Conditioner",
-    "id": "1234567891234",
-    "hs": "12345678",
-    "name": "hovno",
-    "csName": "druhý hovno",
-    "volume": {
-      "number": "123",
-      "unit": "ml"
-    },
-    "price": 34.99,
-    "pack": 35,
-    "boxes_per_layer": 12,
-    "boxes_per_pallet": 96,
-    "key": "500",
-    "new": true,
-    "new_date": "2025-12-18",
-    "discontinued": false,
-    "discontinued_date": ""
   },
   {
     "brand": "Sunnoré",
