@@ -1995,6 +1995,90 @@
         "nr_of_items": 2646,
         "nr_of_layers": 7
       }
+    },
+    "200E": {
+      "ITEM": {
+        "length": "6.5 cm",
+        "width": "3.5 cm",
+        "height": "20 cm",
+        "weight": "0.24 kg"
+      },
+      "CARTON": {
+        "length": "25.0 cm",
+        "width": "13.0 cm",
+        "height": "20.5 cm",
+        "weight": "3.48 kg",
+        "nr_of_items": 14
+      },
+      "LAYER": {
+        "nr_of_items": 378,
+        "nr_of_cartons": 27
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "165.0 cm",
+        "weight": "680.0 kg",
+        "nr_of_cartons": 189,
+        "nr_of_items": 2646,
+        "nr_of_layers": 7
+      }
+    },
+    "200F": {
+      "ITEM": {
+        "length": "6.5 cm",
+        "width": "3.5 cm",
+        "height": "17.5 cm",
+        "weight": "0.21 kg"
+      },
+      "CARTON": {
+        "length": "25.0 cm",
+        "width": "13.0 cm",
+        "height": "18.0 cm",
+        "weight": "3.06 kg",
+        "nr_of_items": 14
+      },
+      "LAYER": {
+        "nr_of_items": 378,
+        "nr_of_cartons": 27
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "148.0 cm",
+        "weight": "600.0 kg",
+        "nr_of_cartons": 189,
+        "nr_of_items": 2646,
+        "nr_of_layers": 7
+      }
+    },
+    "2x200": {
+      "ITEM": {
+        "length": "6.5 cm",
+        "width": "7 cm",
+        "height": "17.5 cm",
+        "weight": "0.48 kg"
+      },
+      "CARTON": {
+        "length": "25.0 cm",
+        "width": "13.0 cm",
+        "height": "18.0 cm",
+        "weight": "3 kg",
+        "nr_of_items": 6
+      },
+      "LAYER": {
+        "nr_of_items": 162,
+        "nr_of_cartons": 27
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "148.0 cm",
+        "weight": "590.0 kg",
+        "nr_of_cartons": 189,
+        "nr_of_items": 1134,
+        "nr_of_layers": 7
+      }
     }
   }
 }
