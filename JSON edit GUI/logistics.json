@@ -1970,30 +1970,30 @@
   "Sunnoré": {
     "200D": {
       "ITEM": {
-        "length": "3.8 cm",
-        "width": "3.8 cm",
-        "height": "10.2 cm",
-        "weight": "0.98 kg"
+        "length": "6.5 cm",
+        "width": "3.5 cm",
+        "height": "17.5 cm",
+        "weight": "0.23 kg"
       },
       "CARTON": {
         "length": "25.0 cm",
-        "width": "90.0 cm",
-        "height": "12.0 cm",
-        "weight": "1.24 kg",
-        "nr_of_items": 12
+        "width": "13.0 cm",
+        "height": "18.0 cm",
+        "weight": "3.32 kg",
+        "nr_of_items": 14
       },
       "LAYER": {
-        "nr_of_items": 492,
-        "nr_of_cartons": 41
+        "nr_of_items": 378,
+        "nr_of_cartons": 27
       },
       "PALLET": {
         "length": "120.0 cm",
         "width": "80.0 cm",
-        "height": "140.0 cm",
-        "weight": "530.0 kg",
-        "nr_of_cartons": 410,
-        "nr_of_items": 4920,
-        "nr_of_layers": 10
+        "height": "148.0 cm",
+        "weight": "650.0 kg",
+        "nr_of_cartons": 189,
+        "nr_of_items": 2646,
+        "nr_of_layers": 7
       }
     }
   }
