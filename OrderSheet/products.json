@@ -5974,8 +5974,8 @@
     "type": "Sun Care",
     "id": "8596048013505",
     "hs": "33049900",
-    "name": "SUNNORÉ SUN MILK SPF 20",
-    "csName": "SUNNORÉ OPALOVACÍ MLÉKO SPF 20",
+    "name": "Sennoré Sun Milk SPF 20",
+    "csName": "Sunnoré Opalovací Mléko SPF 20",
     "volume": {
       "number": "200",
       "unit": "ml"
@@ -5986,7 +5986,7 @@
     "boxes_per_pallet": 189,
     "key": "200D",
     "new": true,
-    "new_date": "22.01.2026",
+    "new_date": "2026-03-01",
     "discontinued": false,
     "discontinued_date": ""
   }
