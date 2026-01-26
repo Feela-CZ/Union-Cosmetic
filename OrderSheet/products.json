@@ -1941,9 +1941,10 @@
   {
     "brand": "Naturalis",
     "type": "Shampoo",
-    "id": 8596048006361,
-    "hs": null,
+    "id": "8596048006361",
+    "hs": "33051000",
     "name": "Naturalis shampoo THISTLE - Natural Balance",
+    "csName": "Naturalis vlasový šampon - Bodlák",
     "volume": {
       "number": "500",
       "unit": "ml"
@@ -1952,11 +1953,11 @@
     "pack": 15,
     "boxes_per_layer": 18,
     "boxes_per_pallet": 108,
+    "key": "500",
     "new": false,
     "new_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Naturalis vlasový šampon - Bodlák"
+    "discontinued": false,
+    "discontinued_date": ""
   },
   {
     "brand": "Naturalis",
@@ -5969,33 +5970,12 @@
     "csName": "NATAVA olejové koule do koupele - Dárková sada  4×"
   },
   {
-    "brand": "Lilien",
-    "type": "Conditioner",
-    "id": "1234567891234",
-    "hs": "12345678",
-    "name": "hovno",
-    "csName": "druhý hovno",
-    "volume": {
-      "number": "123",
-      "unit": "ml"
-    },
-    "price": 34.99,
-    "pack": 35,
-    "boxes_per_layer": 12,
-    "boxes_per_pallet": 96,
-    "key": "500",
-    "new": true,
-    "new_date": "2025-12-18",
-    "discontinued": false,
-    "discontinued_date": ""
-  },
-  {
     "brand": "Sunnoré",
     "type": "Sun Care",
     "id": "8596048013505",
     "hs": "33049900",
-    "name": "SUNNORÉ SUN MILK SPF 20",
-    "csName": "SUNNORÉ OPALOVACÍ MLÉKO SPF 20",
+    "name": "Sennoré Sun Milk SPF 20",
+    "csName": "Sunnoré Opalovací Mléko SPF 20",
     "volume": {
       "number": "200",
       "unit": "ml"
@@ -6006,7 +5986,7 @@
     "boxes_per_pallet": 189,
     "key": "200D",
     "new": true,
-    "new_date": "22.01.2026",
+    "new_date": "2026-03-01",
     "discontinued": false,
     "discontinued_date": ""
   }
