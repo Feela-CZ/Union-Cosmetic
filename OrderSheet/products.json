@@ -5989,5 +5989,26 @@
     "new_date": "2026-03-01",
     "discontinued": false,
     "discontinued_date": ""
+  },
+  {
+    "brand": "Sunnoré",
+    "type": "Sun Care",
+    "id": "8596048013512",
+    "hs": "33049900",
+    "name_en": "Sunnoré Sun Milk SPF 30",
+    "name_cs": "Sunnoré Opalovací Mléko SPF 30",
+    "volume": {
+      "number": "200",
+      "unit": "ml"
+    },
+    "price": "3.09",
+    "pack": "14",
+    "boxes_per_layer": "27",
+    "boxes_per_pallet": "189",
+    "logistics_key": "200D",
+    "new": true,
+    "new_date": "2026-03-01",
+    "discontinued": false,
+    "discontinued_date": ""
   }
 ]
