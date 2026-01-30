@@ -460,71 +460,64 @@ function initUI() {
     document.getElementById('add-product-form').addEventListener('submit', async function (event) {
         event.preventDefault();
 
-        // --- VALIDACE ---
-        // EAN musí mít přesně 13 číslic
-        const eanVal = document.getElementById('add-id').value.trim();
-        if (!/^\d{13}$/.test(eanVal)) {
-            alert("EAN musí mít přesně 13 číslic.");
-            return;
-        }
+        const today = new Date().toISOString().split('T')[0];
 
-        // HS kód – pokud není prázdný, musí být jen číslice
+        const eanVal = document.getElementById('add-ean').value.trim();
         const hsVal = document.getElementById('add-hs').value.trim();
-        if (hsVal !== "" && !/^\d+$/.test(hsVal)) {
-            alert("HS kód smí obsahovat jen číslice.");
-            return;
-        }
 
-        // Pack / Boxes – jen číslice
-        const numericFields = [
-            { id: "add-pack", label: "Počet balení" },
-            { id: "add-boxes_per_layer", label: "Krabic na vrstvu" },
-            { id: "add-boxes_per_pallet", label: "Krabic na paletě" }
-        ];
-        for (const field of numericFields) {
-            const val = document.getElementById(field.id).value.trim();
-            if (val !== "" && !/^\d+$/.test(val)) {
-                alert(`${field.label} smí obsahovat jen číslice.`);
-                return;
-            }
-        }
-        // --- KONEC VALIDACE ---
+        const isNew = document.getElementById('add-new').checked;
+        const newDateRaw = document.getElementById('add-new_date').value;
+
+        const isDisc = document.getElementById('add-discontinued').checked;
+        const discDateRaw = document.getElementById('add-discontinued_date').value;
 
         const newProduct = {
             brand: document.getElementById('add-brand').value.trim(),
             type: document.getElementById('add-type').value.trim(),
             id: eanVal,
             hs: hsVal,
-            name_en: document.getElementById('add-name_en').value.trim(),
-            name_cs: document.getElementById('add-name_cs').value.trim(),
+
+            // ✅ SPRÁVNÉ KLÍČE (STEJNÉ JAKO EDIT + TABULKA)
+            name: document.getElementById('add-name_en').value.trim(),
+            csName: document.getElementById('add-name_cs').value.trim(),
+
             volume: {
                 number: document.getElementById('add-volume-number').value.trim(),
-                unit: document.getElementById('add-volume-unit').value.trim(),
+                unit: document.getElementById('add-volume-unit').value.trim()
             },
-            price: document.getElementById('add-price').value.trim(),
-            pack: document.getElementById('add-pack').value.trim(),
-            boxes_per_layer: document.getElementById('add-boxes_per_layer').value.trim(),
-            boxes_per_pallet: document.getElementById('add-boxes_per_pallet').value.trim(),
-            logistics_key: document.getElementById('add-logistics-key').value.trim(),
-            new: document.getElementById('add-new').checked,
-            new_date: document.getElementById('add-new_date').value,
-            discontinued: document.getElementById('add-discontinued').checked,
-            discontinued_date: document.getElementById('add-discontinued_date').value
+
+            // typy sjednocené s editem
+            price: document.getElementById('add-price').value.trim() === ''
+                ? ''
+                : parseFloat(document.getElementById('add-price').value),
+
+            pack: document.getElementById('add-pack').value.trim() === ''
+                ? ''
+                : parseInt(document.getElementById('add-pack').value, 10),
+
+            boxes_per_layer: document.getElementById('add-boxes_per_layer').value.trim() === ''
+                ? ''
+                : parseInt(document.getElementById('add-boxes_per_layer').value, 10),
+
+            boxes_per_pallet: document.getElementById('add-boxes_per_pallet').value.trim() === ''
+                ? ''
+                : parseInt(document.getElementById('add-boxes_per_pallet').value, 10),
+
+            // ✅ SPRÁVNÝ KLÍČ
+            key: document.getElementById('add-logistics-key').value.trim(),
+
+            new: isNew,
+            new_date: isNew ? (newDateRaw || today) : '',
+            discontinued: isDisc,
+            discontinued_date: isDisc ? (discDateRaw || today) : ''
         };
 
         products.push(newProduct);
-
-        const fileInput = document.getElementById("add-photo-input");
-        if (fileInput && fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            await saveImageToRepo(file, newProduct.id);
-        }
-
-        await saveProductsToRepo();
-
+        await saveProducts();
+        closeAddModal();
         renderTable();
-        document.getElementById('add-modal').style.display = 'none';
     });
+    
     document.getElementById('search-input').addEventListener('input', renderTable);
     document.getElementById('brand-filter').addEventListener('change', function () {
         updateLogisticsKeyFilter();
@@ -1443,6 +1436,24 @@ document.getElementById('discontinued').addEventListener('change', function () {
         document.getElementById('discontinued_date').value = today;
     } else {
         document.getElementById('discontinued_date').value = '';
+    }
+});
+
+document.getElementById('add-new').addEventListener('change', function () {
+    if (this.checked) {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('add-new_date').value = today;
+    } else {
+        document.getElementById('add-new_date').value = '';
+    }
+});
+
+document.getElementById('add-discontinued').addEventListener('change', function () {
+    if (this.checked) {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('add-discontinued_date').value = today;
+    } else {
+        document.getElementById('add-discontinued_date').value = '';
     }
 });
 
