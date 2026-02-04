@@ -6031,5 +6031,26 @@
     "new_date": "2026-03-01",
     "discontinued": false,
     "discontinued_date": ""
+  },
+  {
+    "brand": "Sunnoré",
+    "type": "Sun Care",
+    "id": "8596048013536",
+    "hs": "33049900",
+    "name": "Sunnoré Aftersun Milk",
+    "csName": "Sunnoré Mléko po Opalování",
+    "volume": {
+      "number": "200",
+      "unit": "ml"
+    },
+    "price": 1.15,
+    "pack": 14,
+    "boxes_per_layer": 27,
+    "boxes_per_pallet": 189,
+    "key": "200D",
+    "new": true,
+    "new_date": "2026-03-01",
+    "discontinued": false,
+    "discontinued_date": ""
   }
 ]
