@@ -513,11 +513,14 @@ function initUI() {
         };
 
         products.push(newProduct);
-        await saveProducts();
-        closeAddModal();
+
         renderTable();
+        document.getElementById('add-modal').style.display = 'none';
+
+        try { await saveProductsToRepo(); }
+        catch (e) { alert('Uložení products.json selhalo: ' + (e.message || e)); }
     });
-    
+
     document.getElementById('search-input').addEventListener('input', renderTable);
     document.getElementById('brand-filter').addEventListener('change', function () {
         updateLogisticsKeyFilter();
