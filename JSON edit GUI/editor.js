@@ -462,7 +462,7 @@ function initUI() {
 
         const today = new Date().toISOString().split('T')[0];
 
-        const eanVal = document.getElementById('add-ean').value.trim();
+        const eanVal = document.getElementById('add-id').value.trim();
         const hsVal = document.getElementById('add-hs').value.trim();
 
         const isNew = document.getElementById('add-new').checked;
