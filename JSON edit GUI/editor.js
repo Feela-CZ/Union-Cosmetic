@@ -1935,8 +1935,7 @@ function openLogisticsEditModal(brand, key, index = null) {
         const onlyEANChanged = !hasLogisticsChanges && (prodIdx !== null) && (eanNew !== eanOld);
 
         if (hasLogisticsChanges) {
-            let actualKey = document.getElementById('logistics-key').value
-                || (prodIdx !== null ? products[prodIdx].key : key);
+            const actualKey = key; // ✅ klic logistickeho modalu (to, co editujes)
 
             document.getElementById('logistics-confirm-message').textContent =
                 translations[currentLang].logistics_change_confirm
