@@ -6198,7 +6198,8 @@
     "new": true,
     "new_date": "2026-03-01",
     "discontinued": false,
-    "discontinued_date": ""
+    "discontinued_date": "",
+    "carton_ean": null
   },
   {
     "brand": "Sunnoré",
