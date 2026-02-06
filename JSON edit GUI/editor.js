@@ -1935,12 +1935,18 @@ function openLogisticsEditModal(brand, key, index = null) {
         const onlyEANChanged = !hasLogisticsChanges && (prodIdx !== null) && (eanNew !== eanOld);
 
         if (hasLogisticsChanges) {
-            const actualKey = key; // ✅ klic logistickeho modalu (to, co editujes)
+            // ✅ vezmi aktualne vybrany klic (po "Vybrat logisticky klic" se meni currentLogisticsKey a/nebo product.key)
+            const actualKey =
+                (typeof currentLogisticsKey !== 'undefined' && currentLogisticsKey != null && currentLogisticsKey !== '' && currentLogisticsKey !== 'null')
+                    ? currentLogisticsKey
+                    : ((prodIdx !== null && products[prodIdx]?.key != null && products[prodIdx].key !== '' && products[prodIdx].key !== 'null')
+                        ? products[prodIdx].key
+                        : key);
 
             document.getElementById('logistics-confirm-message').textContent =
                 translations[currentLang].logistics_change_confirm
                     .replace('{brand}', brand)
-                    .replace('{key}', actualKey);
+                    .replace('{key}', (actualKey == null || actualKey === '' || actualKey === 'null') ? '—' : actualKey);
 
             document.getElementById('logistics-confirm-modal').style.display = 'block';
 
