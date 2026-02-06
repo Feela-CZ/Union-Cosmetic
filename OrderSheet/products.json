@@ -6199,5 +6199,26 @@
     "new_date": "2026-03-01",
     "discontinued": false,
     "discontinued_date": ""
+  },
+  {
+    "brand": "Sunnoré",
+    "type": "Sun Care",
+    "id": "8596048013574",
+    "hs": "33049900",
+    "name": "Sunnoré duo pack Sun Milk SPF 20 + Aftersun Milk",
+    "csName": "Sunnoré duo pack Opalovací Mléko SPF 20 + Mléko po Opalování",
+    "volume": {
+      "number": "400",
+      "unit": "ml"
+    },
+    "price": 3.69,
+    "pack": 6,
+    "boxes_per_layer": 27,
+    "boxes_per_pallet": 189,
+    "key": "2x200",
+    "new": true,
+    "new_date": "2026-03-01",
+    "discontinued": false,
+    "discontinued_date": ""
   }
 ]
