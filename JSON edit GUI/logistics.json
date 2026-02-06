@@ -2163,6 +2163,34 @@
         "nr_of_items": 1134,
         "nr_of_layers": 7
       }
+    },
+    "4g": {
+      "ITEM": {
+        "length": "8.0 cm",
+        "width": "2.0 cm",
+        "height": "12.0 cm",
+        "weight": "0,018 kg"
+      },
+      "CARTON": {
+        "length": "25.0 cm",
+        "width": "9 cm",
+        "height": "12.0 cm",
+        "weight": "0,415 kg",
+        "nr_of_items": 20
+      },
+      "LAYER": {
+        "nr_of_items": 820,
+        "nr_of_cartons": 41
+      },
+      "PALLET": {
+        "length": "120.0 cm",
+        "width": "80.0 cm",
+        "height": "142.0 cm",
+        "weight": "205 kg",
+        "nr_of_cartons": 410,
+        "nr_of_items": 8200,
+        "nr_of_layers": 10
+      }
     }
   }
 }
