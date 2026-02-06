@@ -6178,5 +6178,26 @@
     "new_date": "2026-03-01",
     "discontinued": false,
     "discontinued_date": ""
+  },
+  {
+    "brand": "Sunnoré",
+    "type": "Sun Care",
+    "id": "8596048013598",
+    "hs": "33049900",
+    "name": "Sunnoré Carrot Oil",
+    "csName": "Sunnoré Mrkový Olej",
+    "volume": {
+      "number": "200",
+      "unit": "ml"
+    },
+    "price": 2.79,
+    "pack": 14,
+    "boxes_per_layer": 27,
+    "boxes_per_pallet": 189,
+    "key": "200G",
+    "new": true,
+    "new_date": "2026-03-01",
+    "discontinued": false,
+    "discontinued_date": ""
   }
 ]
