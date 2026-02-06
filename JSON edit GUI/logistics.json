@@ -2119,7 +2119,7 @@
         "length": "25.0 cm",
         "width": "13.0 cm",
         "height": "18.0 cm",
-        "weight": null,
+        "weight": "3,2",
         "nr_of_items": 14
       },
       "LAYER": {
@@ -2130,7 +2130,7 @@
         "length": "120.0 cm",
         "width": "80.0 cm",
         "height": "148.0 cm",
-        "weight": null,
+        "weight": 625,
         "nr_of_cartons": 189,
         "nr_of_items": 2646,
         "nr_of_layers": 7
