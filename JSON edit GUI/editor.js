@@ -504,7 +504,7 @@ function initUI() {
                 : parseInt(document.getElementById('add-boxes_per_pallet').value, 10),
 
             // ✅ SPRÁVNÝ KLÍČ
-            key: document.getElementById('add-logistics-key').value.trim(),
+            key: (document.getElementById('add-logistics-key').value.trim() || null),
 
             new: isNew,
             new_date: isNew ? (newDateRaw || today) : '',
@@ -514,11 +514,18 @@ function initUI() {
 
         products.push(newProduct);
 
-        renderTable();
-        document.getElementById('add-modal').style.display = 'none';
+        try {
+            await saveProductsToRepo(); // tady se products prepise z fetch, takze musime renderovat az po tom
+        } catch (e) {
+            alert('Uložení products.json selhalo: ' + (e.message || e));
+        }
 
-        try { await saveProductsToRepo(); }
-        catch (e) { alert('Uložení products.json selhalo: ' + (e.message || e)); }
+        // po syncu z API renderujeme tabulku znova -> tlacitka budou mit spravne indexy
+        renderTable();
+
+        // vycistit add modal po ulozeni
+        resetAddProductForm();
+        document.getElementById('add-modal').style.display = 'none';
     });
 
     document.getElementById('search-input').addEventListener('input', renderTable);
@@ -1238,6 +1245,32 @@ function openAddModal() {
 
     // A nakonec zobrazíme modal
     document.getElementById('add-modal').style.display = 'block';
+}
+
+function resetAddProductForm() {
+    const form = document.getElementById('add-product-form');
+    if (form) form.reset();
+
+    // logisticky klic + navazana pole
+    const keySelect = document.getElementById('add-logistics-key');
+    if (keySelect) keySelect.innerHTML = '<option value="">-- vyber klíč --</option>';
+
+    const packInput = document.getElementById('add-pack');
+    const layerInput = document.getElementById('add-boxes_per_layer');
+    const palletInput = document.getElementById('add-boxes_per_pallet');
+
+    if (packInput) packInput.value = '';
+    if (layerInput) layerInput.value = '';
+    if (palletInput) palletInput.value = '';
+
+    // fotka v add modalu (pokud ji pouzivas)
+    const img = document.getElementById('add-product-photo');
+    const placeholder = document.getElementById('add-photo-placeholder-text');
+    const input = document.getElementById('add-photo-input');
+
+    if (img) { img.src = ''; img.style.display = 'none'; }
+    if (placeholder) placeholder.style.display = 'block';
+    if (input) input.value = '';
 }
 
 function initAddPhotoUpload() {
