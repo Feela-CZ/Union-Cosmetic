@@ -6221,5 +6221,26 @@
     "new_date": "2026-03-01",
     "discontinued": false,
     "discontinued_date": ""
+  },
+  {
+    "brand": "Sunnoré",
+    "type": "Sun Care",
+    "id": "8596048013642",
+    "hs": "33049900",
+    "name": "Sunnoré Lip Balm SPF 30",
+    "csName": "Sunnoré Balzám na rty SPF 30",
+    "volume": {
+      "number": "4",
+      "unit": "g"
+    },
+    "price": 0.95,
+    "pack": "",
+    "boxes_per_layer": "",
+    "boxes_per_pallet": "",
+    "key": null,
+    "new": true,
+    "new_date": "2026-03-01",
+    "discontinued": false,
+    "discontinued_date": ""
   }
 ]
