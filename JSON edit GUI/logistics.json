@@ -2191,6 +2191,34 @@
         "nr_of_items": 8200,
         "nr_of_layers": 10
       }
+    },
+    "null": {
+      "ITEM": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null
+      },
+      "CARTON": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null,
+        "nr_of_items": null
+      },
+      "LAYER": {
+        "nr_of_items": null,
+        "nr_of_cartons": null
+      },
+      "PALLET": {
+        "length": null,
+        "width": null,
+        "height": null,
+        "weight": null,
+        "nr_of_cartons": null,
+        "nr_of_items": null,
+        "nr_of_layers": null
+      }
     }
   }
 }
