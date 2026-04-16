@@ -369,9 +369,10 @@
   {
     "brand": "Lilien",
     "type": "Shower Gel",
-    "id": 8596048005111,
-    "hs": 34013000,
+    "id": "8596048005111",
+    "hs": "34013000",
     "name": "Lilien shower cream Lime & Mint",
+    "csName": "Lilien krémový sprchový gel Limetka & Máta",
     "volume": {
       "number": "750",
       "unit": "ml"
@@ -380,11 +381,11 @@
     "pack": 12,
     "boxes_per_layer": 13,
     "boxes_per_pallet": 65,
+    "key": "750",
     "new": false,
     "new_date": "",
-    "key": 750,
-    "carton_ean": 8596048005180,
-    "csName": "Lilien krémový sprchový gel Limetka & Máta"
+    "discontinued": true,
+    "discontinued_date": "2026-04-16"
   },
   {
     "brand": "Lilien",
