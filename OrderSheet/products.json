@@ -5730,28 +5730,6 @@
   {
     "brand": "Natava",
     "type": "Hand Cream",
-    "id": "8596048012171",
-    "hs": 33049900,
-    "name": "Natava hand cream Flower Garden",
-    "volume": {
-      "number": "40",
-      "unit": "g"
-    },
-    "price": null,
-    "pack": null,
-    "boxes_per_layer": null,
-    "boxes_per_pallet": null,
-    "new": false,
-    "new_date": "",
-    "discontinued": false,
-    "discontinued_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "NATAVA Krém na ruce - Květinová zahrada"
-  },
-  {
-    "brand": "Natava",
-    "type": "Hand Cream",
     "id": "8596048012188",
     "hs": 33049900,
     "name": "Natava hand cream Herbal Wood",
