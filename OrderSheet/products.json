@@ -327,8 +327,9 @@
     "brand": "Lilien",
     "type": "Shower Gel",
     "id": "8596048012003",
-    "hs": 34013000,
+    "hs": "34013000",
     "name": "Lilien Oil Shower Gel Passion Fruit (twice dosage of perfume, rPET)",
+    "csName": "Lilien olejový sprchový gel - Marakuja",
     "volume": {
       "number": "400",
       "unit": "ml"
@@ -337,13 +338,11 @@
     "pack": 12,
     "boxes_per_layer": 20,
     "boxes_per_pallet": 120,
-    "new": true,
-    "new_date": "2025-06-24",
+    "key": "400",
+    "new": false,
+    "new_date": "",
     "discontinued": false,
-    "discontinued_date": "",
-    "key": 400,
-    "carton_ean": 8596048012041,
-    "csName": "Lilien olejový sprchový gel - Marakuja"
+    "discontinued_date": ""
   },
   {
     "brand": "Lilien",
