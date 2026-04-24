@@ -1133,7 +1133,9 @@
     "brand": "Lilien",
     "type": "Liquid Soap",
     "id": "8596048004619",
+    "hs": "undefined",
     "name": "Lilien  liquid soap Hygiene Plus",
+    "csName": "Lilien tekuté mýdlo - Hygiene Plus",
     "volume": {
       "number": "1000",
       "unit": "ml"
@@ -1145,10 +1147,8 @@
     "key": "1000",
     "new": false,
     "new_date": "",
-    "discontinued": true,
-    "discontinued_date": "2025-07-16",
-    "carton_ean": 8596048004688,
-    "csName": "Lilien tekuté mýdlo - Hygiene Plus"
+    "discontinued": false,
+    "discontinued_date": ""
   },
   {
     "brand": "Lilien",
