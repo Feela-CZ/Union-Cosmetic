@@ -1404,7 +1404,7 @@ async function saveImageToRepo(file, productId) {
                 const bytes = new Uint8Array(arrayBuffer);
 
                 await saveFileToRepo(
-                    `Ordersheet/img/${productId}.jpg`,
+                    `OrderSheet/img/${productId}.jpg`,
                     bytes
                 );
                 resolve();
