@@ -6,6 +6,7 @@ let logisticsData = {};
 let currentLogisticsBrand = null;
 let currentLogisticsKey = null;
 let currentLogisticsProductIndex = null;
+let logisticsWorkingData = null;
 let currentLang = 'cs';
 let showingAllKeys = false;
 let showDiscontinued = false;
@@ -709,57 +710,30 @@ function initUI() {
 
     document.getElementById('choose-logistics-form').addEventListener('submit', function (e) {
         e.preventDefault();
+
         const selectedBrand = document.getElementById('choose-brand').value;
         const selectedKey = document.getElementById('choose-key').value;
 
-        const sourceLogistics = logisticsData[selectedBrand]?.[selectedKey];
+        // working state (nehrabeme do products ani logisticsData)
+        logisticsWorkingBrand = selectedBrand;
+        logisticsWorkingKey = selectedKey;
 
-        if (sourceLogistics) {
-            if (!logisticsData[selectedBrand]) logisticsData[selectedBrand] = {};
+        const emptyLogistics = {
+            ITEM: { length: '', width: '', height: '', weight: '' },
+            CARTON: { length: '', width: '', height: '', weight: '', nr_of_items: '' },
+            LAYER: { nr_of_items: '', nr_of_cartons: '' },
+            PALLET: { length: '', width: '', height: '', weight: '', nr_of_cartons: '', nr_of_items: '', nr_of_layers: '' }
+        };
 
-            // deep copy + odstranění případného PALLET.carton_ean
-            const copy = JSON.parse(JSON.stringify(sourceLogistics));
-            if (copy.PALLET && 'carton_ean' in copy.PALLET) delete copy.PALLET.carton_ean;
-            logisticsData[selectedBrand][selectedKey] = copy;
+        const src = logisticsData?.[selectedBrand]?.[selectedKey];
+        logisticsWorkingData = src
+            ? JSON.parse(JSON.stringify(src))
+            : JSON.parse(JSON.stringify(emptyLogistics));
 
-            document.getElementById('logistics-key').value = selectedKey;
+        // vykreslit formular z working copy
+        updateLogisticsModalContent(selectedBrand, selectedKey);
 
-            if (sourceLogistics.ITEM) {
-                Object.keys(sourceLogistics.ITEM).forEach(k => {
-                    const input = document.getElementById('logistics-ITEM-' + k);
-                    if (input) input.value = sourceLogistics.ITEM[k] || '';
-                });
-            }
-            if (sourceLogistics.CARTON) {
-                Object.keys(sourceLogistics.CARTON).forEach(k => {
-                    const input = document.getElementById('logistics-CARTON-' + k);
-                    if (input) input.value = sourceLogistics.CARTON[k] || '';
-                });
-            }
-            if (sourceLogistics.LAYER) {
-                Object.keys(sourceLogistics.LAYER).forEach(k => {
-                    const input = document.getElementById('logistics-LAYER-' + k);
-                    if (input) input.value = sourceLogistics.LAYER[k] || '';
-                });
-            }
-            if (sourceLogistics.PALLET) {
-                Object.keys(sourceLogistics.PALLET).forEach(k => {
-                    if (k === 'carton_ean') return; // nepropagovat historický EAN do inputů
-                    const input = document.getElementById('logistics-PALLET-' + k);
-                    if (input) input.value = sourceLogistics.PALLET[k] || '';
-                });
-            }
-
-            if (currentLogisticsProductIndex !== null) {
-                products[currentLogisticsProductIndex].key = selectedKey || null;
-            }
-
-            updateLogisticsModalContent(selectedBrand, selectedKey);
-        }
-        currentLogisticsKey = selectedKey;
-        currentLogisticsBrand = selectedBrand;
         document.getElementById('choose-logistics-modal').style.display = 'none';
-        renderTable();
     });
 
     const url = LOCAL_MODE
@@ -1812,8 +1786,16 @@ function openLogisticsEditModal(brand, key, index = null) {
     };
 
     if (!logisticsData[brand]) logisticsData[brand] = {};
-    if (!logisticsData[brand][key]) logisticsData[brand][key] = JSON.parse(JSON.stringify(emptyLogistics));
-    const data = logisticsData[brand][key];
+
+    // ✅ data jen "nacteme", nic nevytvarime pri otevreni
+    const data = (key != null && key !== '' && key !== 'null')
+        ? (logisticsData[brand][key] || null)
+        : null;
+
+    // ✅ pokud produkt nema klic, otevreme prazdny formular (ale NIC nezapisujeme do logisticsData)
+    const workingData = data
+        ? JSON.parse(JSON.stringify(data))
+        : JSON.parse(JSON.stringify(emptyLogistics));
 
     document.getElementById('logistics-edit-title').textContent =
         translations[currentLang].logistics_data_for
@@ -1826,8 +1808,8 @@ function openLogisticsEditModal(brand, key, index = null) {
         const colDiv = document.createElement('div');
         colDiv.className = 'logistics-fields-col';
         sections.forEach(section => {
-            if (!data[section]) return;
-            const group = data[section];
+            if (!workingData[section]) return;
+            const group = workingData[section];
             const sectionName = translations[currentLang]['section_' + section] || section;
             let html = `<div class="section-group"><h4>${sectionName}</h4>`;
             for (const [keyName, value] of Object.entries(group)) {
@@ -1882,7 +1864,7 @@ function openLogisticsEditModal(brand, key, index = null) {
     oldForm.onsubmit = async function (e) {
         e.preventDefault();
 
-        const newData = JSON.parse(JSON.stringify(data));
+        const newData = JSON.parse(JSON.stringify(workingData));
 
         if (newData.PALLET && 'carton_ean' in newData.PALLET) {
             delete newData.PALLET.carton_ean;
@@ -1931,7 +1913,7 @@ function openLogisticsEditModal(brand, key, index = null) {
         const prodIdx = currentLogisticsProductIndex;
         const eanOld = (prodIdx !== null) ? (products[prodIdx].carton_ean ?? null) : null;
 
-        const hasLogisticsChanges = logisticsChanged(data, newData);
+        const hasLogisticsChanges = logisticsChanged(workingData, newData);
         const onlyEANChanged = !hasLogisticsChanges && (prodIdx !== null) && (eanNew !== eanOld);
 
         if (hasLogisticsChanges) {
@@ -1951,36 +1933,61 @@ function openLogisticsEditModal(brand, key, index = null) {
             document.getElementById('logistics-confirm-modal').style.display = 'block';
 
             document.getElementById('logistics-confirm-yes').onclick = async function () {
-                if (data.PALLET && 'carton_ean' in data.PALLET) {
-                    delete data.PALLET.carton_ean;
+                // ✅ CILOVY klic = to, co je v confirm hlaskce
+                const targetKey = actualKey;
+
+                // Bez klice neukladat (a hlavne nikdy neprepisovat "null" omylem)
+                if (targetKey == null || targetKey === '' || targetKey === 'null') {
+                    alert('Nejdřív vyber logistický klíč (nebudeme ukládat do "null").');
+                    return;
                 }
-                // propsat nové hodnoty z newData do data (logisticsData)
+
+                // priprav cilovy objekt v logisticsData
+                if (!logisticsData[brand]) logisticsData[brand] = {};
+                if (!logisticsData[brand][targetKey]) {
+                    logisticsData[brand][targetKey] = JSON.parse(JSON.stringify(emptyLogistics));
+                }
+                const target = logisticsData[brand][targetKey];
+
+                // nikdy netahat carton_ean do logistics.json
+                if (target.PALLET && 'carton_ean' in target.PALLET) delete target.PALLET.carton_ean;
+
+                // ✅ propsat zmeny do CILOVEHO klice (target), ne do "data" (puvodni key)
                 for (const [section, values] of Object.entries(newData)) {
+                    if (!target[section]) target[section] = {};
                     for (const keyName of Object.keys(values)) {
-                        data[section][keyName] = values[keyName];
+                        target[section][keyName] = values[keyName];
                     }
                 }
 
-                // případně propsat změnu carton_ean do produktu
-                if (prodIdx !== null && inp) {
-                    products[prodIdx].carton_ean = eanNew;
+                // ✅ propsat klic (a pripadne carton_ean) do produktu az po potvrzeni
+                if (prodIdx !== null && products[prodIdx]) {
+                    products[prodIdx].key = targetKey;
+
+                    if (inp) {
+                        products[prodIdx].carton_ean = eanNew;
+                    }
                 }
 
-                // zavřít modaly
+                // aktualizuj "context" pro dalsi klikani v UI
+                currentLogisticsBrand = brand;
+                currentLogisticsKey = targetKey;
+
+                // zavrit modaly
                 document.getElementById('logistics-confirm-modal').style.display = 'none';
                 modal.style.display = 'none';
 
-                // ULOŽIT logistiky do repa
+                // ulozit logistics
                 try { await saveLogisticsToRepo(); }
-                catch (e) { alert('Uložení logistics.json selhalo: ' + e.message); }
+                catch (e) { alert('Uložení logistics.json selhalo: ' + (e.message || e)); }
 
-                // Pokud jsme změnili i carton_ean v produktu, ulož i products.json
-                if (prodIdx !== null && inp) {
+                // ✅ ulozit products (protoze jsme zmenili product.key a mozna i carton_ean)
+                if (prodIdx !== null) {
                     try { await saveProductsToRepo(); }
-                    catch (e) { alert('Uložení products.json selhalo: ' + e.message); }
+                    catch (e) { alert('Uložení products.json selhalo: ' + (e.message || e)); }
                 }
 
-                // znovu otevři náhled pro aktuální produkt
+                // znovu otevri nahled pro aktualni produkt
                 if (prodIdx !== null) {
                     showLogistics(prodIdx);
                 }
@@ -2046,23 +2053,46 @@ function initInputValidations() {
 }
 
 function updateLogisticsModalContent(brand, key) {
-    const data = logisticsData[brand][key];
+    // update titulek edit modalu
+    const titleEl = document.getElementById('logistics-edit-title');
+    if (titleEl) {
+        const shownKey = (key === null || key === undefined || key === '') ? 'null' : String(key);
+        titleEl.textContent =
+            translations[currentLang].logistics_data_for
+                .replace('{brand}', brand)
+                .replace('{key}', shownKey);
+    }
+
     const fieldsContainer = document.getElementById('logistics-fields');
     fieldsContainer.innerHTML = '';
+
+    // kreslime VZDY z working copy (nikdy primo z logisticsData)
+    const data = logisticsWorkingData;
+    if (!data) return;
 
     function makeCol(sections) {
         const colDiv = document.createElement('div');
         colDiv.className = 'logistics-fields-col';
+
         sections.forEach(section => {
             if (!data[section]) return;
+
             const group = data[section];
             const sectionName = translations[currentLang]['section_' + section] || section;
+
             let html = `<div class="section-group"><h4>${sectionName}</h4>`;
             for (const [keyName, value] of Object.entries(group)) {
                 if (keyName === 'carton_ean') continue;
+
+                const label =
+                    translations[currentLang][keyName] ||
+                    attributeLabels[keyName] ||
+                    keyName.replace(/_/g, ' ');
+
                 const inputId = `logistics-${section}-${keyName}`;
+
                 html += `
-                    <label>${attributeLabels[keyName] || keyName.replace(/_/g, ' ')}:
+                    <label>${label}:
                         <input type="text" id="${inputId}" value="${value !== null && value !== undefined ? value : ''}">
                     </label>
                 `;
@@ -2070,6 +2100,7 @@ function updateLogisticsModalContent(brand, key) {
             html += `</div>`;
             colDiv.innerHTML += html;
         });
+
         return colDiv;
     }
 
