@@ -264,8 +264,9 @@
     "brand": "Lilien",
     "type": "Shower Gel",
     "id": "8596048011983",
-    "hs": 34013000,
+    "hs": "34013000",
     "name": "Lilien Oil Shower Gel Bergamot & Lime (twice dosage of perfume, rPET)",
+    "csName": "Lilien olejový sprchový gel - Bergamot a Limeta",
     "volume": {
       "number": "400",
       "unit": "ml"
@@ -274,20 +275,19 @@
     "pack": 12,
     "boxes_per_layer": 20,
     "boxes_per_pallet": 120,
-    "new": true,
-    "new_date": "2025-06-24",
+    "key": "400",
+    "new": false,
+    "new_date": "",
     "discontinued": false,
-    "discontinued_date": "",
-    "key": 400,
-    "carton_ean": 8596048012027,
-    "csName": "Lilien olejový sprchový gel - Bergamot a Limeta"
+    "discontinued_date": ""
   },
   {
     "brand": "Lilien",
     "type": "Shower Gel",
     "id": "8596048012010",
-    "hs": 34013000,
+    "hs": "34013000",
     "name": "Lilien Oil Shower Gel Argan (twice dosage of perfume, rPET)",
+    "csName": "Lilien olejový sprchový gel - Argan",
     "volume": {
       "number": "400",
       "unit": "ml"
@@ -296,20 +296,19 @@
     "pack": 12,
     "boxes_per_layer": 20,
     "boxes_per_pallet": 120,
-    "new": true,
-    "new_date": "2025-06-24",
+    "key": "400",
+    "new": false,
+    "new_date": "",
     "discontinued": false,
-    "discontinued_date": "",
-    "key": 400,
-    "carton_ean": null,
-    "csName": "Lilien olejový sprchový gel - Argan"
+    "discontinued_date": ""
   },
   {
     "brand": "Lilien",
     "type": "Shower Gel",
     "id": "8596048011990",
-    "hs": 34013000,
+    "hs": "34013000",
     "name": "Lilien Oil Shower Gel Pomegranate (twice dosage of perfume, rPET)",
+    "csName": "Lilien olejový sprchový gel - Granátové jablko",
     "volume": {
       "number": "400",
       "unit": "ml"
@@ -318,20 +317,19 @@
     "pack": 12,
     "boxes_per_layer": 20,
     "boxes_per_pallet": 120,
-    "new": true,
-    "new_date": "2025-06-24",
+    "key": "400",
+    "new": false,
+    "new_date": "",
     "discontinued": false,
-    "discontinued_date": "",
-    "key": 400,
-    "carton_ean": 8596048012034,
-    "csName": "Lilien olejový sprchový gel - Granátové jablko"
+    "discontinued_date": ""
   },
   {
     "brand": "Lilien",
     "type": "Shower Gel",
     "id": "8596048012003",
-    "hs": 34013000,
+    "hs": "34013000",
     "name": "Lilien Oil Shower Gel Passion Fruit (twice dosage of perfume, rPET)",
+    "csName": "Lilien olejový sprchový gel - Marakuja",
     "volume": {
       "number": "400",
       "unit": "ml"
@@ -340,13 +338,11 @@
     "pack": 12,
     "boxes_per_layer": 20,
     "boxes_per_pallet": 120,
-    "new": true,
-    "new_date": "2025-06-24",
+    "key": "400",
+    "new": false,
+    "new_date": "",
     "discontinued": false,
-    "discontinued_date": "",
-    "key": 400,
-    "carton_ean": 8596048012041,
-    "csName": "Lilien olejový sprchový gel - Marakuja"
+    "discontinued_date": ""
   },
   {
     "brand": "Lilien",
@@ -373,9 +369,10 @@
   {
     "brand": "Lilien",
     "type": "Shower Gel",
-    "id": 8596048005111,
-    "hs": 34013000,
+    "id": "8596048005111",
+    "hs": "34013000",
     "name": "Lilien shower cream Lime & Mint",
+    "csName": "Lilien krémový sprchový gel Limetka & Máta",
     "volume": {
       "number": "750",
       "unit": "ml"
@@ -384,11 +381,11 @@
     "pack": 12,
     "boxes_per_layer": 13,
     "boxes_per_pallet": 65,
+    "key": "750",
     "new": false,
     "new_date": "",
-    "key": 750,
-    "carton_ean": 8596048005180,
-    "csName": "Lilien krémový sprchový gel Limetka & Máta"
+    "discontinued": true,
+    "discontinued_date": "2026-04-16"
   },
   {
     "brand": "Lilien",
@@ -1136,7 +1133,9 @@
     "brand": "Lilien",
     "type": "Liquid Soap",
     "id": "8596048004619",
+    "hs": "undefined",
     "name": "Lilien  liquid soap Hygiene Plus",
+    "csName": "Lilien tekuté mýdlo - Hygiene Plus",
     "volume": {
       "number": "1000",
       "unit": "ml"
@@ -1148,10 +1147,8 @@
     "key": "1000",
     "new": false,
     "new_date": "",
-    "discontinued": true,
-    "discontinued_date": "2025-07-16",
-    "carton_ean": 8596048004688,
-    "csName": "Lilien tekuté mýdlo - Hygiene Plus"
+    "discontinued": false,
+    "discontinued_date": ""
   },
   {
     "brand": "Lilien",
@@ -5726,94 +5723,6 @@
     "key": 250,
     "carton_ean": 8596048012942,
     "csName": "NATAVA Přírodní sprchový gel - Konopí"
-  },
-  {
-    "brand": "Natava",
-    "type": "Hand Cream",
-    "id": "8596048012157",
-    "hs": 33049900,
-    "name": "Natava hand cream Sweet Moringa",
-    "volume": {
-      "number": "40",
-      "unit": "g"
-    },
-    "price": null,
-    "pack": null,
-    "boxes_per_layer": null,
-    "boxes_per_pallet": null,
-    "new": false,
-    "new_date": "",
-    "discontinued": false,
-    "discontinued_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "NATAVA Krém na ruce - Sladká moringa"
-  },
-  {
-    "brand": "Natava",
-    "type": "Hand Cream",
-    "id": "8596048012164",
-    "hs": 33049900,
-    "name": "Natava hand cream Fruit Power",
-    "volume": {
-      "number": "40",
-      "unit": "g"
-    },
-    "price": null,
-    "pack": null,
-    "boxes_per_layer": null,
-    "boxes_per_pallet": null,
-    "new": false,
-    "new_date": "",
-    "discontinued": false,
-    "discontinued_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "NATAVA Krém na ruce - Síla ovoce"
-  },
-  {
-    "brand": "Natava",
-    "type": "Hand Cream",
-    "id": "8596048012171",
-    "hs": 33049900,
-    "name": "Natava hand cream Flower Garden",
-    "volume": {
-      "number": "40",
-      "unit": "g"
-    },
-    "price": null,
-    "pack": null,
-    "boxes_per_layer": null,
-    "boxes_per_pallet": null,
-    "new": false,
-    "new_date": "",
-    "discontinued": false,
-    "discontinued_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "NATAVA Krém na ruce - Květinová zahrada"
-  },
-  {
-    "brand": "Natava",
-    "type": "Hand Cream",
-    "id": "8596048012188",
-    "hs": 33049900,
-    "name": "Natava hand cream Herbal Wood",
-    "volume": {
-      "number": "40",
-      "unit": "g"
-    },
-    "price": null,
-    "pack": null,
-    "boxes_per_layer": null,
-    "boxes_per_pallet": null,
-    "new": false,
-    "new_date": "",
-    "discontinued": false,
-    "discontinued_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "NATAVA Krém na ruce - Bylinné dřevo"
   },
   {
     "brand": "Natava",
