@@ -406,6 +406,7 @@ function trimInputOnChange(input) {
         input.value = input.value.trim(); // při opuštění inputu zůstane ořezané
     });
 }
+/**/
 
 const LOCAL_MODE = location.hostname === "127.0.0.1" || location.hostname === "localhost";
 
