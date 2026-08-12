@@ -76,28 +76,11 @@ let justEdited = false;
 let orderState = {};
 loadOrderState();
 
-function formatVolume(value) {
-    if (value && typeof value === 'object') {
-        const number = value.number ?? '';
-        const unit = value.unit ?? '';
-        return `${number} ${unit}`.trim();
-    }
-
-    return value == null ? '' : String(value);
-}
-
-function parseVolumeNumber(value) {
-    const normalized = formatVolume(value).replace(',', '.');
-    const match = normalized.match(/-?\d+(?:\.\d+)?/);
-    return match ? Number.parseFloat(match[0]) : 0;
-}
-
 const logoMap = {
     "Lilien": "logo_lilien.png",
     "Naturalis": "logo-naturalis.png",
     "Twister": "logo_twister.jpg",
-    "Natava": "logo-natava.png",
-    "Sunnoré": null
+    "Natava": "logo-natava.png"
 };
 
 fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`)
@@ -126,14 +109,7 @@ function renderBrands() {
     Object.keys(logoMap).forEach(brand => {
         const card = document.createElement('div');
         card.className = 'brand-card' + (currentBrand === brand ? ' active' : '');
-
-        const logoFile = logoMap[brand];
-        if (logoFile) {
-            card.innerHTML = `<img src="${logoFile}" alt="${brand}" width="200" height="80" decoding="async" loading="eager"><div>${brand}</div>`;
-        } else {
-            card.innerHTML = `<div style="width:200px;height:80px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;letter-spacing:0.08em;">${brand.toUpperCase()}</div><div>${brand}</div>`;
-        }
-
+        card.innerHTML = `<img src="${logoMap[brand]}" alt="${brand}" width="200" height="80" decoding="async" loading="eager"><div>${brand}</div>`;
         card.onclick = () => selectBrand(brand);
         brandContainer.appendChild(card);
     });
@@ -211,18 +187,14 @@ function renderProducts() {
     filtered.sort((a, b) => {
         if (a.new && !b.new) return -1;
         if (!a.new && b.new) return 1;
-        return parseVolumeNumber(a.volume) - parseVolumeNumber(b.volume);
+        const parseVolume = v => parseFloat(v.replace(/[^\d.]/g, '')) || 0;
+        return parseVolume(a.volume) - parseVolume(b.volume);
     });
 
     filtered.forEach(product => {
         const card = document.createElement('div');
         card.className = 'product-card';
         const ean = product.id.toString();
-        const displayVolume = formatVolume(product.volume);
-        const packSize = Number(product.pack);
-        const boxesPerPallet = Number(product.boxes_per_pallet);
-        const hasPackData = Number.isFinite(packSize) && packSize > 0;
-        const hasPalletData = hasPackData && Number.isFinite(boxesPerPallet) && boxesPerPallet > 0;
 
         if (product.new) {
             const badge = document.createElement('div');
@@ -259,7 +231,7 @@ function renderProducts() {
 
         const details = [
             [`EAN:`, formatMissing(product.id)],
-            [`Volume:`, formatMissing(displayVolume)],
+            [`Volume:`, formatMissing(product.volume)],
             [`Price:`, formatMissing(`${product.price} €`)],
             [`Pieces/Pack:`, formatMissing(product.pack)],
             [`Boxes/Layer:`, formatMissing(product.boxes_per_layer)],
@@ -290,10 +262,10 @@ function renderProducts() {
         const pieceInput = document.createElement('input');
         pieceInput.type = 'number';
         pieceInput.min = '0';
-        pieceInput.step = hasPackData ? packSize : 1;
+        pieceInput.step = product.pack;
         pieceInput.placeholder = 'pieces';
         pieceInput.value = orderState[ean] ? orderState[ean].pieces : '';
-        pieceInput.dataset.pack = hasPackData ? packSize : '';
+        pieceInput.dataset.pack = product.pack;
 
         piecesRow.appendChild(minusBtn);
         piecesRow.appendChild(pieceInput);
@@ -342,18 +314,6 @@ function renderProducts() {
         palletRow.appendChild(palletInput);
         palletRow.appendChild(palletPlus);
 
-        if (!hasPackData) {
-            [minusBtn, plusBtn, pieceInput, boxMinus, boxPlus, boxInput, palletMinus, palletPlus, palletInput]
-                .forEach(control => { control.disabled = true; });
-            pieceInput.placeholder = 'pack data missing';
-            boxInput.placeholder = 'pack data missing';
-            palletInput.placeholder = 'pallet data missing';
-        } else if (!hasPalletData) {
-            [palletMinus, palletPlus, palletInput]
-                .forEach(control => { control.disabled = true; });
-            palletInput.placeholder = 'pallet data missing';
-        }
-
         const boxPalletRow = document.createElement('div');
         boxPalletRow.className = 'box-pallet-row';
         boxPalletRow.appendChild(boxRow);
@@ -364,22 +324,25 @@ function renderProducts() {
         card.appendChild(quantityWrapper);
 
         function updateAllFromPieces(pieces) {
-            const boxes = Math.floor(pieces / packSize);
-            const pallets = hasPalletData ? Math.floor(boxes / boxesPerPallet) : 0;
+            const pack = product.pack;
+            const boxesPerPallet = product.boxes_per_pallet;
+
+            const boxes = Math.floor(pieces / pack);
+            const pallets = Math.floor(boxes / boxesPerPallet);
 
             pieceInput.value = pieces || '';
             boxInput.value = boxes || '';
             palletInput.value = pallets || '';
-            updateOrderState(ean, product.name, displayVolume, product.price, pieces);
+            updateOrderState(ean, product.name, product.volume, product.price, pieces);
         }
 
         function validateAndRound() {
             let pieces = parseInt(pieceInput.value) || 0;
-            const remainder = pieces % packSize;
+            const remainder = pieces % product.pack;
             if (pieces === 0) {
                 pieceInput.value = '';
             } else if (remainder !== 0) {
-                const rounded = Math.ceil(pieces / packSize) * packSize;
+                const rounded = Math.ceil(pieces / product.pack) * product.pack;
                 pieceInput.value = rounded;
                 showInfoModal(`Ordered amount needs to be in full boxes. Rounded up to ${rounded} pcs.`);
             }
@@ -388,13 +351,13 @@ function renderProducts() {
 
         minusBtn.addEventListener('click', () => {
             let pieces = parseInt(pieceInput.value) || 0;
-            pieces = Math.max(0, pieces - packSize);
+            pieces = Math.max(0, pieces - product.pack);
             updateAllFromPieces(pieces);
         });
 
         plusBtn.addEventListener('click', () => {
             let pieces = parseInt(pieceInput.value) || 0;
-            pieces += packSize;
+            pieces += product.pack;
             updateAllFromPieces(pieces);
         });
 
@@ -409,36 +372,36 @@ function renderProducts() {
         });
 
         boxMinus.addEventListener('click', () => {
-            let boxes = Math.floor((parseInt(pieceInput.value) || 0) / packSize);
+            let boxes = Math.floor((parseInt(pieceInput.value) || 0) / product.pack);
             boxes = Math.max(0, boxes - 1);
-            const pieces = boxes * packSize;
+            const pieces = boxes * product.pack;
             updateAllFromPieces(pieces);
         });
 
         boxPlus.addEventListener('click', () => {
-            let boxes = Math.floor((parseInt(pieceInput.value) || 0) / packSize);
+            let boxes = Math.floor((parseInt(pieceInput.value) || 0) / product.pack);
             boxes += 1;
-            const pieces = boxes * packSize;
+            const pieces = boxes * product.pack;
             updateAllFromPieces(pieces);
         });
 
         boxInput.addEventListener('blur', () => {
             const boxes = parseInt(boxInput.value) || 0;
-            const pieces = boxes * packSize;
+            const pieces = boxes * product.pack;
             updateAllFromPieces(pieces);
         });
 
         boxInput.addEventListener('keydown', e => {
             if (e.key === 'Enter') {
                 const boxes = parseInt(boxInput.value) || 0;
-                const pieces = boxes * packSize;
+                const pieces = boxes * product.pack;
                 updateAllFromPieces(pieces);
             }
         });
 
         palletMinus.addEventListener('click', () => {
             const existing = parseInt(pieceInput.value) || 0;
-            const step = boxesPerPallet * packSize;
+            const step = product.boxes_per_pallet * product.pack;
 
             if (existing < step) {
                 updateAllFromPieces(0);
@@ -451,21 +414,21 @@ function renderProducts() {
 
         palletPlus.addEventListener('click', () => {
             const existing = parseInt(pieceInput.value) || 0;
-            const step = boxesPerPallet * packSize;
+            const step = product.boxes_per_pallet * product.pack;
             const newTotal = existing + step;
             updateAllFromPieces(newTotal);
         });
 
         palletInput.addEventListener('blur', () => {
             const pallets = parseInt(palletInput.value) || 0;
-            const pieces = pallets * boxesPerPallet * packSize;
+            const pieces = pallets * product.boxes_per_pallet * product.pack;
             updateAllFromPieces(pieces);
         });
 
         palletInput.addEventListener('keydown', e => {
             if (e.key === 'Enter') {
                 const pallets = parseInt(palletInput.value) || 0;
-                const pieces = pallets * boxesPerPallet * packSize;
+                const pieces = pallets * product.boxes_per_pallet * product.pack;
                 updateAllFromPieces(pieces);
             }
         });
