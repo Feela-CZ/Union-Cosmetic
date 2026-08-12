@@ -2923,8 +2923,9 @@
     "brand": "Naturalis",
     "type": "Bath Foam",
     "id": "8596048012690",
-    "hs": 33073000,
-    "name": "Naturalis 2-phase oil bath Bergamot & Lime (new design, rPET)",
+    "hs": "33073000",
+    "name": "Naturalis 2-phase oil bath Bergamot & Lime",
+    "csName": "Naturalis dvoufázová olejová pěna Bergamot & Limeta 800 ml",
     "volume": {
       "number": "800",
       "unit": "ml"
@@ -2933,12 +2934,11 @@
     "pack": 10,
     "boxes_per_layer": 14,
     "boxes_per_pallet": 70,
-    "new": true,
-    "new_date": "2025-07-14",
-    "discontinued": false,
-    "discontinued_date": "",
     "key": "800",
-    "carton_ean": "8596048012720"
+    "new": false,
+    "new_date": "",
+    "discontinued": false,
+    "discontinued_date": ""
   },
   {
     "brand": "Naturalis",
