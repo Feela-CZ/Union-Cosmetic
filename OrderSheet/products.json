@@ -2430,8 +2430,9 @@
     "brand": "Naturalis",
     "type": "Body Scrub",
     "id": "8596048012423",
-    "hs": 33049900,
+    "hs": "33049900",
     "name": "Naturalis body scrub Bergamot-Lime",
+    "csName": "Naturalis cukrový tělový scrub Bergamot a Limeta",
     "volume": {
       "number": "250",
       "unit": "g"
@@ -2440,13 +2441,11 @@
     "pack": 12,
     "boxes_per_layer": 12,
     "boxes_per_pallet": 120,
-    "new": true,
-    "new_date": "2025-06-01",
-    "discontinued": false,
-    "discontinued_date": "",
     "key": "250g",
-    "carton_ean": 8596048012461,
-    "csName": "Naturalis cukrový tělový scrub Bergamot a Limeta"
+    "new": false,
+    "new_date": "",
+    "discontinued": true,
+    "discontinued_date": "2026-08-12"
   },
   {
     "brand": "Naturalis",
