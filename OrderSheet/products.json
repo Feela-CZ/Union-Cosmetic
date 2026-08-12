@@ -2796,23 +2796,22 @@
     "brand": "Naturalis",
     "type": "Bath Foam",
     "id": "8596048012515",
-    "hs": 33073000,
+    "hs": "33073000",
     "name": "Naturalis Foam Bath EUCALYPTUS HARMONY  (new design, rPET)",
+    "csName": "Naturalis pěnivá koupel - Eucalyptus Harmony",
     "volume": {
       "number": "1000",
       "unit": "ml"
     },
-    "price": null,
+    "price": 1.14,
     "pack": 15,
     "boxes_per_layer": 10,
     "boxes_per_pallet": 40,
-    "new": true,
-    "new_date": "2025-07-18",
+    "key": "1000",
+    "new": false,
+    "new_date": "",
     "discontinued": false,
-    "discontinued_date": "",
-    "key": 1000,
-    "carton_ean": 8596048012645,
-    "csName": "Naturalis pěnivá koupel - Eucalyptus Harmony"
+    "discontinued_date": ""
   },
   {
     "brand": "Naturalis",
