@@ -6539,8 +6539,9 @@
     "boxes_per_layer": 21,
     "boxes_per_pallet": 147,
     "key": "400B",
-    "new": true,
-    "new_date": "2026-08-12",
+    "carton_ean": "8596048013277",
+    "new": false,
+    "new_date": "",
     "discontinued": false,
     "discontinued_date": ""
   },
@@ -6560,9 +6561,8 @@
     "boxes_per_layer": 21,
     "boxes_per_pallet": 147,
     "key": "400B",
-    "carton_ean": "8596048013284",
-    "new": false,
-    "new_date": "",
+    "new": true,
+    "new_date": "2026-08-12",
     "discontinued": false,
     "discontinued_date": ""
   },
