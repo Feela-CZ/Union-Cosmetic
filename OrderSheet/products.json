@@ -6232,8 +6232,9 @@
     "boxes_per_layer": 18,
     "boxes_per_pallet": 144,
     "key": "250gA",
-    "new": true,
-    "new_date": "2026-08-12",
+    "carton_ean": "8596048013352",
+    "new": false,
+    "new_date": "",
     "discontinued": false,
     "discontinued_date": ""
   },
@@ -6253,9 +6254,8 @@
     "boxes_per_layer": 18,
     "boxes_per_pallet": 144,
     "key": "250gA",
-    "carton_ean": "8596048013369",
-    "new": false,
-    "new_date": "",
+    "new": true,
+    "new_date": "2026-08-12",
     "discontinued": false,
     "discontinued_date": ""
   },
