@@ -2775,23 +2775,22 @@
     "brand": "Naturalis",
     "type": "Bath Foam",
     "id": "8596048012508",
-    "hs": 33073000,
+    "hs": "33073000",
     "name": "Naturalis relaxation Bath LAVENDER MAGIC  (new design, rPET)",
+    "csName": "Naturalis relaxační lázěň - Lavender Magic",
     "volume": {
       "number": "1000",
       "unit": "ml"
     },
-    "price": null,
+    "price": 1.14,
     "pack": 15,
     "boxes_per_layer": 10,
     "boxes_per_pallet": 40,
-    "new": true,
-    "new_date": "2025-07-18",
+    "key": "1000",
+    "new": false,
+    "new_date": "",
     "discontinued": false,
-    "discontinued_date": "",
-    "key": 1000,
-    "carton_ean": 8596048012638,
-    "csName": "Naturalis relaxační lázěň - Lavender Magic"
+    "discontinued_date": ""
   },
   {
     "brand": "Naturalis",
