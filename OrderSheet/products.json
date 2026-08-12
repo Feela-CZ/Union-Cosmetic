@@ -6188,9 +6188,8 @@
     "boxes_per_layer": 25,
     "boxes_per_pallet": 200,
     "key": "100",
-    "carton_ean": null,
-    "new": false,
-    "new_date": "",
+    "new": true,
+    "new_date": "2026-08-12",
     "discontinued": false,
     "discontinued_date": ""
   },
