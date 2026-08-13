@@ -6,8 +6,10 @@ let logisticsData = {};
 let currentLogisticsBrand = null;
 let currentLogisticsKey = null;
 let currentLogisticsProductIndex = null;
-let currentLang = 'en';
+let logisticsWorkingData = null;
+let currentLang = 'cs';
 let showingAllKeys = false;
+let showDiscontinued = false;
 
 const attributeLabels = {
     nr_of_items: "Number of Items",
@@ -16,14 +18,15 @@ const attributeLabels = {
     length: "Length",
     width: "Width",
     height: "Height",
-    weight: "Weight"
+    weight: "Weight",
+    carton_ean: "Carton EAN",
 };
 
 const translations = {
     en: {
         title: "Product Editor",
-        download_products: "Download products.json",
-        download_logistics: "Download logistics.json",
+        download_products: "Save products.json",
+        download_logistics: "Save logistics.json",
         reset_filters: "Reset Filters",
         search_placeholder: "Search...",
         brand_filter: "Filter by Brand",
@@ -61,7 +64,7 @@ const translations = {
         label_discontinued: "Discontinued",
         save: "Save",
         confirm_delete_title: "Confirm Deletion",
-        confirm_delete_message: "Are you sure you want to delete this product?",
+        confirm_delete_message: "Are you sure you want to delete this product? This action will completely remove the product. If it is only discontinued, go to \"Edit/Discontinued\".",
         confirm_delete_yes: "Yes, delete",
         confirm_delete_no: "Cancel",
         logistics_title: "Logistics Information",
@@ -99,9 +102,6 @@ const translations = {
         filter_brand: "Filter by Brand",
         filter_type: "Filter by Type",
         filter_logistics_key: "Filter by Logistics Key",
-        edit: "Edit",
-        logistics: "Logistics",
-        delete: "Delete",
         export_logistics: "Export logistics data",
         export_logistics_modal_title: "Export logistics data",
         export_logistics_select_brand: "Brand:",
@@ -119,11 +119,64 @@ const translations = {
         create: "Create",
         key_already_exists: "This key already exists for the selected brand.",
         key_required: "Please enter a key name.",
+        show_discontinued: "Show discontinued",
+        hide_discontinued: "Hide discontinued",
+        carton_ean: "Carton EAN",
+        download_photo: "Download photo",
+        add_product_title: "Add product",
+        upload_photo: "Upload photo",
+        dragdrop_photo: "Drag & Drop - same name as EAN!!!",
+        product_types: {
+            "Accessories": "Accessories",
+            "Bath Ball": "Bath Ball",
+            "Bath Essence": "Bath Essence",
+            "Bath Foam": "Bath Foam",
+            "Bath Salt": "Bath Salt",
+            "Beard Care": "Beard Care",
+            "Body Butter": "Body Butter",
+            "Body Lotion": "Body Lotion",
+            "Body Oil": "Body Oil",
+            "Body Scrub": "Body Scrub",
+            "Conditioner": "Conditioner",
+            "Dishwashing Liquid": "Dishwashing Liquid",
+            "Fabric Softener": "Fabric Softener",
+            "Face Serum": "Face Serum",
+            "Facial Cosmetics": "Facial Cosmetics",
+            "Foot Cream": "Foot Cream",
+            "Hair Balsam": "Hair Balsam",
+            "Hair Oil": "Hair Oil",
+            "Hand Cream": "Hand Cream",
+            "Hand Gel": "Hand Gel",
+            "Interior Candle": "Interior Candle",
+            "Laundry Perfume": "Laundry Perfume",
+            "Lip Balm": "Lip Balm",
+            "Liquid Soap": "Liquid Soap",
+            "Massage Candle": "Massage Candle",
+            "Massage Emulsion": "Massage Emulsion",
+            "Micellar Water": "Micellar Water",
+            "Nail Polish Remover": "Nail Polish Remover",
+            "Parfum": "Parfum",
+            "Shampoo": "Shampoo",
+            "Shower Gel": "Shower Gel",
+            "Skin Oil": "Skin Oil",
+            "Solid Hair Balsam": "Solid Hair Balsam",
+            "Solid Body Butter": "Solid Body Butter",
+            "Solid Deodorant": "Solid Deodorant",
+            "Solid Shampoo": "Solid Shampoo",
+            "Solid Soap": "Solid Soap",
+            "Sun Care": "Sun Care",
+            "Toothpaste": "Toothpaste",
+            "Travel Kit": "Travel Kit",
+            "Vaselinum": "Vaselinum",
+            "WC Gel": "WC Gel",
+            "Washing Gel": "Washing Gel"
+        }
+
     },
     cs: {
         title: "Editor produktů",
-        download_products: "Stáhnout products.json",
-        download_logistics: "Stáhnout logistics.json",
+        download_products: "Uložit products.json",
+        download_logistics: "Uložit logistics.json",
         reset_filters: "Resetovat filtry",
         search_placeholder: "Hledat...",
         brand_filter: "Filtrovat podle značky",
@@ -161,7 +214,7 @@ const translations = {
         label_discontinued: "Ukončeno",
         save: "Uložit",
         confirm_delete_title: "Potvrdit smazání",
-        confirm_delete_message: "Opravdu chcete tento produkt smazat?",
+        confirm_delete_message: "Opravdu chceš tento produkt smazat? Tímto dojde k úplnému smazání. Pokud se produkt přestal vyrábět, zvol \"Upravit/Ukončeno\".",
         confirm_delete_yes: "Ano, smazat",
         confirm_delete_no: "Zrušit",
         logistics_title: "Logistické informace",
@@ -183,7 +236,7 @@ const translations = {
         delete: "Smazat",
         logistics_data_for: 'Logistická data pro {brand} – "{key}" produkty',
         no_logistics_data: "Logistická data nejsou dostupná.",
-        logistics_change_confirm: 'Tímto změníte data pro všechny "{brand}" ("{key}") produkty! Opravdu si přejete pokračovat?',
+        logistics_change_confirm: 'Tímto změníš data pro všechny "{brand}" ("{key}") produkty! Opravdu si přeješ pokračovat?',
         section_ITEM: "Kus",
         section_CARTON: "Karton",
         section_LAYER: "Vrstva",
@@ -199,9 +252,6 @@ const translations = {
         filter_brand: "Filtrovat podle značky",
         filter_type: "Filtrovat podle typu",
         filter_logistics_key: "Filtrovat podle log. klíče",
-        edit: "Upravit",
-        logistics: "Logistika",
-        delete: "Smazat",
         export_logistics: "Exportovat logistická data",
         export_logistics_modal_title: "Export logistických dat",
         export_logistics_select_brand: "Značka:",
@@ -219,21 +269,180 @@ const translations = {
         create: "Vytvořit",
         key_already_exists: "Tenhle klíč už pro danou značku existuje.",
         key_required: "Zadejte název klíče, prosím.",
+        show_discontinued: "Zobrazit ukončené",
+        hide_discontinued: "Skrýt ukončené",
+        carton_ean: "EAN kartonu",
+        download_photo: "Stáhnout fotku",
+        upload_photo: "Nahrát fotku",
+        dragdrop_photo: "Přetáhni sem pro nahrání (název totožný s EAN!!!)",
+        add_product_title: "Přidat produkt",
+        product_types: {
+            "Accessories": "Doplňky",
+            "Bath Ball": "Koupelová koule",
+            "Bath Essence": "Esence do koupele",
+            "Bath Foam": "Pěna do koupele",
+            "Bath Salt": "Sůl do koupele",
+            "Beard Care": "Péče o vousy",
+            "Body Butter": "Tělové máslo",
+            "Body Lotion": "Tělové mléko",
+            "Body Oil": "Tělový olej",
+            "Body Scrub": "Tělový peeling",
+            "Conditioner": "Kondicionér",
+            "Dishwashing Liquid": "Prostředek na mytí nádobí",
+            "Fabric Softener": "Aviváž",
+            "Face Serum": "Pleťové sérum",
+            "Facial Cosmetics": "Pleťová kosmetika",
+            "Foot Cream": "Krém na nohy",
+            "Hair Balsam": "Vlasový balzám",
+            "Hair Oil": "Vlasový olej",
+            "Hand Cream": "Krém na ruce",
+            "Hand Gel": "Gel na ruce",
+            "Interior Candle": "Interiérová svíčka",
+            "Laundry Perfume": "Parfém na praní",
+            "Lip Balm": "Balzám na rty",
+            "Liquid Soap": "Tekuté mýdlo",
+            "Massage Candle": "Masážní svíčka",
+            "Massage Emulsion": "Masážní emulze",
+            "Micellar Water": "Micelární voda",
+            "Nail Polish Remover": "Odlakovač na nehty",
+            "Parfum": "Parfém",
+            "Shampoo": "Šampon",
+            "Shower Gel": "Sprchový gel",
+            "Skin Oil": "Pleťový olej",
+            "Solid Hair Balsam": "Tuhý vlasový balzám",
+            "Solid Body Butter": "Tuhé tělové máslo",
+            "Solid Deodorant": "Tuhý deodorant",
+            "Solid Shampoo": "Tuhý šampon",
+            "Solid Soap": "Tuhé mýdlo",
+            "Sun Care": "Opalování",
+            "Toothpaste": "Zubní pasta",
+            "Travel Kit": "Cestovní sada",
+            "Vaselinum": "Vazelína",
+            "WC Gel": "WC gel",
+            "Washing Gel": "Prací gel"
+        }
     }
 };
 
-fetch('logistics.json')
-    .then(res => res.json())
-    .then(data => {
-        logisticsData = data;
-        initUI();
+async function apiPut(name, data) {
+    const res = await fetch(`${window.API_BASE}/api/${name}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
     });
+
+    if (!res.ok) throw new Error(await res.text() || res.statusText);
+    try {
+        return await res.json();
+    } catch {
+        return { ok: true };
+    }
+}
+
+async function saveProductsToRepo() {
+    try {
+        await apiPut('products', products);
+        products = await fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`).then(r => r.json());
+    } catch (e) {
+        alert('Uložení products.json selhalo: ' + e.message);
+    }
+}
+
+function uint8ToBase64(uint8) {
+    let binary = "";
+    const len = uint8.length;
+    for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(uint8[i]);
+    }
+    return btoa(binary);
+}
+
+async function saveFileToRepo(path, bytes) {
+    const base64 = uint8ToBase64(bytes);
+
+    const res = await fetch(`${window.API_BASE}/api/upload-image`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            path,
+            content: base64
+        })
+    });
+
+    if (!res.ok) {
+        throw new Error("Upload failed: " + (await res.text()));
+    }
+}
+
+async function saveLogisticsToRepo() {
+    try {
+        await apiPut('logistics', logisticsData);
+        logisticsData = await fetch(`${window.API_BASE}/api/logistics?ts=${Date.now()}`).then(r => r.json());
+        Object.keys(logisticsData || {}).forEach(br => {
+            Object.keys(logisticsData[br] || {}).forEach(k => {
+                const pal = logisticsData[br][k]?.PALLET;
+                if (pal && 'carton_ean' in pal) delete pal.carton_ean;
+            });
+        });
+    } catch (e) {
+        alert('Uložení logistics.json selhalo: ' + e.message);
+    }
+}
+
+function translateType(type) {
+    if (!type) return '';
+    try {
+        return translations[currentLang]?.product_types?.[type] || type;
+    } catch {
+        return String(type);
+    }
+}
+
+function trimInputOnChange(input) {
+    input.addEventListener("input", () => {
+        input.value = input.value.trimStart(); // průběžně odmazává mezery na začátku
+    });
+    input.addEventListener("blur", () => {
+        input.value = input.value.trim(); // při opuštění inputu zůstane ořezané
+    });
+}
+
+const LOCAL_MODE = location.hostname === "127.0.0.1" || location.hostname === "localhost";
+
+const productsUrl = LOCAL_MODE
+    ? "../OrderSheet/products.json?ts=" + Date.now()
+    : `${window.API_BASE}/api/products?ts=${Date.now()}`;
+
+const logisticsUrl = LOCAL_MODE
+    ? "logistics.json?ts=" + Date.now()
+    : `${window.API_BASE}/api/logistics?ts=${Date.now()}`;
+
+Promise.all([
+    fetch(productsUrl).then(r => r.json()),
+    fetch(logisticsUrl).then(r => r.json())
+]).then(([productsData, logisticsDataRaw]) => {
+    products = productsData;
+    logisticsData = logisticsDataRaw;
+
+    // očista logisticsData
+    Object.keys(logisticsData || {}).forEach(br => {
+        Object.keys(logisticsData[br] || {}).forEach(k => {
+            const pal = logisticsData[br][k]?.PALLET;
+            if (pal && 'carton_ean' in pal) delete pal.carton_ean;
+        });
+    });
+
+    initUI();
+    renderTable();
+    document.getElementById('product-table-section').style.display = 'block';
+}).catch(err => console.error("Chyba při načítání dat:", err));
 
 function fillKeysSelect(brand, selectedKey = null) {
     const chooseKey = document.getElementById('choose-key');
     chooseKey.innerHTML = '';
     if (logisticsData[brand]) {
-        Object.keys(logisticsData[brand]).forEach(key => {
+        const sortedKeys = Object.keys(logisticsData[brand]).sort(logisticsKeyCompare);
+        sortedKeys.forEach(key => {
             const option = document.createElement('option');
             option.value = key;
             option.textContent = key;
@@ -246,12 +455,80 @@ function fillKeysSelect(brand, selectedKey = null) {
 }
 
 function initUI() {
-    document.getElementById('download-logistics-button').disabled = false;
 
-    document.getElementById('file-input').addEventListener('change', handleFileUpload);
-    document.getElementById('download-button').addEventListener('click', downloadJSON);
     document.getElementById('add-product').addEventListener('click', openAddModal);
     document.getElementById('product-form').addEventListener('submit', saveProduct);
+    document.getElementById('add-product-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const today = new Date().toISOString().split('T')[0];
+
+        const eanVal = document.getElementById('add-id').value.trim();
+        const hsVal = document.getElementById('add-hs').value.trim();
+
+        const isNew = document.getElementById('add-new').checked;
+        const newDateRaw = document.getElementById('add-new_date').value;
+
+        const isDisc = document.getElementById('add-discontinued').checked;
+        const discDateRaw = document.getElementById('add-discontinued_date').value;
+
+        const newProduct = {
+            brand: document.getElementById('add-brand').value.trim(),
+            type: document.getElementById('add-type').value.trim(),
+            id: eanVal,
+            hs: hsVal,
+
+            // ✅ SPRÁVNÉ KLÍČE (STEJNÉ JAKO EDIT + TABULKA)
+            name: document.getElementById('add-name_en').value.trim(),
+            csName: document.getElementById('add-name_cs').value.trim(),
+
+            volume: {
+                number: document.getElementById('add-volume-number').value.trim(),
+                unit: document.getElementById('add-volume-unit').value.trim()
+            },
+
+            // typy sjednocené s editem
+            price: document.getElementById('add-price').value.trim() === ''
+                ? ''
+                : parseFloat(document.getElementById('add-price').value),
+
+            pack: document.getElementById('add-pack').value.trim() === ''
+                ? ''
+                : parseInt(document.getElementById('add-pack').value, 10),
+
+            boxes_per_layer: document.getElementById('add-boxes_per_layer').value.trim() === ''
+                ? ''
+                : parseInt(document.getElementById('add-boxes_per_layer').value, 10),
+
+            boxes_per_pallet: document.getElementById('add-boxes_per_pallet').value.trim() === ''
+                ? ''
+                : parseInt(document.getElementById('add-boxes_per_pallet').value, 10),
+
+            // ✅ SPRÁVNÝ KLÍČ
+            key: (document.getElementById('add-logistics-key').value.trim() || null),
+
+            new: isNew,
+            new_date: isNew ? (newDateRaw || today) : '',
+            discontinued: isDisc,
+            discontinued_date: isDisc ? (discDateRaw || today) : ''
+        };
+
+        products.push(newProduct);
+
+        try {
+            await saveProductsToRepo(); // tady se products prepise z fetch, takze musime renderovat az po tom
+        } catch (e) {
+            alert('Uložení products.json selhalo: ' + (e.message || e));
+        }
+
+        // po syncu z API renderujeme tabulku znova -> tlacitka budou mit spravne indexy
+        renderTable();
+
+        // vycistit add modal po ulozeni
+        resetAddProductForm();
+        document.getElementById('add-modal').style.display = 'none';
+    });
+
     document.getElementById('search-input').addEventListener('input', renderTable);
     document.getElementById('brand-filter').addEventListener('change', function () {
         updateLogisticsKeyFilter();
@@ -280,6 +557,13 @@ function initUI() {
         fillKeysSelect(this.value);
     });
 
+    document.getElementById('brand').addEventListener('change', function () {
+        populateTypeSelect();
+    });
+
+    populateTypeSelect();
+    populateTypeSelect('add-type');
+
     document.querySelectorAll('.close-modal').forEach(el => {
         el.addEventListener('click', () => {
             const m = el.closest('.modal');
@@ -287,8 +571,23 @@ function initUI() {
         });
     });
 
-    window.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal')) {
+    let mouseDownInside = false;
+
+    document.addEventListener('mousedown', (e) => {
+        // pokud začal klik uvnitř modalu, zapamatujeme si
+        if (e.target.closest('.modal-content')) {
+            mouseDownInside = true;
+        } else {
+            mouseDownInside = false;
+        }
+    });
+
+    window.addEventListener('mouseup', (e) => {
+        // zavři modal jen když klik skončil přímo na overlay a nezačal uvnitř
+        if (
+            e.target.classList.contains('modal') &&
+            !mouseDownInside
+        ) {
             e.target.style.display = 'none';
         }
     });
@@ -299,7 +598,7 @@ function initUI() {
         }
     });
 
-    document.getElementById('add-logistics-key').addEventListener('click', function () {
+    document.getElementById('add-logistics-key-btn').addEventListener('click', function () {
         const modal = document.getElementById('add-logistics-key-modal');
         const brandSelect = document.getElementById('add-logistics-brand');
         const keyInput = document.getElementById('add-logistics-key-name');
@@ -318,15 +617,23 @@ function initUI() {
 
     document.getElementById('add-logistics-key-form').addEventListener('submit', function (e) {
         e.preventDefault();
+
         const brand = document.getElementById('add-logistics-brand').value.trim();
-        const newKey = document.getElementById('add-logistics-key-name').value.trim();
+        const newKeyRaw = document.getElementById('add-logistics-key-name').value;
+        const newKey = newKeyRaw.trim();
 
         if (!newKey) {
             alert(translations[currentLang].key_required);
             return;
         }
+
         if (!logisticsData[brand]) logisticsData[brand] = {};
-        if (logisticsData[brand][newKey]) {
+
+        const exists = Object.keys(logisticsData[brand]).some(
+            k => k.trim().toLowerCase() === newKey.toLowerCase()
+        );
+
+        if (exists) {
             alert(translations[currentLang].key_already_exists);
             return;
         }
@@ -339,8 +646,8 @@ function initUI() {
             populateLogisticsKeySelect();
             const logSel = document.getElementById('logistics-key');
             if (logSel) {
-                let exists = Array.from(logSel.options).some(o => o.value === newKey);
-                if (!exists) {
+                let existsInSelect = Array.from(logSel.options).some(o => o.value.trim().toLowerCase() === newKey.toLowerCase());
+                if (!existsInSelect) {
                     const opt = document.createElement('option');
                     opt.value = newKey;
                     opt.textContent = newKey;
@@ -358,69 +665,100 @@ function initUI() {
         });
     });
 
+    // Po změně značky v Add Product modalu -> doplnit klíče
+    document.getElementById('add-brand').addEventListener('change', function () {
+        const brand = this.value.trim();
+        const keySelect = document.getElementById('add-logistics-key');
+        const packInput = document.getElementById('add-pack');
+        const layerInput = document.getElementById('add-boxes_per_layer');
+        const palletInput = document.getElementById('add-boxes_per_pallet');
+
+        keySelect.innerHTML = '<option value="">-- vyber klíč --</option>';
+        packInput.value = "";
+        layerInput.value = "";
+        palletInput.value = "";
+
+        if (brand && logisticsData[brand]) {
+            Object.keys(logisticsData[brand]).sort(logisticsKeyCompare).forEach(key => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = key;
+                keySelect.appendChild(opt);
+            });
+        }
+    });
+
+    // Po výběru klíče -> doplnit logistická pole
+    document.getElementById('add-logistics-key').addEventListener('change', function () {
+        const brand = document.getElementById('add-brand').value.trim();
+        const key = this.value.trim();
+        const packInput = document.getElementById('add-pack');
+        const layerInput = document.getElementById('add-boxes_per_layer');
+        const palletInput = document.getElementById('add-boxes_per_pallet');
+
+        packInput.value = "";
+        layerInput.value = "";
+        palletInput.value = "";
+
+        if (brand && key && logisticsData[brand]?.[key]) {
+            const data = logisticsData[brand][key];
+            packInput.value = data?.CARTON?.nr_of_items ?? "";
+            layerInput.value = data?.LAYER?.nr_of_cartons ?? "";
+            palletInput.value = data?.PALLET?.nr_of_cartons ?? "";
+        }
+    });
+
     document.getElementById('choose-logistics-form').addEventListener('submit', function (e) {
         e.preventDefault();
+
         const selectedBrand = document.getElementById('choose-brand').value;
         const selectedKey = document.getElementById('choose-key').value;
 
-        const sourceLogistics = logisticsData[selectedBrand]?.[selectedKey];
+        // working state (nehrabeme do products ani logisticsData)
+        logisticsWorkingBrand = selectedBrand;
+        logisticsWorkingKey = selectedKey;
 
-        if (sourceLogistics) {
-            if (!logisticsData[selectedBrand]) logisticsData[selectedBrand] = {};
-            logisticsData[selectedBrand][selectedKey] = JSON.parse(JSON.stringify(sourceLogistics));
+        const emptyLogistics = {
+            ITEM: { length: '', width: '', height: '', weight: '' },
+            CARTON: { length: '', width: '', height: '', weight: '', nr_of_items: '' },
+            LAYER: { nr_of_items: '', nr_of_cartons: '' },
+            PALLET: { length: '', width: '', height: '', weight: '', nr_of_cartons: '', nr_of_items: '', nr_of_layers: '' }
+        };
 
-            document.getElementById('logistics-key').value = selectedKey;
-            if (sourceLogistics.ITEM) {
-                Object.keys(sourceLogistics.ITEM).forEach(k => {
-                    const input = document.getElementById('logistics-ITEM-' + k);
-                    if (input) input.value = sourceLogistics.ITEM[k] || '';
-                });
-            }
-            if (sourceLogistics.CARTON) {
-                Object.keys(sourceLogistics.CARTON).forEach(k => {
-                    const input = document.getElementById('logistics-CARTON-' + k);
-                    if (input) input.value = sourceLogistics.CARTON[k] || '';
-                });
-            }
-            if (sourceLogistics.LAYER) {
-                Object.keys(sourceLogistics.LAYER).forEach(k => {
-                    const input = document.getElementById('logistics-LAYER-' + k);
-                    if (input) input.value = sourceLogistics.LAYER[k] || '';
-                });
-            }
-            if (sourceLogistics.PALLET) {
-                Object.keys(sourceLogistics.PALLET).forEach(k => {
-                    const input = document.getElementById('logistics-PALLET-' + k);
-                    if (input) input.value = sourceLogistics.PALLET[k] || '';
-                });
-            }
-            if (currentLogisticsProductIndex !== null) {
-                products[currentLogisticsProductIndex].key = selectedKey;
-            }
-            updateLogisticsModalContent(selectedBrand, selectedKey);
-        }
-        currentLogisticsKey = selectedKey;
+        const src = logisticsData?.[selectedBrand]?.[selectedKey];
+        logisticsWorkingData = src
+            ? JSON.parse(JSON.stringify(src))
+            : JSON.parse(JSON.stringify(emptyLogistics));
+
+        // vykreslit formular z working copy
+        updateLogisticsModalContent(selectedBrand, selectedKey);
+
         document.getElementById('choose-logistics-modal').style.display = 'none';
-        renderTable();
     });
 
-    fetch('../Order sheet/products.json')
-        .then(res => res.json())
-        .then(data => {
-            products = data;
-            renderTable();
-            document.getElementById('product-table-section').style.display = 'block';
-            document.getElementById('download-button').disabled = false;
-        });
+    const url = LOCAL_MODE
+        ? "products.json?ts=" + Date.now()
+        : `${window.API_BASE}/api/products?ts=${Date.now()}`;
 
     updateLogisticsKeyFilter();
+
+    document.getElementById('toggle-discontinued').addEventListener('click', () => {
+        showDiscontinued = !showDiscontinued;
+        updateToggleDiscontinuedText();
+        renderTable();
+    });
+    updateToggleDiscontinuedText();
+    updateUITexts();
+    initAddPhotoUpload();
+    initInputValidations();
 }
 
 function setLang(lang) {
     currentLang = lang;
     updateUITexts();
+    updateToggleDiscontinuedText();
     renderTable();
-    updateFilterPlaceholders();
+    updateExportLogisticsModalTexts();
 }
 
 function updateUITexts() {
@@ -439,28 +777,17 @@ function updateUITexts() {
     });
 }
 
-function updateFilterPlaceholders() {
-    document.getElementById('search-input').placeholder = translations[currentLang].placeholder_search;
-    document.getElementById('brand-filter').options[0].textContent = translations[currentLang].filter_brand;
-    document.getElementById('type-filter').options[0].textContent = translations[currentLang].filter_type;
-    document.getElementById('logistics-key-filter').options[0].textContent = translations[currentLang].filter_logistics_key;
+function updateToggleDiscontinuedText() {
+    const btn = document.getElementById('toggle-discontinued');
+    if (!btn) return;
+    const key = showDiscontinued ? 'hide_discontinued' : 'show_discontinued';
+    btn.setAttribute('data-i18n', key);
+    btn.textContent = translations[currentLang][key];
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     updateUITexts();
 });
-
-function handleFileUpload(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        products = JSON.parse(e.target.result);
-        renderTable();
-        document.getElementById('product-table-section').style.display = 'block';
-        document.getElementById('download-button').disabled = false;
-    };
-    reader.readAsText(file);
-}
 
 function renderTable() {
     const tbody = document.querySelector('#product-table tbody');
@@ -472,22 +799,39 @@ function renderTable() {
     const logisticsKeyFilter = document.getElementById('logistics-key-filter').value;
 
     populateDropdowns();
+    updateLogisticsKeyFilter();
 
     const filteredProducts = products.filter(product => {
-        const matchesSearch = (product.brand + ' ' + product.type + ' ' + product.id + ' ' + product.name)
+        const matchesSearch = (product.brand + ' ' + product.type + ' ' + product.id + ' ' + product.name + ' ' + (product.csName || ''))
             .toLowerCase()
             .includes(searchText);
 
         const matchesBrand = brandFilter ? product.brand === brandFilter : true;
         const matchesType = typeFilter ? product.type === typeFilter : true;
 
+        const isDiscontinued =
+            product.discontinued === true ||
+            product.discontinued === 'true' ||
+            product.discontinued === 1;
+
+        const includeByDiscontinued = showDiscontinued ? true : !isDiscontinued;
+
         let matchesLogisticsKey = true;
         if (brandFilter && logisticsKeyFilter) {
-            matchesLogisticsKey = (product.key != null && String(product.key) === logisticsKeyFilter);
+            if (logisticsKeyFilter === 'null') {
+                matchesLogisticsKey = (product.key == null || product.key === 'null');
+            } else {
+                matchesLogisticsKey = (product.key != null && String(product.key) === logisticsKeyFilter);
+            }
         }
 
-        return matchesSearch && matchesBrand && matchesType && matchesLogisticsKey;
+        return matchesSearch && matchesBrand && matchesType && matchesLogisticsKey && includeByDiscontinued;
     });
+
+    const tableEl = document.getElementById('product-table');
+    if (tableEl) {
+        tableEl.classList.toggle('hide-discontinued-cols', !showDiscontinued);
+    }
 
     if (currentSortField) {
         filteredProducts.sort((a, b) => {
@@ -514,16 +858,16 @@ function renderTable() {
 
         row.innerHTML = `
         <td>${product.brand}</td>
-        <td>${product.type}</td>
+        <td>${translateType(product.type)}</td>
         <td>${product.id}</td>
         <td>${product.hs}</td>
-        <td>${product.name}</td>
-        <td>${product.volume}</td>
+        <td>${(currentLang === 'cs' && product.csName) ? product.csName : product.name}</td>
+        <td>${product.volume ? product.volume.number + " " + product.volume.unit : ""}</td>
         <td>${product.price}</td>
         <td>${product.new ? '✅' : ''}</td>
         <td>${product.new_date || ''}</td>
-        <td>${product.discontinued ? '🚫' : ''}</td>
-        <td>${product.discontinued_date || ''}</td>
+        <td class="col-discontinued">${product.discontinued ? '🚫' : ''}</td>
+        <td class="col-discontinued">${product.discontinued_date || ''}</td>
         <td>
             <button onclick="editProduct(${originalIndex})">${translations[currentLang].edit}</button>
             <button class="${getLogisticsClass(product)}" onclick="showLogistics(${originalIndex})">
@@ -829,14 +1173,6 @@ function downloadXML(xmlStr, fileName) {
     }, 100);
 }
 
-if (typeof setLang === 'function') {
-    const origSetLang = setLang;
-    setLang = function (lang) {
-        origSetLang(lang);
-        updateExportLogisticsModalTexts();
-    }
-}
-
 function populateDropdowns() {
     const brandFilter = document.getElementById('brand-filter');
     const typeFilter = document.getElementById('type-filter');
@@ -844,31 +1180,128 @@ function populateDropdowns() {
     const selectedBrand = brandFilter.value;
     const selectedType = typeFilter.value;
 
-    const brands = [...new Set(products.map(p => p.brand))].sort();
-    const types = [...new Set(products.map(p => p.type))].sort();
-
+    const brands = [...new Set(products.map(p => p.brand))];
     brandFilter.innerHTML = `<option value="">${translations[currentLang].filter_brand}</option>` +
         brands.map(b => `<option value="${b}" ${b === selectedBrand ? 'selected' : ''}>${b}</option>`).join('');
+
+    const types = [...new Set(products.map(p => p.type))].sort((a, b) =>
+        translateType(a).localeCompare(translateType(b), currentLang, { sensitivity: 'base' })
+    );
     typeFilter.innerHTML = `<option value="">${translations[currentLang].filter_type}</option>` +
-        types.map(t => `<option value="${t}" ${t === selectedType ? 'selected' : ''}>${t}</option>`).join('');
+        types.map(t => `<option value="${t}" ${t === selectedType ? 'selected' : ''}>${translateType(t)}</option>`).join('');
 }
 
 function openAddModal() {
-    editIndex = null;
-    document.getElementById('product-form').reset();
-    populateTypeSelect();
-    populateLogisticsKeySelect();
-    if (document.getElementById('new').checked) {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('new_date').value = today;
-    } else {
-        document.getElementById('new_date').value = '';
+    const brandSelect = document.getElementById('add-brand');
+    const keySelect = document.getElementById('add-logistics-key');
+    const packInput = document.getElementById('add-pack');
+    const layerInput = document.getElementById('add-boxes_per_layer');
+    const palletInput = document.getElementById('add-boxes_per_pallet');
+
+    // Vyčistíme select i hodnoty polí
+    keySelect.innerHTML = '<option value="">-- vyber klíč --</option>';
+    packInput.value = "";
+    layerInput.value = "";
+    palletInput.value = "";
+
+    // Naplníme klíče jen když je vybraný brand
+    const brand = brandSelect.value.trim();
+    if (brand && logisticsData[brand]) {
+        Object.keys(logisticsData[brand])
+            .sort(logisticsKeyCompare) // pokud máš funkci na řazení
+            .forEach(key => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = key;
+                keySelect.appendChild(opt);
+            });
     }
-    document.getElementById('modal').style.display = 'block';
+
+    // A nakonec zobrazíme modal
+    document.getElementById('add-modal').style.display = 'block';
 }
 
-function closeModal() {
-    document.getElementById('modal').style.display = 'none';
+function resetAddProductForm() {
+    const form = document.getElementById('add-product-form');
+    if (form) form.reset();
+
+    // logisticky klic + navazana pole
+    const keySelect = document.getElementById('add-logistics-key');
+    if (keySelect) keySelect.innerHTML = '<option value="">-- vyber klíč --</option>';
+
+    const packInput = document.getElementById('add-pack');
+    const layerInput = document.getElementById('add-boxes_per_layer');
+    const palletInput = document.getElementById('add-boxes_per_pallet');
+
+    if (packInput) packInput.value = '';
+    if (layerInput) layerInput.value = '';
+    if (palletInput) palletInput.value = '';
+
+    // fotka v add modalu (pokud ji pouzivas)
+    const img = document.getElementById('add-product-photo');
+    const placeholder = document.getElementById('add-photo-placeholder-text');
+    const input = document.getElementById('add-photo-input');
+
+    if (img) { img.src = ''; img.style.display = 'none'; }
+    if (placeholder) placeholder.style.display = 'block';
+    if (input) input.value = '';
+}
+
+function initAddPhotoUpload() {
+    const dropzone = document.getElementById('add-photo-dropzone');
+    const input = document.getElementById('add-photo-input');
+    const img = document.getElementById('add-product-photo');
+    const placeholder = document.getElementById('add-photo-placeholder-text');
+    const uploadBtn = document.getElementById('add-upload-photo-btn');
+
+    if (!dropzone || !input || !img || !placeholder || !uploadBtn) return;
+
+    // Klik na tlačítko -> otevře file input
+    uploadBtn.addEventListener('click', () => {
+        input.click();
+    });
+
+    // Klik na dropzone -> taky otevře file input
+    dropzone.addEventListener('click', () => {
+        input.click();
+    });
+
+    // Když se vybere soubor
+    input.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                img.src = ev.target.result;
+                img.style.display = 'block';
+                placeholder.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Drag & drop
+    dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+    });
+    dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('dragover');
+    });
+    dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                img.src = ev.target.result;
+                img.style.display = 'block';
+                placeholder.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 }
 
 let pendingProduct = null;
@@ -881,8 +1314,9 @@ function saveProduct(event) {
     const brand = document.getElementById('brand').value.trim();
     const type = document.getElementById('type').value.trim();
     const id = document.getElementById('id').value.trim();
-    hs: document.getElementById('hs').value.trim();
-    const name = document.getElementById('name').value.trim();
+    const hs = document.getElementById('hs').value.trim();
+    const nameEn = document.getElementById('name_en').value.trim();
+    const nameCs = document.getElementById('name_cs').value.trim();
     const volumeNumber = document.getElementById('volume-number').value.trim();
     const volumeUnit = document.getElementById('volume-unit').value.trim();
     const price = document.getElementById('price').value.trim();
@@ -894,7 +1328,8 @@ function saveProduct(event) {
     if (!brand) missingFields.push('Brand');
     if (!type) missingFields.push('Type');
     if (!id) missingFields.push('ID (EAN)');
-    if (!name) missingFields.push('Name');
+    if (!nameEn) missingFields.push('Name (EN)');
+    if (!nameCs) missingFields.push('Name (CZ)');
     if (!volumeNumber || !volumeUnit) missingFields.push('Volume');
     if (!price) missingFields.push('Price');
     if (!pack) missingFields.push('Pack');
@@ -906,8 +1341,13 @@ function saveProduct(event) {
         brand,
         type,
         id,
-        name,
-        volume: volumeNumber + ' ' + volumeUnit,
+        hs,
+        name: nameEn,
+        csName: nameCs,
+        volume: {
+            number: volumeNumber,
+            unit: volumeUnit
+        },
         price: parseFloat(price),
         pack: parseInt(pack),
         boxes_per_layer: parseInt(boxesPerLayer),
@@ -932,15 +1372,52 @@ function saveProduct(event) {
     saveProductFinal(product);
 }
 
-function saveProductFinal(product) {
+async function saveProductFinal(product) {
     if (editIndex !== null) {
         products[editIndex] = product;
     } else {
         products.push(product);
     }
 
+    const fileInput = document.getElementById("photo-input");
+    if (fileInput && fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        await saveImageToRepo(file, product.id);
+    }
+
     renderTable();
     closeModal();
+
+    // auto-commit do GitHubu po uložení produktu
+    try { await saveProductsToRepo(); }
+    catch (e) { alert('Uložení products.json selhalo: ' + e.message); }
+}
+
+async function saveImageToRepo(file, productId) {
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+
+    return new Promise((resolve, reject) => {
+        reader.onload = async () => {
+            try {
+                const arrayBuffer = reader.result;
+                const bytes = new Uint8Array(arrayBuffer);
+
+                await saveFileToRepo(
+                    `OrderSheet/img/${productId}.jpg`,
+                    bytes
+                );
+                resolve();
+            } catch (e) {
+                reject(e);
+            }
+        };
+        reader.onerror = reject;
+    });
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
 }
 
 document.getElementById('reset-filters').addEventListener('click', () => {
@@ -972,6 +1449,24 @@ document.getElementById('discontinued').addEventListener('change', function () {
     }
 });
 
+document.getElementById('add-new').addEventListener('change', function () {
+    if (this.checked) {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('add-new_date').value = today;
+    } else {
+        document.getElementById('add-new_date').value = '';
+    }
+});
+
+document.getElementById('add-discontinued').addEventListener('change', function () {
+    if (this.checked) {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('add-discontinued_date').value = today;
+    } else {
+        document.getElementById('add-discontinued_date').value = '';
+    }
+});
+
 function editProduct(index) {
     const product = products[index];
     editIndex = index;
@@ -983,10 +1478,11 @@ function editProduct(index) {
     document.getElementById('logistics-key').value = product.key || '';
     document.getElementById('id').value = product.id;
     document.getElementById('hs').value = product.hs;
-    document.getElementById('name').value = product.name;
-    const [volValue, volUnit] = (product.volume || '').split(' ');
-    document.getElementById('volume-number').value = volValue || '';
-    document.getElementById('volume-unit').value = volUnit || 'ml';
+    document.getElementById('name_en').value = product.name || '';
+    document.getElementById('name_cs').value = product.csName || '';
+    const vol = product.volume || { number: "", unit: "" };
+    document.getElementById('volume-number').value = vol.number || '';
+    document.getElementById('volume-unit').value = vol.unit || '';
     document.getElementById('price').value = product.price;
     document.getElementById('pack').value = product.pack;
     document.getElementById('boxes_per_layer').value = product.boxes_per_layer;
@@ -996,6 +1492,93 @@ function editProduct(index) {
     document.getElementById('discontinued').checked = product.discontinued === true;
     document.getElementById('discontinued_date').value = product.discontinued_date;
     document.getElementById('modal').style.display = 'block';
+
+    const photoEl = document.getElementById('product-photo');
+    const downloadBtn = document.getElementById('download-photo-btn');
+    const uploadBtn = document.getElementById('edit-upload-photo-btn');
+    const editPhotoInput = document.getElementById('edit-photo-input');
+
+    function updatePhotoButtons(hasPhoto) {
+        if (downloadBtn) downloadBtn.style.display = hasPhoto ? 'inline-block' : 'none';
+        if (uploadBtn) uploadBtn.style.display = hasPhoto ? 'none' : 'inline-block';
+    }
+
+    async function checkImageExists(url) {
+        try {
+            const res = await fetch(url + '?check=' + Date.now(), { method: 'HEAD' });
+            return res.ok;
+        } catch {
+            return false;
+        }
+    }
+
+    (async () => {
+        if (!product.id) {
+            photoEl.src = 'OrderSheet/img/no-image.jpg';
+            updatePhotoButtons(false);
+            return;
+        }
+
+        const baseJpg = `https://feela-cz.github.io/Union-Cosmetic/OrderSheet/img/${product.id}.jpg`;
+
+        const exists = await checkImageExists(baseJpg);
+
+        if (exists) {
+            photoEl.src = baseJpg + '?ts=' + Date.now();
+            updatePhotoButtons(true);
+        } else {
+            photoEl.src = 'https://feela-cz.github.io/Union-Cosmetic/JSON%20edit%20GUI/no-image.jpg';
+            updatePhotoButtons(false);
+        }
+    })();
+    // Kliknutí na miniaturu = otevřít plnou fotku v lightboxu
+    photoEl.onclick = () => {
+        if (photoEl.src && !photoEl.src.includes('no-image')) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            lightboxImg.src = photoEl.src;
+            lightbox.style.display = 'flex';
+        }
+    };
+
+    // Zavření lightboxu kliknutím
+    document.getElementById('lightbox').onclick = () => {
+        document.getElementById('lightbox').style.display = 'none';
+    };
+
+    // Tlačítko stáhnout fotku
+    if (downloadBtn) {
+        downloadBtn.onclick = () => {
+            if (!photoEl.src || photoEl.src.includes('no-image')) {
+                alert('Fotka není k dispozici');
+                return;
+            }
+            const a = document.createElement('a');
+            a.href = photoEl.src;
+            a.download = `${product.id}.jpg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        };
+    }
+
+    // Tlačítko nahrát fotku + file input
+    if (uploadBtn && editPhotoInput && product.id) {
+        uploadBtn.onclick = () => {
+            editPhotoInput.click();
+        };
+
+        editPhotoInput.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                await saveImageToRepo(file, product.id);
+                photoEl.src = `https://feela-cz.github.io/Union-Cosmetic/OrderSheet/img/${product.id}.jpg?ts=${Date.now()}`;
+            } catch (err) {
+                alert('Nahrání fotky selhalo: ' + (err.message || err));
+            }
+        };
+    }
 }
 
 let deleteIndex = null;
@@ -1005,10 +1588,12 @@ function deleteProduct(index) {
     document.getElementById('confirm-delete-modal').style.display = 'block';
 }
 
-document.getElementById('confirm-delete-yes').addEventListener('click', () => {
+document.getElementById('confirm-delete-yes').addEventListener('click', async () => {
     if (deleteIndex !== null) {
         products.splice(deleteIndex, 1);
         renderTable();
+        try { await saveProductsToRepo(); } // commit po smazání
+        catch (e) { alert('Uložení products.json selhalo: ' + e.message); }
     }
     closeDeleteModal();
 });
@@ -1020,7 +1605,7 @@ function closeDeleteModal() {
     deleteIndex = null;
 }
 
-function downloadJSON() {
+/*function downloadJSON() {
     const dataStr = JSON.stringify(products, null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -1029,7 +1614,7 @@ function downloadJSON() {
     a.download = 'products.json';
     a.click();
     URL.revokeObjectURL(url);
-}
+}*/
 
 function sortTable(field) {
     if (currentSortField === field) {
@@ -1049,29 +1634,38 @@ function showLogistics(index) {
     const content = document.getElementById('logistics-content');
     content.innerHTML = '';
 
-    const hiddenKeys = ['boxes_per_layer', 'boxes_per_pallet', 'pack'];
-
     document.getElementById('logistics-title').textContent =
         translations[currentLang].logistics_data_for
             .replace('{brand}', product.brand)
             .replace('{key}', product.key);
 
+    // Carton EAN pouze pro zobrazení – primárně z produktu, fallback z historických dat (nepíšeme do logisticsData!)
+    const palletCartonEANForDisplay =
+        (product.carton_ean != null && product.carton_ean !== '') ? product.carton_ean : null;
+
     if (!data) {
         content.innerHTML = `<p>${translations[currentLang].no_logistics_data}</p>`;
     } else {
         for (const [section, values] of Object.entries(data)) {
-            const visibleEntries = Object.entries(values).filter(([key]) => !hiddenKeys.includes(key));
-            if (visibleEntries.length === 0) continue;
+            // Vynecháme případný historický PALLET.carton_ean, jinak zobrazíme vše
+            const entries = Object.entries(values).filter(([k]) => !(section === 'PALLET' && k === 'carton_ean'));
+            if (entries.length === 0) continue;
 
             const sectionName = translations[currentLang]['section_' + section] || section;
             content.innerHTML += `<h4>${sectionName}:</h4><ul>`;
-            for (const [key, value] of visibleEntries) {
+            for (const [key, value] of entries) {
                 const label = translations[currentLang][key] || attributeLabels[key] || key.replace(/_/g, ' ');
                 content.innerHTML += `<li><strong>${label}</strong>: ${value}</li>`;
             }
-            content.innerHTML += '</ul>';
+            content.innerHTML += `</ul>`;
+        }
+
+        if (palletCartonEANForDisplay != null && palletCartonEANForDisplay !== '') {
+            const label = translations[currentLang]['carton_ean'] || attributeLabels['carton_ean'] || 'Carton EAN';
+            content.innerHTML += `<div class="carton-ean-line"><strong>${label}</strong>: ${palletCartonEANForDisplay}</div>`;
         }
     }
+
     modal.style.display = 'block';
 
     document.querySelectorAll('.close-modal, .close-logistics-modal').forEach(el => {
@@ -1086,13 +1680,31 @@ function showLogistics(index) {
     };
 }
 
-function populateTypeSelect() {
-    const typeSelect = document.getElementById('type');
+function populateTypeSelect(selectId = 'type') {
+    const typeSelect = document.getElementById(selectId);
     if (!typeSelect) return;
 
-    const types = [...new Set(products.map(p => p.type))].sort();
-    typeSelect.innerHTML = '<option value="">-- select type --</option>' +
-        types.map(t => `<option value="${t}">${t}</option>`).join('');
+    const types = Object.keys(translations[currentLang].product_types).sort((a, b) =>
+        translateType(a).localeCompare(translateType(b), currentLang, { sensitivity: 'base' })
+    );
+    typeSelect.innerHTML = '<option value="">' + translations[currentLang].select_type + '</option>' +
+        types.map(t => `<option value="${t}">${translateType(t)}</option>`).join('');
+}
+
+function logisticsKeyCompare(a, b) {
+    const regex = /^(\d+)(.*)$/;
+    const ma = a.match(regex);
+    const mb = b.match(regex);
+
+    if (ma && mb) {
+        const numA = parseInt(ma[1], 10);
+        const numB = parseInt(mb[1], 10);
+        if (numA !== numB) return numA - numB;
+        return ma[2].localeCompare(mb[2], undefined, { sensitivity: 'base' });
+    }
+    if (ma) return -1;
+    if (mb) return 1;
+    return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
 }
 
 function getLogisticsClass(product) {
@@ -1121,7 +1733,8 @@ function populateLogisticsKeySelect() {
     keySelect.innerHTML = '<option value="">-- select key --</option>';
 
     if (logisticsData && logisticsData[brand]) {
-        Object.keys(logisticsData[brand]).forEach((key) => {
+        const sortedKeys = Object.keys(logisticsData[brand]).sort(logisticsKeyCompare);
+        sortedKeys.forEach((key) => {
             const option = document.createElement('option');
             option.value = key;
             option.textContent = key;
@@ -1133,34 +1746,28 @@ function populateLogisticsKeySelect() {
 function updateLogisticsKeyFilter() {
     const brand = document.getElementById('brand-filter').value;
     const logisticsKeyFilter = document.getElementById('logistics-key-filter');
+    const selectedKey = logisticsKeyFilter.value;
 
     if (brand && logisticsData[brand]) {
         const keys = Object.keys(logisticsData[brand]);
-        keys.sort((a, b) => {
-            const aNum = parseFloat(a);
-            const bNum = parseFloat(b);
+        keys.sort(logisticsKeyCompare);
 
-            const aIsNum = !isNaN(aNum) && a.match(/^\d/);
-            const bIsNum = !isNaN(bNum) && b.match(/^\d/);
+        logisticsKeyFilter.innerHTML =
+            `<option value="">${translations[currentLang].filter_logistics_key}</option>` +
+            keys.map(key =>
+                `<option value="${key}" ${key === selectedKey ? 'selected' : ''}>${key}</option>`
+            ).join('');
 
-            if (aIsNum && bIsNum) return aNum - bNum;
-            if (aIsNum) return -1;
-            if (bIsNum) return 1;
-            return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
-        });
-
-        logisticsKeyFilter.innerHTML = `<option value="">${translations[currentLang].filter_logistics_key}</option>` +
-            keys.map(key => `<option value="${key}">${key}</option>`).join('');
         logisticsKeyFilter.style.display = 'inline-block';
         logisticsKeyFilter.disabled = false;
     } else {
-        logisticsKeyFilter.innerHTML = `<option value="">${translations[currentLang].filter_logistics_key}</option>`;
+        logisticsKeyFilter.innerHTML =
+            `<option value="">${translations[currentLang].filter_logistics_key}</option>`;
         logisticsKeyFilter.style.display = 'none';
         logisticsKeyFilter.value = '';
         logisticsKeyFilter.disabled = true;
     }
 }
-
 function openLogisticsEditModal(brand, key, index = null) {
     currentLogisticsBrand = brand;
     currentLogisticsKey = key;
@@ -1173,12 +1780,22 @@ function openLogisticsEditModal(brand, key, index = null) {
         ITEM: { length: '', width: '', height: '', weight: '' },
         CARTON: { length: '', width: '', height: '', weight: '', nr_of_items: '' },
         LAYER: { nr_of_items: '', nr_of_cartons: '' },
-        PALLET: { length: '', width: '', height: '', weight: '', nr_of_cartons: '', nr_of_items: '', nr_of_layers: '' }
+        PALLET: {
+            length: '', width: '', height: '', weight: '', nr_of_cartons: '', nr_of_items: '', nr_of_layers: '',
+        }
     };
 
     if (!logisticsData[brand]) logisticsData[brand] = {};
-    if (!logisticsData[brand][key]) logisticsData[brand][key] = JSON.parse(JSON.stringify(emptyLogistics));
-    const data = logisticsData[brand][key];
+
+    // ✅ data jen "nacteme", nic nevytvarime pri otevreni
+    const data = (key != null && key !== '' && key !== 'null')
+        ? (logisticsData[brand][key] || null)
+        : null;
+
+    // ✅ pokud produkt nema klic, otevreme prazdny formular (ale NIC nezapisujeme do logisticsData)
+    const workingData = data
+        ? JSON.parse(JSON.stringify(data))
+        : JSON.parse(JSON.stringify(emptyLogistics));
 
     document.getElementById('logistics-edit-title').textContent =
         translations[currentLang].logistics_data_for
@@ -1191,18 +1808,19 @@ function openLogisticsEditModal(brand, key, index = null) {
         const colDiv = document.createElement('div');
         colDiv.className = 'logistics-fields-col';
         sections.forEach(section => {
-            if (!data[section]) return;
-            const group = data[section];
+            if (!workingData[section]) return;
+            const group = workingData[section];
             const sectionName = translations[currentLang]['section_' + section] || section;
             let html = `<div class="section-group"><h4>${sectionName}</h4>`;
             for (const [keyName, value] of Object.entries(group)) {
+                if (keyName === 'carton_ean') continue;
                 const label = translations[currentLang][keyName] || attributeLabels[keyName] || keyName.replace(/_/g, ' ');
                 const inputId = `logistics-${section}-${keyName}`;
                 html += `
-                    <label>${label}:
-                        <input type="text" id="${inputId}" value="${value !== null && value !== undefined ? value : ''}">
-                    </label>
-                `;
+        <label>${label}:
+          <input type="text" id="${inputId}" value="${value !== null && value !== undefined ? value : ''}">
+        </label>
+      `;
             }
             html += `</div>`;
             colDiv.innerHTML += html;
@@ -1213,57 +1831,18 @@ function openLogisticsEditModal(brand, key, index = null) {
     fieldsContainer.appendChild(makeCol(['ITEM', 'CARTON']));
     fieldsContainer.appendChild(makeCol(['LAYER', 'PALLET']));
 
+    const prod = currentLogisticsProductIndex !== null ? products[currentLogisticsProductIndex] : null;
+    const productCartonEAN = prod && prod.carton_ean != null ? String(prod.carton_ean) : '';
+
+    const eanBlock = document.createElement('div');
+    eanBlock.className = 'ean-block';
+    eanBlock.innerHTML = `
+  <h4>${translations[currentLang]['carton_ean'] || attributeLabels['carton_ean'] || 'Carton EAN'}</h4>
+  <div><input type="text" id="product-carton-ean" value="${productCartonEAN}"></div>
+`;
+    fieldsContainer.appendChild(eanBlock);
+
     modal.style.display = 'block';
-
-    const oldForm = document.getElementById('logistics-edit-form');
-    oldForm.onsubmit = null;
-
-    oldForm.onsubmit = function (e) {
-        e.preventDefault();
-
-        const newData = JSON.parse(JSON.stringify(data));
-        for (const [section, values] of Object.entries(newData)) {
-            for (const keyName of Object.keys(values)) {
-                const inputId = `logistics-${section}-${keyName}`;
-                const input = document.getElementById(inputId);
-                if (input) {
-                    let val = input.value;
-                    if (!isNaN(val) && val.trim() !== "") {
-                        val = Number(val);
-                    }
-                    values[keyName] = val === "" ? null : val;
-                }
-            }
-        }
-
-        let actualKey = document.getElementById('logistics-key').value
-            || (currentLogisticsProductIndex !== null ? products[currentLogisticsProductIndex].key : key);
-
-        document.getElementById('logistics-confirm-message').textContent =
-            translations[currentLang].logistics_change_confirm
-                .replace('{brand}', brand)
-                .replace('{key}', actualKey);
-
-        document.getElementById('logistics-confirm-modal').style.display = 'block';
-
-        document.getElementById('logistics-confirm-yes').onclick = function () {
-            for (const [section, values] of Object.entries(newData)) {
-                for (const keyName of Object.keys(values)) {
-                    data[section][keyName] = values[keyName];
-                }
-            }
-            document.getElementById('logistics-confirm-modal').style.display = 'none';
-            modal.style.display = 'none';
-
-            if (currentLogisticsProductIndex !== null) {
-                showLogistics(currentLogisticsProductIndex);
-            }
-        };
-
-        document.getElementById('logistics-confirm-no').onclick = function () {
-            document.getElementById('logistics-confirm-modal').style.display = 'none';
-        };
-    };
 
     document.querySelectorAll('.close-modal, .close-logistics-modal').forEach(el => {
         el.onclick = function () {
@@ -1278,24 +1857,242 @@ function openLogisticsEditModal(brand, key, index = null) {
             document.getElementById('logistics-edit-modal').style.display = 'none';
         };
     }
+
+    const oldForm = document.getElementById('logistics-edit-form');
+    oldForm.onsubmit = null;
+
+    oldForm.onsubmit = async function (e) {
+        e.preventDefault();
+
+        const newData = JSON.parse(JSON.stringify(workingData));
+
+        if (newData.PALLET && 'carton_ean' in newData.PALLET) {
+            delete newData.PALLET.carton_ean;
+        }
+
+        for (const [section, values] of Object.entries(newData)) {
+            for (const keyName of Object.keys(values)) {
+                const inputId = `logistics-${section}-${keyName}`;
+                const input = document.getElementById(inputId);
+                if (input) {
+                    let val = input.value;
+                    if (!isNaN(val) && val.trim() !== "") {
+                        val = Number(val);
+                    }
+                    values[keyName] = val === "" ? null : val;
+                }
+            }
+        }
+
+        function logisticsChanged(orig, upd) {
+            const secs = ['ITEM', 'CARTON', 'LAYER', 'PALLET'];
+            for (const s of secs) {
+                const go = orig[s] || {};
+                const gu = upd[s] || {};
+                const keys = new Set([...Object.keys(go), ...Object.keys(gu)]);
+                for (const k of keys) {
+                    if (s === 'PALLET' && k === 'carton_ean') continue;
+                    const vo = go[k] ?? null;
+                    const vu = gu[k] ?? null;
+                    if (vo !== vu) return true;
+                }
+            }
+            return false;
+        }
+
+        const inp = document.getElementById('product-carton-ean');
+        let eanNew = null;
+        if (inp) {
+            let v = inp.value.trim();
+            if (v === '') v = null;
+            else if (v.toLowerCase() === 'can') v = 'can';
+            else if (/^\d+$/.test(v)) v = v;
+            eanNew = v;
+        }
+
+        const prodIdx = currentLogisticsProductIndex;
+        const eanOld = (prodIdx !== null) ? (products[prodIdx].carton_ean ?? null) : null;
+
+        const hasLogisticsChanges = logisticsChanged(workingData, newData);
+        const onlyEANChanged = !hasLogisticsChanges && (prodIdx !== null) && (eanNew !== eanOld);
+
+        if (hasLogisticsChanges) {
+            // ✅ vezmi aktualne vybrany klic (po "Vybrat logisticky klic" se meni currentLogisticsKey a/nebo product.key)
+            const actualKey =
+                (typeof currentLogisticsKey !== 'undefined' && currentLogisticsKey != null && currentLogisticsKey !== '' && currentLogisticsKey !== 'null')
+                    ? currentLogisticsKey
+                    : ((prodIdx !== null && products[prodIdx]?.key != null && products[prodIdx].key !== '' && products[prodIdx].key !== 'null')
+                        ? products[prodIdx].key
+                        : key);
+
+            document.getElementById('logistics-confirm-message').textContent =
+                translations[currentLang].logistics_change_confirm
+                    .replace('{brand}', brand)
+                    .replace('{key}', (actualKey == null || actualKey === '' || actualKey === 'null') ? '—' : actualKey);
+
+            document.getElementById('logistics-confirm-modal').style.display = 'block';
+
+            document.getElementById('logistics-confirm-yes').onclick = async function () {
+                // ✅ CILOVY klic = to, co je v confirm hlaskce
+                const targetKey = actualKey;
+
+                // Bez klice neukladat (a hlavne nikdy neprepisovat "null" omylem)
+                if (targetKey == null || targetKey === '' || targetKey === 'null') {
+                    alert('Nejdřív vyber logistický klíč (nebudeme ukládat do "null").');
+                    return;
+                }
+
+                // priprav cilovy objekt v logisticsData
+                if (!logisticsData[brand]) logisticsData[brand] = {};
+                if (!logisticsData[brand][targetKey]) {
+                    logisticsData[brand][targetKey] = JSON.parse(JSON.stringify(emptyLogistics));
+                }
+                const target = logisticsData[brand][targetKey];
+
+                // nikdy netahat carton_ean do logistics.json
+                if (target.PALLET && 'carton_ean' in target.PALLET) delete target.PALLET.carton_ean;
+
+                // ✅ propsat zmeny do CILOVEHO klice (target), ne do "data" (puvodni key)
+                for (const [section, values] of Object.entries(newData)) {
+                    if (!target[section]) target[section] = {};
+                    for (const keyName of Object.keys(values)) {
+                        target[section][keyName] = values[keyName];
+                    }
+                }
+
+                // ✅ propsat klic (a pripadne carton_ean) do produktu az po potvrzeni
+                if (prodIdx !== null && products[prodIdx]) {
+                    products[prodIdx].key = targetKey;
+
+                    if (inp) {
+                        products[prodIdx].carton_ean = eanNew;
+                    }
+                }
+
+                // aktualizuj "context" pro dalsi klikani v UI
+                currentLogisticsBrand = brand;
+                currentLogisticsKey = targetKey;
+
+                // zavrit modaly
+                document.getElementById('logistics-confirm-modal').style.display = 'none';
+                modal.style.display = 'none';
+
+                // ulozit logistics
+                try { await saveLogisticsToRepo(); }
+                catch (e) { alert('Uložení logistics.json selhalo: ' + (e.message || e)); }
+
+                // ✅ ulozit products (protoze jsme zmenili product.key a mozna i carton_ean)
+                if (prodIdx !== null) {
+                    try { await saveProductsToRepo(); }
+                    catch (e) { alert('Uložení products.json selhalo: ' + (e.message || e)); }
+                }
+
+                // znovu otevri nahled pro aktualni produkt
+                if (prodIdx !== null) {
+                    showLogistics(prodIdx);
+                }
+            };
+
+            document.getElementById('logistics-confirm-no').onclick = function () {
+                document.getElementById('logistics-confirm-modal').style.display = 'none';
+            };
+        } else {
+            if (onlyEANChanged && prodIdx !== null) {
+                products[prodIdx].carton_ean = eanNew;
+                try { await saveProductsToRepo(); } // commit i při samotné změně EAN
+                catch (e) { alert('Uložení products.json selhalo: ' + e.message); }
+            }
+            modal.style.display = 'none';
+            if (prodIdx !== null) {
+                showLogistics(prodIdx);
+            }
+        }
+    }
+}
+
+function initInputValidations() {
+    // ID/EAN – jen číslice, 13 znaků
+    const eanInputs = [document.getElementById("add-id"), document.getElementById("id")];
+    eanInputs.forEach(input => {
+        if (!input) return;
+        trimInputOnChange(input);
+        input.addEventListener("input", () => {
+            input.value = input.value.replace(/\D/g, ""); // jen číslice
+            if (input.value.length > 13) {
+                input.value = input.value.slice(0, 13);
+            }
+        });
+    });
+
+    // HS kód – jen číslice
+    const hsInputs = [document.getElementById("add-hs"), document.getElementById("hs")];
+    hsInputs.forEach(input => {
+        if (!input) return;
+        trimInputOnChange(input);
+        input.addEventListener("input", () => {
+            input.value = input.value.replace(/\D/g, "");
+        });
+    });
+
+    // Pack / Boxes per layer / Boxes per pallet – jen číslice
+    const numericInputs = [
+        document.getElementById("add-pack"),
+        document.getElementById("add-boxes_per_layer"),
+        document.getElementById("add-boxes_per_pallet"),
+        document.getElementById("pack"),
+        document.getElementById("boxes_per_layer"),
+        document.getElementById("boxes_per_pallet")
+    ];
+    numericInputs.forEach(input => {
+        if (!input) return;
+        trimInputOnChange(input);
+        input.addEventListener("input", () => {
+            input.value = input.value.replace(/\D/g, "");
+        });
+    });
 }
 
 function updateLogisticsModalContent(brand, key) {
-    const data = logisticsData[brand][key];
+    // update titulek edit modalu
+    const titleEl = document.getElementById('logistics-edit-title');
+    if (titleEl) {
+        const shownKey = (key === null || key === undefined || key === '') ? 'null' : String(key);
+        titleEl.textContent =
+            translations[currentLang].logistics_data_for
+                .replace('{brand}', brand)
+                .replace('{key}', shownKey);
+    }
+
     const fieldsContainer = document.getElementById('logistics-fields');
     fieldsContainer.innerHTML = '';
+
+    // kreslime VZDY z working copy (nikdy primo z logisticsData)
+    const data = logisticsWorkingData;
+    if (!data) return;
 
     function makeCol(sections) {
         const colDiv = document.createElement('div');
         colDiv.className = 'logistics-fields-col';
+
         sections.forEach(section => {
             if (!data[section]) return;
+
             const group = data[section];
-            let html = `<div class="section-group"><h4>${section}</h4>`;
+            const sectionName = translations[currentLang]['section_' + section] || section;
+
+            let html = `<div class="section-group"><h4>${sectionName}</h4>`;
             for (const [keyName, value] of Object.entries(group)) {
+                if (keyName === 'carton_ean') continue;
+
+                const label =
+                    translations[currentLang][keyName] ||
+                    attributeLabels[keyName] ||
+                    keyName.replace(/_/g, ' ');
+
                 const inputId = `logistics-${section}-${keyName}`;
+
                 html += `
-                    <label>${attributeLabels[keyName] || keyName.replace(/_/g, ' ')}:
+                    <label>${label}:
                         <input type="text" id="${inputId}" value="${value !== null && value !== undefined ? value : ''}">
                     </label>
                 `;
@@ -1303,6 +2100,7 @@ function updateLogisticsModalContent(brand, key) {
             html += `</div>`;
             colDiv.innerHTML += html;
         });
+
         return colDiv;
     }
 
@@ -1310,9 +2108,9 @@ function updateLogisticsModalContent(brand, key) {
     fieldsContainer.appendChild(makeCol(['LAYER', 'PALLET']));
 }
 
-document.getElementById('force-save-button').addEventListener('click', () => {
+document.getElementById('force-save-button').addEventListener('click', async () => {
     if (pendingProduct) {
-        saveProductFinal(pendingProduct);
+        await saveProductFinal(pendingProduct); // skutečně commitne
         pendingProduct = null;
     }
     document.getElementById('validation-modal').style.display = 'none';
