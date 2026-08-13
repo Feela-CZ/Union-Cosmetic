@@ -3175,28 +3175,7 @@
     "id": "8596048012805",
     "hs": "33074900",
     "name": "Twister Laundry Perfume Green Land",
-    "volume": {
-      "number": "250",
-      "unit": "ml"
-    },
-    "price": 3.19,
-    "pack": 12,
-    "boxes_per_layer": 25,
-    "boxes_per_pallet": 175,
-    "key": "250",
-    "new": true,
-    "new_date": "2025-08-14",
-    "discontinued": false,
-    "discontinued_date": "",
-    "csName": "Twister parfém na praní - Green Land"
-  },
-  {
-    "brand": "Twister",
-    "type": "Laundry Perfume",
-    "id": "8596048012812",
-    "hs": "33074900",
-    "name": "Twister Laundry Perfume Fresh Breeze",
-    "csName": "Twister parfém na praní - Fresh Breeze",
+    "csName": "Twister parfém na praní - Green Land",
     "volume": {
       "number": "250",
       "unit": "ml"
@@ -3214,9 +3193,9 @@
   {
     "brand": "Twister",
     "type": "Laundry Perfume",
-    "id": "8596048012829",
+    "id": "8596048012812",
     "hs": "33074900",
-    "name": "Twister Laundry Perfume Flower Bouquet",
+    "name": "Twister Laundry Perfume Fresh Breeze",
     "volume": {
       "number": "250",
       "unit": "ml"
@@ -3230,7 +3209,28 @@
     "new_date": "2025-08-14",
     "discontinued": false,
     "discontinued_date": "",
-    "csName": "Twister parfém na praní - Flower Bouquet"
+    "csName": "Twister parfém na praní - Fresh Breeze"
+  },
+  {
+    "brand": "Twister",
+    "type": "Laundry Perfume",
+    "id": "8596048012829",
+    "hs": "33074900",
+    "name": "Twister Laundry Perfume Flower Bouquet",
+    "csName": "Twister parfém na praní - Flower Bouquet",
+    "volume": {
+      "number": "250",
+      "unit": "ml"
+    },
+    "price": 3.19,
+    "pack": 12,
+    "boxes_per_layer": 25,
+    "boxes_per_pallet": 175,
+    "key": "250",
+    "new": false,
+    "new_date": "",
+    "discontinued": false,
+    "discontinued_date": ""
   },
   {
     "brand": "Twister",
