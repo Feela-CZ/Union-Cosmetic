@@ -3464,8 +3464,9 @@
     "brand": "Lilien",
     "type": "Sun Care",
     "id": "8596048002837",
-    "hs": 33049900,
+    "hs": "33049900",
     "name": "Sun Active Emulsion SPF 20",
+    "csName": "Lilien Sun Active opalovací emulze OF 20 -",
     "volume": {
       "number": "200",
       "unit": "ml"
@@ -3474,13 +3475,11 @@
     "pack": 12,
     "boxes_per_layer": 27,
     "boxes_per_pallet": 243,
+    "key": "",
     "new": false,
     "new_date": "",
-    "discontinued": false,
-    "discontinued_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Lilien Sun Active opalovací emulze OF 20 -"
+    "discontinued": true,
+    "discontinued_date": "2026-08-13"
   },
   {
     "brand": "Lilien",
