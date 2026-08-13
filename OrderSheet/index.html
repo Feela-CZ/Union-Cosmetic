@@ -3,171 +3,67 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="favicon.png">
-    <title>Union Cosmetic Apps</title>
-    <style>
-        :root {
-            --background: #f6f8fa;
-            --button: #1867c0;
-            --button-hover: #115293;
-            --focus: rgba(24, 103, 192, 0.3);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--background);
-            color: #1f2328;
-            font-family: "Segoe UI", Arial, sans-serif;
-        }
-
-        main {
-            width: min(700px, calc(100% - 40px));
-        }
-
-        h1 {
-            margin: 0 0 50px;
-            text-align: center;
-            font-size: clamp(2rem, 5vw, 2.5rem);
-            line-height: 1.2;
-        }
-
-        .button-group {
-            display: grid;
-            gap: 32px;
-        }
-
-        .app-btn {
-            width: 100%;
-            min-height: 86px;
-            padding: 18px 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            border: 0;
-            border-radius: 18px;
-            background: var(--button);
-            color: #fff;
-            box-shadow: 0 8px 22px rgba(31, 35, 40, 0.14);
-            font: inherit;
-            font-size: clamp(1.35rem, 3vw, 1.8rem);
-            cursor: pointer;
-            transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
-        }
-
-        .app-btn:hover {
-            background: var(--button-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(31, 35, 40, 0.2);
-        }
-
-        .app-btn:focus-visible {
-            outline: 4px solid var(--focus);
-            outline-offset: 4px;
-        }
-
-        .app-btn:active {
-            transform: translateY(0);
-        }
-
-        .app-icon {
-            width: 42px;
-            height: 42px;
-            flex: 0 0 42px;
-            display: grid;
-            place-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 11px;
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        .app-icon svg {
-            width: 26px;
-            height: 26px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 1.8;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .app-label {
-            line-height: 1.25;
-        }
-
-        @media (max-width: 560px) {
-            main {
-                width: min(100% - 28px, 700px);
-            }
-
-            h1 {
-                margin-bottom: 34px;
-            }
-
-            .button-group {
-                gap: 20px;
-            }
-
-            .app-btn {
-                min-height: 78px;
-                padding: 16px 20px;
-                gap: 14px;
-            }
-
-            .app-icon {
-                width: 38px;
-                height: 38px;
-                flex-basis: 38px;
-            }
-        }
-    </style>
+    <title>Order sheet</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="../favicon.png">
 </head>
 
 <body>
-    <main>
-        <h1>Choose app/Vyber apku:</h1>
 
-        <div class="button-group">
-            <button class="app-btn" type="button"
-                onclick="window.open('./JSON%20edit%20GUI/', '_blank')"
-                aria-label="Open Jason data editor">
-                <span class="app-icon" aria-hidden="true">
-                    <!-- Database -->
-                    <svg viewBox="0 0 24 24">
-                        <ellipse cx="12" cy="5" rx="8" ry="3"></ellipse>
-                        <path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"></path>
-                        <path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"></path>
-                    </svg>
-                </span>
-                <span class="app-label">„Jason“ (Editor dat)</span>
-            </button>
+    <div id="cart-button" class="cart-button" onclick="openCartModal()">
+        🛒 <span id="cart-count">0</span>
+    </div>
 
-            <button class="app-btn" type="button"
-                onclick="window.open('./OrderSheet/', '_blank')"
-                aria-label="Open Fredy order form">
-                <span class="app-icon" aria-hidden="true">
-                    <!-- Order form -->
-                    <svg viewBox="0 0 24 24">
-                        <rect x="5" y="4" width="14" height="17" rx="2"></rect>
-                        <path d="M9 4V2.8h6V4"></path>
-                        <path d="M9 9h6"></path>
-                        <path d="M9 13h6"></path>
-                        <path d="M9 17h4"></path>
-                    </svg>
-                </span>
-                <span class="app-label">„Fredy“ (Objednávkový formulář)</span>
-            </button>
+    <h1>Order sheet</h1>
+
+    <div id="brand-container" class="brand-container"></div>
+    <div id="type-container" class="type-container"></div>
+    <div id="product-container" class="product-container"></div>
+
+    <div id="lightbox" class="lightbox">
+        <img id="lightbox-img" src="" alt="Large view">
+    </div>
+
+    <div id="cart-modal" class="cart-modal">
+        <div class="cart-modal-content">
+            <span class="close" onclick="closeCartModal()">&times;</span>
+            <h2>Your Order</h2>
+            <div id="cart-table-container"></div>
+            <div id="cart-summary"></div>
+            <div id="cart-buttons">
+                <button class="confirm-button" onclick="showConfirmModal()">Confirm Order</button>
+                <button class="clear-button" onclick="showClearModal()">Clear Order</button>
+            </div>
         </div>
-    </main>
+    </div>
+
+    <div id="confirm-modal" class="small-modal">
+        <div class="small-modal-content">
+            <p>Do you really want to confirm and send the order?</p>
+            <button onclick="confirmOrder()" class="confirm-button">Yes, confirm</button>
+            <button onclick="closeConfirmModal()" class="cancel-button">Cancel</button>
+        </div>
+    </div>
+
+    <div id="clear-modal" class="small-modal">
+        <div class="small-modal-content">
+            <p>Do you really want to clear the order?</p>
+            <button onclick="clearCart()" class="clear-button">Yes, clear</button>
+            <button onclick="closeClearModal()" class="cancel-button">Cancel</button>
+        </div>
+    </div>
+
+    <div id="info-modal" class="small-modal">
+        <div class="small-modal-content">
+            <p id="info-modal-text">Info text here</p>
+            <button onclick="closeInfoModal()" class="confirm-button">OK</button>
+        </div>
+    </div>
+    <script>
+        window.API_BASE = "https://union-cosmetic.filipluchesi.workers.dev";
+    </script>
+    <script src="xlsx.full.min.js"></script>
+    <script src="main.js"></script>
 </body>
 
 </html>
