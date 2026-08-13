@@ -3505,10 +3505,30 @@
   {
     "brand": "Lilien",
     "type": "Sun Care",
-    "id": "8596048002905",
-    "hs": "33049900",
+    "id": 8596048002905,
+    "hs": 33049900,
     "name": "Sun Active Burn Relief Ice Gel",
-    "csName": "Lilien Sun Active chladivý gel po opalování",
+    "volume": {
+      "number": "200",
+      "unit": "ml"
+    },
+    "price": 1.69,
+    "pack": 14,
+    "boxes_per_layer": 27,
+    "boxes_per_pallet": 189,
+    "new": false,
+    "new_date": "",
+    "key": null,
+    "carton_ean": null,
+    "csName": "Lilien Sun Active chladivý gel po opalování"
+  },
+  {
+    "brand": "Lilien",
+    "type": "Sun Care",
+    "id": "8596048002912",
+    "hs": "33049900",
+    "name": "Sun Active Panthenol Spray (4%)",
+    "csName": "Lilien Sun Active panthenol sprej po opalování",
     "volume": {
       "number": "200",
       "unit": "ml"
@@ -3522,26 +3542,6 @@
     "new_date": "",
     "discontinued": true,
     "discontinued_date": "2026-08-13"
-  },
-  {
-    "brand": "Lilien",
-    "type": "Sun Care",
-    "id": 8596048002912,
-    "hs": 33049900,
-    "name": "Sun Active Panthenol Spray (4%)",
-    "volume": {
-      "number": "200",
-      "unit": "ml"
-    },
-    "price": 1.69,
-    "pack": 14,
-    "boxes_per_layer": 27,
-    "boxes_per_pallet": 189,
-    "new": false,
-    "new_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Lilien Sun Active panthenol sprej po opalování"
   },
   {
     "brand": "Natava",
