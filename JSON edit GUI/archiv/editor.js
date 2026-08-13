@@ -7,9 +7,93 @@ let currentLogisticsBrand = null;
 let currentLogisticsKey = null;
 let currentLogisticsProductIndex = null;
 let logisticsWorkingData = null;
+let logisticsWorkingBrand = null;
+let logisticsWorkingKey = null;
 let currentLang = 'cs';
 let showingAllKeys = false;
 let showDiscontinued = false;
+
+const INVALID_LOGISTICS_KEYS = new Set(['', 'null', 'undefined', '___', '—', '-']);
+
+function normalizeLogisticsKey(value) {
+    if (value === null || value === undefined) return null;
+    const key = String(value).trim();
+    return INVALID_LOGISTICS_KEYS.has(key.toLowerCase()) ? null : key;
+}
+
+function isValidLogisticsKey(value) {
+    return normalizeLogisticsKey(value) !== null;
+}
+
+function getValidLogisticsKeys(brand) {
+    return Object.keys(logisticsData?.[brand] || {})
+        .filter(isValidLogisticsKey)
+        .sort(logisticsKeyCompare);
+}
+
+function logisticsCount(value) {
+    if (value === null || value === undefined || value === '') return '';
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+
+    const normalized = String(value).trim().replace(',', '.');
+    const match = normalized.match(/^-?\d+(?:\.\d+)?/);
+    if (!match) return '';
+
+    const number = Number(match[0]);
+    return Number.isFinite(number) ? number : '';
+}
+
+function syncProductPackagingFromLogistics(product, data) {
+    if (!product || !data) return false;
+
+    const nextValues = {
+        pack: logisticsCount(data?.CARTON?.nr_of_items),
+        boxes_per_layer: logisticsCount(data?.LAYER?.nr_of_cartons),
+        boxes_per_pallet: logisticsCount(data?.PALLET?.nr_of_cartons)
+    };
+
+    let changed = false;
+    Object.entries(nextValues).forEach(([field, value]) => {
+        if (product[field] !== value) {
+            product[field] = value;
+            changed = true;
+        }
+    });
+    return changed;
+}
+
+function fillEditPackagingFromSelectedKey(overwrite = true) {
+    const brand = document.getElementById('brand')?.value?.trim();
+    const key = normalizeLogisticsKey(document.getElementById('logistics-key')?.value);
+    const data = key ? logisticsData?.[brand]?.[key] : null;
+
+    const fields = {
+        pack: data ? logisticsCount(data?.CARTON?.nr_of_items) : '',
+        boxes_per_layer: data ? logisticsCount(data?.LAYER?.nr_of_cartons) : '',
+        boxes_per_pallet: data ? logisticsCount(data?.PALLET?.nr_of_cartons) : ''
+    };
+
+    Object.entries(fields).forEach(([id, value]) => {
+        const input = document.getElementById(id);
+        if (!input) return;
+        if (overwrite || input.value.trim() === '') input.value = value;
+    });
+}
+
+function sanitizeLogisticsData(data) {
+    Object.keys(data || {}).forEach(brand => {
+        Object.keys(data[brand] || {}).forEach(key => {
+            if (!isValidLogisticsKey(key)) {
+                delete data[brand][key];
+                return;
+            }
+
+            const pallet = data[brand][key]?.PALLET;
+            if (pallet && 'carton_ean' in pallet) delete pallet.carton_ean;
+        });
+    });
+    return data;
+}
 
 const attributeLabels = {
     nr_of_items: "Number of Items",
@@ -376,14 +460,10 @@ async function saveFileToRepo(path, bytes) {
 
 async function saveLogisticsToRepo() {
     try {
+        sanitizeLogisticsData(logisticsData);
         await apiPut('logistics', logisticsData);
         logisticsData = await fetch(`${window.API_BASE}/api/logistics?ts=${Date.now()}`).then(r => r.json());
-        Object.keys(logisticsData || {}).forEach(br => {
-            Object.keys(logisticsData[br] || {}).forEach(k => {
-                const pal = logisticsData[br][k]?.PALLET;
-                if (pal && 'carton_ean' in pal) delete pal.carton_ean;
-            });
-        });
+        sanitizeLogisticsData(logisticsData);
     } catch (e) {
         alert('Uložení logistics.json selhalo: ' + e.message);
     }
@@ -424,13 +504,8 @@ Promise.all([
     products = productsData;
     logisticsData = logisticsDataRaw;
 
-    // očista logisticsData
-    Object.keys(logisticsData || {}).forEach(br => {
-        Object.keys(logisticsData[br] || {}).forEach(k => {
-            const pal = logisticsData[br][k]?.PALLET;
-            if (pal && 'carton_ean' in pal) delete pal.carton_ean;
-        });
-    });
+    // Neplatné pseudo-klíče (null, undefined, ___...) nejsou logistické skupiny.
+    sanitizeLogisticsData(logisticsData);
 
     initUI();
     renderTable();
@@ -441,15 +516,16 @@ function fillKeysSelect(brand, selectedKey = null) {
     const chooseKey = document.getElementById('choose-key');
     chooseKey.innerHTML = '';
     if (logisticsData[brand]) {
-        const sortedKeys = Object.keys(logisticsData[brand]).sort(logisticsKeyCompare);
+        const sortedKeys = getValidLogisticsKeys(brand);
         sortedKeys.forEach(key => {
             const option = document.createElement('option');
             option.value = key;
             option.textContent = key;
             chooseKey.appendChild(option);
         });
-        if (selectedKey) {
-            chooseKey.value = selectedKey;
+        const normalizedSelectedKey = normalizeLogisticsKey(selectedKey);
+        if (normalizedSelectedKey && sortedKeys.includes(normalizedSelectedKey)) {
+            chooseKey.value = normalizedSelectedKey;
         }
     }
 }
@@ -537,9 +613,14 @@ function initUI() {
     document.getElementById('logistics-key-filter').addEventListener('change', renderTable);
     document.getElementById('type-filter').addEventListener('change', renderTable);
 
+    // Stejné předvyplnění logistiky jako v modalu pro přidání produktu.
+    document.getElementById('logistics-key').addEventListener('change', function () {
+        fillEditPackagingFromSelectedKey(true);
+    });
+
     document.getElementById('choose-logistics-key-btn').addEventListener('click', function () {
         const selectedBrand = currentLogisticsBrand;
-        const selectedKey = currentLogisticsKey;
+        const selectedKey = normalizeLogisticsKey(logisticsWorkingKey) || normalizeLogisticsKey(currentLogisticsKey);
         const chooseBrand = document.getElementById('choose-brand');
         chooseBrand.innerHTML = '';
         Object.keys(logisticsData).forEach(brand => {
@@ -622,7 +703,7 @@ function initUI() {
         const newKeyRaw = document.getElementById('add-logistics-key-name').value;
         const newKey = newKeyRaw.trim();
 
-        if (!newKey) {
+        if (!isValidLogisticsKey(newKey)) {
             alert(translations[currentLang].key_required);
             return;
         }
@@ -679,7 +760,7 @@ function initUI() {
         palletInput.value = "";
 
         if (brand && logisticsData[brand]) {
-            Object.keys(logisticsData[brand]).sort(logisticsKeyCompare).forEach(key => {
+            getValidLogisticsKeys(brand).forEach(key => {
                 const opt = document.createElement('option');
                 opt.value = key;
                 opt.textContent = key;
@@ -712,11 +793,17 @@ function initUI() {
         e.preventDefault();
 
         const selectedBrand = document.getElementById('choose-brand').value;
-        const selectedKey = document.getElementById('choose-key').value;
+        const selectedKey = normalizeLogisticsKey(document.getElementById('choose-key').value);
+
+        if (!selectedKey) {
+            alert('Vyber platný logistický klíč.');
+            return;
+        }
 
         // working state (nehrabeme do products ani logisticsData)
         logisticsWorkingBrand = selectedBrand;
         logisticsWorkingKey = selectedKey;
+        currentLogisticsKey = selectedKey;
 
         const emptyLogistics = {
             ITEM: { length: '', width: '', height: '', weight: '' },
@@ -818,11 +905,7 @@ function renderTable() {
 
         let matchesLogisticsKey = true;
         if (brandFilter && logisticsKeyFilter) {
-            if (logisticsKeyFilter === 'null') {
-                matchesLogisticsKey = (product.key == null || product.key === 'null');
-            } else {
-                matchesLogisticsKey = (product.key != null && String(product.key) === logisticsKeyFilter);
-            }
+            matchesLogisticsKey = normalizeLogisticsKey(product.key) === normalizeLogisticsKey(logisticsKeyFilter);
         }
 
         return matchesSearch && matchesBrand && matchesType && matchesLogisticsKey && includeByDiscontinued;
@@ -905,7 +988,7 @@ function fillExportLogisticsKeys(showAll = false) {
     keysDiv.innerHTML = `<div style="margin-bottom:4px;font-weight:bold;" data-i18n="export_logistics_keys"></div>`;
     if (!logisticsData[brand]) return;
 
-    let allKeys = Object.keys(logisticsData[brand]).filter(k => k);
+    let allKeys = getValidLogisticsKeys(brand);
 
     let keysWithData = [];
     let keysEmpty = [];
@@ -1207,8 +1290,7 @@ function openAddModal() {
     // Naplníme klíče jen když je vybraný brand
     const brand = brandSelect.value.trim();
     if (brand && logisticsData[brand]) {
-        Object.keys(logisticsData[brand])
-            .sort(logisticsKeyCompare) // pokud máš funkci na řazení
+        getValidLogisticsKeys(brand)
             .forEach(key => {
                 const opt = document.createElement('option');
                 opt.value = key;
@@ -1475,7 +1557,7 @@ function editProduct(index) {
     populateTypeSelect();
     document.getElementById('type').value = product.type;
     populateLogisticsKeySelect();
-    document.getElementById('logistics-key').value = product.key || '';
+    document.getElementById('logistics-key').value = normalizeLogisticsKey(product.key) || '';
     document.getElementById('id').value = product.id;
     document.getElementById('hs').value = product.hs;
     document.getElementById('name_en').value = product.name || '';
@@ -1487,6 +1569,9 @@ function editProduct(index) {
     document.getElementById('pack').value = product.pack;
     document.getElementById('boxes_per_layer').value = product.boxes_per_layer;
     document.getElementById('boxes_per_pallet').value = product.boxes_per_pallet;
+    // U starších záznamů mohl být klíč vyplněný, ale odvozená pole prázdná.
+    // Doplníme jen chybějící hodnoty; existující produktová data zachováme.
+    fillEditPackagingFromSelectedKey(false);
     document.getElementById('new').checked = product.new;
     document.getElementById('new_date').value = product.new_date;
     document.getElementById('discontinued').checked = product.discontinued === true;
@@ -1628,7 +1713,8 @@ function sortTable(field) {
 
 function showLogistics(index) {
     const product = products[index];
-    const data = logisticsData?.[product.brand]?.[product.key];
+    const productKey = normalizeLogisticsKey(product.key);
+    const data = productKey ? logisticsData?.[product.brand]?.[productKey] : null;
 
     const modal = document.getElementById('logistics-modal');
     const content = document.getElementById('logistics-content');
@@ -1637,7 +1723,7 @@ function showLogistics(index) {
     document.getElementById('logistics-title').textContent =
         translations[currentLang].logistics_data_for
             .replace('{brand}', product.brand)
-            .replace('{key}', product.key);
+            .replace('{key}', productKey || '—');
 
     // Carton EAN pouze pro zobrazení – primárně z produktu, fallback z historických dat (nepíšeme do logisticsData!)
     const palletCartonEANForDisplay =
@@ -1676,7 +1762,7 @@ function showLogistics(index) {
     });
 
     document.getElementById('edit-logistics-btn').onclick = function () {
-        openLogisticsEditModal(product.brand, product.key, index);
+        openLogisticsEditModal(product.brand, productKey, index);
     };
 }
 
@@ -1708,7 +1794,8 @@ function logisticsKeyCompare(a, b) {
 }
 
 function getLogisticsClass(product) {
-    const logistics = logisticsData?.[product.brand]?.[product.key];
+    const key = normalizeLogisticsKey(product.key);
+    const logistics = key ? logisticsData?.[product.brand]?.[key] : null;
     if (!logistics) return 'logistics-empty';
 
     const allValues = [];
@@ -1733,7 +1820,7 @@ function populateLogisticsKeySelect() {
     keySelect.innerHTML = '<option value="">-- select key --</option>';
 
     if (logisticsData && logisticsData[brand]) {
-        const sortedKeys = Object.keys(logisticsData[brand]).sort(logisticsKeyCompare);
+        const sortedKeys = getValidLogisticsKeys(brand);
         sortedKeys.forEach((key) => {
             const option = document.createElement('option');
             option.value = key;
@@ -1749,8 +1836,7 @@ function updateLogisticsKeyFilter() {
     const selectedKey = logisticsKeyFilter.value;
 
     if (brand && logisticsData[brand]) {
-        const keys = Object.keys(logisticsData[brand]);
-        keys.sort(logisticsKeyCompare);
+        const keys = getValidLogisticsKeys(brand);
 
         logisticsKeyFilter.innerHTML =
             `<option value="">${translations[currentLang].filter_logistics_key}</option>` +
@@ -1769,9 +1855,12 @@ function updateLogisticsKeyFilter() {
     }
 }
 function openLogisticsEditModal(brand, key, index = null) {
+    const initialKey = normalizeLogisticsKey(key);
     currentLogisticsBrand = brand;
-    currentLogisticsKey = key;
+    currentLogisticsKey = initialKey;
     currentLogisticsProductIndex = index;
+    logisticsWorkingBrand = brand;
+    logisticsWorkingKey = initialKey;
 
     const modal = document.getElementById('logistics-edit-modal');
     const fieldsContainer = document.getElementById('logistics-fields');
@@ -1788,19 +1877,20 @@ function openLogisticsEditModal(brand, key, index = null) {
     if (!logisticsData[brand]) logisticsData[brand] = {};
 
     // ✅ data jen "nacteme", nic nevytvarime pri otevreni
-    const data = (key != null && key !== '' && key !== 'null')
-        ? (logisticsData[brand][key] || null)
+    const data = initialKey
+        ? (logisticsData[brand][initialKey] || null)
         : null;
 
     // ✅ pokud produkt nema klic, otevreme prazdny formular (ale NIC nezapisujeme do logisticsData)
-    const workingData = data
+    logisticsWorkingData = data
         ? JSON.parse(JSON.stringify(data))
         : JSON.parse(JSON.stringify(emptyLogistics));
+    const workingData = logisticsWorkingData;
 
     document.getElementById('logistics-edit-title').textContent =
         translations[currentLang].logistics_data_for
             .replace('{brand}', brand)
-            .replace('{key}', key);
+            .replace('{key}', initialKey || '—');
 
     fieldsContainer.innerHTML = '';
 
@@ -1864,7 +1954,10 @@ function openLogisticsEditModal(brand, key, index = null) {
     oldForm.onsubmit = async function (e) {
         e.preventDefault();
 
-        const newData = JSON.parse(JSON.stringify(workingData));
+        // Formulář mohl být mezitím přepnut na jiný klíč. Jako výchozí
+        // stav proto bereme aktuálně zvolený klíč, ne klíč při otevření modalu.
+        const baselineData = JSON.parse(JSON.stringify(logisticsWorkingData || workingData || emptyLogistics));
+        const newData = JSON.parse(JSON.stringify(baselineData));
 
         if (newData.PALLET && 'carton_ean' in newData.PALLET) {
             delete newData.PALLET.carton_ean;
@@ -1913,100 +2006,89 @@ function openLogisticsEditModal(brand, key, index = null) {
         const prodIdx = currentLogisticsProductIndex;
         const eanOld = (prodIdx !== null) ? (products[prodIdx].carton_ean ?? null) : null;
 
-        const hasLogisticsChanges = logisticsChanged(workingData, newData);
-        const onlyEANChanged = !hasLogisticsChanges && (prodIdx !== null) && (eanNew !== eanOld);
+        const targetKey =
+            normalizeLogisticsKey(logisticsWorkingKey) ||
+            normalizeLogisticsKey(currentLogisticsKey) ||
+            normalizeLogisticsKey(prodIdx !== null ? products[prodIdx]?.key : null) ||
+            initialKey;
 
-        if (hasLogisticsChanges) {
-            // ✅ vezmi aktualne vybrany klic (po "Vybrat logisticky klic" se meni currentLogisticsKey a/nebo product.key)
-            const actualKey =
-                (typeof currentLogisticsKey !== 'undefined' && currentLogisticsKey != null && currentLogisticsKey !== '' && currentLogisticsKey !== 'null')
-                    ? currentLogisticsKey
-                    : ((prodIdx !== null && products[prodIdx]?.key != null && products[prodIdx].key !== '' && products[prodIdx].key !== 'null')
-                        ? products[prodIdx].key
-                        : key);
+        if (!targetKey) {
+            alert('Nejdřív vyber platný logistický klíč.');
+            return;
+        }
 
+        const targetBrand = brand;
+        const existingTargetData = logisticsData?.[targetBrand]?.[targetKey] || null;
+        const comparisonData = existingTargetData || emptyLogistics;
+        const hasLogisticsChanges = logisticsChanged(comparisonData, newData);
+        const createsLogisticsKey = !existingTargetData;
+
+        async function applySave(saveLogistics) {
+            if (saveLogistics) {
+                if (!logisticsData[targetBrand]) logisticsData[targetBrand] = {};
+                logisticsData[targetBrand][targetKey] = JSON.parse(JSON.stringify(newData));
+                if (logisticsData[targetBrand][targetKey].PALLET &&
+                    'carton_ean' in logisticsData[targetBrand][targetKey].PALLET) {
+                    delete logisticsData[targetBrand][targetKey].PALLET.carton_ean;
+                }
+            }
+
+            let productChanged = false;
+            if (prodIdx !== null && products[prodIdx]) {
+                const product = products[prodIdx];
+
+                if (normalizeLogisticsKey(product.key) !== targetKey) {
+                    product.key = targetKey;
+                    productChanged = true;
+                }
+
+                if ((product.carton_ean ?? null) !== eanNew) {
+                    product.carton_ean = eanNew;
+                    productChanged = true;
+                }
+
+                // Po přiřazení klíče musí být s logistikou v souladu i tři
+                // hodnoty používané objednávkovým formulářem.
+                if (syncProductPackagingFromLogistics(product, newData)) {
+                    productChanged = true;
+                }
+            }
+
+            currentLogisticsBrand = targetBrand;
+            currentLogisticsKey = targetKey;
+            logisticsWorkingBrand = targetBrand;
+            logisticsWorkingKey = targetKey;
+            logisticsWorkingData = JSON.parse(JSON.stringify(newData));
+
+            document.getElementById('logistics-confirm-modal').style.display = 'none';
+            modal.style.display = 'none';
+
+            if (saveLogistics) await saveLogisticsToRepo();
+            if (productChanged) await saveProductsToRepo();
+
+            renderTable();
+            if (prodIdx !== null) showLogistics(prodIdx);
+        }
+
+        // Existující platný klíč: potvrzení je potřeba pouze při skutečné
+        // změně jeho společných dat. Pouhé přiřazení produktu se uloží samostatně.
+        if (existingTargetData && hasLogisticsChanges) {
             document.getElementById('logistics-confirm-message').textContent =
                 translations[currentLang].logistics_change_confirm
-                    .replace('{brand}', brand)
-                    .replace('{key}', (actualKey == null || actualKey === '' || actualKey === 'null') ? '—' : actualKey);
+                    .replace('{brand}', targetBrand)
+                    .replace('{key}', targetKey);
 
             document.getElementById('logistics-confirm-modal').style.display = 'block';
-
-            document.getElementById('logistics-confirm-yes').onclick = async function () {
-                // ✅ CILOVY klic = to, co je v confirm hlaskce
-                const targetKey = actualKey;
-
-                // Bez klice neukladat (a hlavne nikdy neprepisovat "null" omylem)
-                if (targetKey == null || targetKey === '' || targetKey === 'null') {
-                    alert('Nejdřív vyber logistický klíč (nebudeme ukládat do "null").');
-                    return;
-                }
-
-                // priprav cilovy objekt v logisticsData
-                if (!logisticsData[brand]) logisticsData[brand] = {};
-                if (!logisticsData[brand][targetKey]) {
-                    logisticsData[brand][targetKey] = JSON.parse(JSON.stringify(emptyLogistics));
-                }
-                const target = logisticsData[brand][targetKey];
-
-                // nikdy netahat carton_ean do logistics.json
-                if (target.PALLET && 'carton_ean' in target.PALLET) delete target.PALLET.carton_ean;
-
-                // ✅ propsat zmeny do CILOVEHO klice (target), ne do "data" (puvodni key)
-                for (const [section, values] of Object.entries(newData)) {
-                    if (!target[section]) target[section] = {};
-                    for (const keyName of Object.keys(values)) {
-                        target[section][keyName] = values[keyName];
-                    }
-                }
-
-                // ✅ propsat klic (a pripadne carton_ean) do produktu az po potvrzeni
-                if (prodIdx !== null && products[prodIdx]) {
-                    products[prodIdx].key = targetKey;
-
-                    if (inp) {
-                        products[prodIdx].carton_ean = eanNew;
-                    }
-                }
-
-                // aktualizuj "context" pro dalsi klikani v UI
-                currentLogisticsBrand = brand;
-                currentLogisticsKey = targetKey;
-
-                // zavrit modaly
-                document.getElementById('logistics-confirm-modal').style.display = 'none';
-                modal.style.display = 'none';
-
-                // ulozit logistics
-                try { await saveLogisticsToRepo(); }
-                catch (e) { alert('Uložení logistics.json selhalo: ' + (e.message || e)); }
-
-                // ✅ ulozit products (protoze jsme zmenili product.key a mozna i carton_ean)
-                if (prodIdx !== null) {
-                    try { await saveProductsToRepo(); }
-                    catch (e) { alert('Uložení products.json selhalo: ' + (e.message || e)); }
-                }
-
-                // znovu otevri nahled pro aktualni produkt
-                if (prodIdx !== null) {
-                    showLogistics(prodIdx);
-                }
-            };
-
+            document.getElementById('logistics-confirm-yes').onclick = () => applySave(true);
             document.getElementById('logistics-confirm-no').onclick = function () {
                 document.getElementById('logistics-confirm-modal').style.display = 'none';
             };
-        } else {
-            if (onlyEANChanged && prodIdx !== null) {
-                products[prodIdx].carton_ean = eanNew;
-                try { await saveProductsToRepo(); } // commit i při samotné změně EAN
-                catch (e) { alert('Uložení products.json selhalo: ' + e.message); }
-            }
-            modal.style.display = 'none';
-            if (prodIdx !== null) {
-                showLogistics(prodIdx);
-            }
+            return;
         }
+
+        // Nový klíč se založí přímo. Pokud už klíč existuje a data nebyla
+        // upravena, měníme pouze konkrétní produkt (key/EAN/balení).
+        await applySave(createsLogisticsKey);
     }
 }
 
@@ -2124,4 +2206,5 @@ document.getElementById('cancel-save-button').addEventListener('click', () => {
 document.getElementById('brand').addEventListener('change', function () {
     populateTypeSelect();
     populateLogisticsKeySelect();
+    fillEditPackagingFromSelectedKey(true);
 });

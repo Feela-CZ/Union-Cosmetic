@@ -12,6 +12,9 @@ let logisticsWorkingKey = null;
 let currentLang = 'cs';
 let showingAllKeys = false;
 let showDiscontinued = false;
+let productSaveQueue = Promise.resolve();
+let pendingProductSaveCount = 0;
+let productSaveStatusTimer = null;
 
 const INVALID_LOGISTICS_KEYS = new Set(['', 'null', 'undefined', '___', '—', '-']);
 
@@ -423,14 +426,81 @@ async function apiPut(name, data) {
     }
 }
 
+function getProductSaveStatusElement() {
+    let status = document.getElementById('product-save-status');
+    if (status) return status;
+
+    status = document.createElement('div');
+    status.id = 'product-save-status';
+    Object.assign(status.style, {
+        position: 'fixed',
+        right: '18px',
+        bottom: '18px',
+        zIndex: '10000',
+        padding: '10px 14px',
+        borderRadius: '7px',
+        color: '#fff',
+        fontWeight: '600',
+        boxShadow: '0 2px 10px rgba(0,0,0,.25)',
+        display: 'none'
+    });
+    document.body.appendChild(status);
+    return status;
+}
+
+function updateProductSaveStatus(error = null) {
+    const status = getProductSaveStatusElement();
+    if (productSaveStatusTimer) clearTimeout(productSaveStatusTimer);
+
+    if (error) {
+        status.textContent = currentLang === 'cs' ? 'Uložení selhalo' : 'Save failed';
+        status.style.background = '#c62828';
+        status.style.display = 'block';
+        productSaveStatusTimer = setTimeout(() => { status.style.display = 'none'; }, 5000);
+        return;
+    }
+
+    if (pendingProductSaveCount > 0) {
+        const suffix = pendingProductSaveCount > 1 ? ` (${pendingProductSaveCount})` : '';
+        status.textContent = (currentLang === 'cs' ? 'Ukládám změny' : 'Saving changes') + suffix + '…';
+        status.style.background = '#1565c0';
+        status.style.display = 'block';
+        return;
+    }
+
+    status.textContent = currentLang === 'cs' ? 'Uloženo' : 'Saved';
+    status.style.background = '#2e7d32';
+    status.style.display = 'block';
+    productSaveStatusTimer = setTimeout(() => { status.style.display = 'none'; }, 1200);
+}
+
 async function saveProductsToRepo() {
+    // Každý klik ukládá vlastní neměnný snímek. Fronta zaručí pořadí PUTů
+    // a žádná opožděná odpověď už nepřepíše novější lokální změny.
+    const snapshot = JSON.parse(JSON.stringify(products));
+    pendingProductSaveCount++;
+    updateProductSaveStatus();
+
+    const saveJob = productSaveQueue.then(() => apiPut('products', snapshot));
+    productSaveQueue = saveJob.catch(() => undefined);
+
+    let saveError = null;
     try {
-        await apiPut('products', products);
-        products = await fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`).then(r => r.json());
+        await saveJob;
     } catch (e) {
-        alert('Uložení products.json selhalo: ' + e.message);
+        saveError = e;
+        throw e;
+    } finally {
+        pendingProductSaveCount--;
+        updateProductSaveStatus(saveError);
     }
 }
+
+window.addEventListener('beforeunload', function (event) {
+    if (pendingProductSaveCount === 0) return;
+    event.preventDefault();
+    event.returnValue = '';
+});
 
 function uint8ToBase64(uint8) {
     let binary = "";
