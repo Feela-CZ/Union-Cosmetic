@@ -5,75 +5,172 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="favicon.png">
-    <title>Homepage</title>
+    <title>Union Cosmetic Apps</title>
     <style>
-        body {
-            background: #f6f8fa;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            justify-content: center;
+        :root {
+            --background: #f6f8fa;
+            --button: #1867c0;
+            --button-hover: #115293;
+            --focus: rgba(24, 103, 192, 0.3);
         }
 
-        h1 {
-            margin-bottom: 40px;
-            font-size: 2.5rem;
-            color: #222;
-        }
-
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-            justify-content: flex-start;
-            width: 700px;
-        }
-
-        .app-btn {
-            font-size: 1.8rem;
-            padding: 1.5rem 4rem;
-            border: none;
-            border-radius: 1.2rem;
-            background: #1867c0;
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 4px 20px 0 #0002;
-            transition: background 0.2s, transform 0.15s;
-            margin: 1rem;
-            width: 100%;
+        * {
             box-sizing: border-box;
         }
 
-        .app-btn:hover {
-            background: #115293;
-            transform: translateY(-3px) scale(1.04);
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--background);
+            color: #1f2328;
+            font-family: "Segoe UI", Arial, sans-serif;
         }
 
-        @media (max-width: 600px) {
+        main {
+            width: min(700px, calc(100% - 40px));
+        }
+
+        h1 {
+            margin: 0 0 50px;
+            text-align: center;
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            line-height: 1.2;
+        }
+
+        .button-group {
+            display: grid;
+            gap: 32px;
+        }
+
+        .app-btn {
+            width: 100%;
+            min-height: 86px;
+            padding: 18px 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            border: 0;
+            border-radius: 18px;
+            background: var(--button);
+            color: #fff;
+            box-shadow: 0 8px 22px rgba(31, 35, 40, 0.14);
+            font: inherit;
+            font-size: clamp(1.35rem, 3vw, 1.8rem);
+            cursor: pointer;
+            transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+        }
+
+        .app-btn:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(31, 35, 40, 0.2);
+        }
+
+        .app-btn:focus-visible {
+            outline: 4px solid var(--focus);
+            outline-offset: 4px;
+        }
+
+        .app-btn:active {
+            transform: translateY(0);
+        }
+
+        .app-icon {
+            width: 42px;
+            height: 42px;
+            flex: 0 0 42px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 11px;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .app-icon svg {
+            width: 26px;
+            height: 26px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .app-label {
+            line-height: 1.25;
+        }
+
+        @media (max-width: 560px) {
+            main {
+                width: min(100% - 28px, 700px);
+            }
+
+            h1 {
+                margin-bottom: 34px;
+            }
+
             .button-group {
-                flex-direction: column;
                 gap: 20px;
             }
 
             .app-btn {
-                width: 100%;
-                padding: 1.2rem 0;
+                min-height: 78px;
+                padding: 16px 20px;
+                gap: 14px;
+            }
+
+            .app-icon {
+                width: 38px;
+                height: 38px;
+                flex-basis: 38px;
             }
         }
     </style>
 </head>
 
 <body>
-    <h1>Choose app/Vyber apku:</h1>
-    <div class="button-group">
-        <button class="app-btn" onclick="window.open('./JSON%20edit%20GUI/', '_blank')">📝 "Jason" (Editor dat)</button>
-        <button class="app-btn" onclick="window.open('./OrderSheet/', '_blank')">📊 "Fredy" (Objednávkový
-            formulář)</button>
-    </div>
+    <main>
+        <h1>Choose app/Vyber apku:</h1>
+
+        <div class="button-group">
+            <button class="app-btn" type="button"
+                onclick="window.open('./JSON%20edit%20GUI/', '_blank')"
+                aria-label="Open Jason data editor">
+                <span class="app-icon" aria-hidden="true">
+                    <!-- Data table with edit pencil -->
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="4" width="14" height="16" rx="2"></rect>
+                        <path d="M3 9h14"></path>
+                        <path d="M8 9v11"></path>
+                        <path d="M3 14h9"></path>
+                        <path d="m13.5 18.5.7-3 5.6-5.6a1.4 1.4 0 0 1 2 2l-5.6 5.6-2.7 1z"></path>
+                        <path d="m18.8 10.9 2 2"></path>
+                    </svg>
+                </span>
+                <span class="app-label">„Jason“ (Editor dat)</span>
+            </button>
+
+            <button class="app-btn" type="button"
+                onclick="window.open('./OrderSheet/', '_blank')"
+                aria-label="Open Fredy order form">
+                <span class="app-icon" aria-hidden="true">
+                    <!-- Order form -->
+                    <svg viewBox="0 0 24 24">
+                        <rect x="5" y="4" width="14" height="17" rx="2"></rect>
+                        <path d="M9 4V2.8h6V4"></path>
+                        <path d="M9 9h6"></path>
+                        <path d="M9 13h6"></path>
+                        <path d="M9 17h4"></path>
+                    </svg>
+                </span>
+                <span class="app-label">„Fredy“ (Objednávkový formulář)</span>
+            </button>
+        </div>
+    </main>
 </body>
 
 </html>
