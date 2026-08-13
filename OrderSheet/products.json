@@ -3175,6 +3175,7 @@
     "id": "8596048012805",
     "hs": "33074900",
     "name": "Twister Laundry Perfume Green Land",
+    "csName": "Twister parfém na praní - Green Land",
     "volume": {
       "number": "250",
       "unit": "ml"
@@ -3184,11 +3185,10 @@
     "boxes_per_layer": 25,
     "boxes_per_pallet": 175,
     "key": "250",
-    "new": true,
-    "new_date": "2025-08-14",
+    "new": false,
+    "new_date": "",
     "discontinued": false,
-    "discontinued_date": "",
-    "csName": "Twister parfém na praní - Green Land"
+    "discontinued_date": ""
   },
   {
     "brand": "Twister",
