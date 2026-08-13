@@ -2612,9 +2612,10 @@
   {
     "brand": "Naturalis",
     "type": "Bath Foam",
-    "id": 8595196902716,
-    "hs": 33073000,
+    "id": "8595196902716",
+    "hs": "33073000",
     "name": "Naturalis foam bath Fresh Touch (Peat)",
+    "csName": "Naturalis pěnivá koupel - Fresh Touch",
     "volume": {
       "number": "1000",
       "unit": "ml"
@@ -2623,11 +2624,11 @@
     "pack": 15,
     "boxes_per_layer": 10,
     "boxes_per_pallet": 40,
+    "key": "1000",
     "new": false,
     "new_date": "",
-    "key": 1000,
-    "carton_ean": 8595196904314,
-    "csName": "Naturalis pěnivá koupel - Fresh Touch"
+    "discontinued": true,
+    "discontinued_date": "2026-08-13"
   },
   {
     "brand": "Naturalis",
