@@ -2633,10 +2633,9 @@
   {
     "brand": "Naturalis",
     "type": "Bath Foam",
-    "id": "8595196902723",
-    "hs": "33073000",
+    "id": 8595196902723,
+    "hs": 33073000,
     "name": "Naturalis foam bath Time To Chill (Ginseng)",
-    "csName": "Naturalis pěnivá koupel - Time to Chill",
     "volume": {
       "number": "1000",
       "unit": "ml"
@@ -2645,11 +2644,11 @@
     "pack": 15,
     "boxes_per_layer": 10,
     "boxes_per_pallet": 40,
-    "key": "1000",
     "new": false,
     "new_date": "",
-    "discontinued": true,
-    "discontinued_date": "2026-08-13"
+    "key": 1000,
+    "carton_ean": 8595196903058,
+    "csName": "Naturalis pěnivá koupel - Time to Chill"
   },
   {
     "brand": "Naturalis",
@@ -2675,9 +2674,10 @@
   {
     "brand": "Naturalis",
     "type": "Bath Foam",
-    "id": 8595196902747,
-    "hs": 33073000,
+    "id": "8595196902747",
+    "hs": "33073000",
     "name": "Naturalis foam bath Magic Moments (Lotus Blossom)",
+    "csName": "Naturalis pěnivá koupel - Magic Moments",
     "volume": {
       "number": "1000",
       "unit": "ml"
@@ -2686,11 +2686,11 @@
     "pack": 15,
     "boxes_per_layer": 10,
     "boxes_per_pallet": 40,
+    "key": "1000",
     "new": false,
     "new_date": "",
-    "key": 1000,
-    "carton_ean": 8595196903041,
-    "csName": "Naturalis pěnivá koupel - Magic Moments"
+    "discontinued": true,
+    "discontinued_date": "2026-08-13"
   },
   {
     "brand": "Naturalis",
