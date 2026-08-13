@@ -97,7 +97,7 @@ const logoMap = {
     "Naturalis": "logo-naturalis.png",
     "Twister": "logo_twister.jpg",
     "Natava": "logo-natava.png",
-    "Sunnoré": null
+    "Sunnoré": "logo-sunnore.png"
 };
 
 fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`)
