@@ -2692,9 +2692,10 @@
   {
     "brand": "Naturalis",
     "type": "Bath Foam",
-    "id": 8595196902761,
-    "hs": null,
+    "id": "8595196902761",
+    "hs": "",
     "name": "Naturalis relaxation bath Tea Spa (Green Tea)",
+    "csName": "Naturalis relaxační lázeň - Tea Spa",
     "volume": {
       "number": "1000",
       "unit": "ml"
@@ -2703,18 +2704,19 @@
     "pack": 15,
     "boxes_per_layer": 10,
     "boxes_per_pallet": 40,
+    "key": "",
     "new": false,
     "new_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Naturalis relaxační lázeň - Tea Spa"
+    "discontinued": true,
+    "discontinued_date": "2026-08-13"
   },
   {
     "brand": "Naturalis",
     "type": "Bath Foam",
-    "id": 8595196902785,
-    "hs": 33073000,
+    "id": "8595196902785",
+    "hs": "33073000",
     "name": "Naturalis relaxation bath Indian Summer (Desert)",
+    "csName": "Naturalis relaxační lázeň - Indian Summer",
     "volume": {
       "number": "1000",
       "unit": "ml"
@@ -2723,11 +2725,11 @@
     "pack": 15,
     "boxes_per_layer": 10,
     "boxes_per_pallet": 40,
+    "key": "1000",
     "new": false,
     "new_date": "",
-    "key": 1000,
-    "carton_ean": 8595196903034,
-    "csName": "Naturalis relaxační lázeň - Indian Summer"
+    "discontinued": true,
+    "discontinued_date": "2026-08-13"
   },
   {
     "brand": "Naturalis",
@@ -3462,8 +3464,9 @@
     "brand": "Lilien",
     "type": "Sun Care",
     "id": "8596048002837",
-    "hs": 33049900,
+    "hs": "33049900",
     "name": "Sun Active Emulsion SPF 20",
+    "csName": "Lilien Sun Active opalovací emulze OF 20 -",
     "volume": {
       "number": "200",
       "unit": "ml"
@@ -3472,20 +3475,19 @@
     "pack": 12,
     "boxes_per_layer": 27,
     "boxes_per_pallet": 243,
+    "key": "",
     "new": false,
     "new_date": "",
-    "discontinued": false,
-    "discontinued_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Lilien Sun Active opalovací emulze OF 20 -"
+    "discontinued": true,
+    "discontinued_date": "2026-08-13"
   },
   {
     "brand": "Lilien",
     "type": "Sun Care",
-    "id": 8596048002752,
-    "hs": 33049900,
+    "id": "8596048002752",
+    "hs": "33049900",
     "name": "Sun Active Aftersun Milk",
+    "csName": "Lilien Sun Active mléko po opalování",
     "volume": {
       "number": "200",
       "unit": "ml"
@@ -3494,18 +3496,19 @@
     "pack": 14,
     "boxes_per_layer": 27,
     "boxes_per_pallet": 189,
+    "key": "",
     "new": false,
     "new_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Lilien Sun Active mléko po opalování"
+    "discontinued": true,
+    "discontinued_date": "2026-08-13"
   },
   {
     "brand": "Lilien",
     "type": "Sun Care",
-    "id": 8596048002905,
-    "hs": 33049900,
+    "id": "8596048002905",
+    "hs": "33049900",
     "name": "Sun Active Burn Relief Ice Gel",
+    "csName": "Lilien Sun Active chladivý gel po opalování",
     "volume": {
       "number": "200",
       "unit": "ml"
@@ -3514,18 +3517,19 @@
     "pack": 14,
     "boxes_per_layer": 27,
     "boxes_per_pallet": 189,
+    "key": "",
     "new": false,
     "new_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Lilien Sun Active chladivý gel po opalování"
+    "discontinued": true,
+    "discontinued_date": "2026-08-13"
   },
   {
     "brand": "Lilien",
     "type": "Sun Care",
-    "id": 8596048002912,
-    "hs": 33049900,
+    "id": "8596048002912",
+    "hs": "33049900",
     "name": "Sun Active Panthenol Spray (4%)",
+    "csName": "Lilien Sun Active panthenol sprej po opalování",
     "volume": {
       "number": "200",
       "unit": "ml"
@@ -3534,11 +3538,11 @@
     "pack": 14,
     "boxes_per_layer": 27,
     "boxes_per_pallet": 189,
+    "key": "",
     "new": false,
     "new_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Lilien Sun Active panthenol sprej po opalování"
+    "discontinued": true,
+    "discontinued_date": "2026-08-13"
   },
   {
     "brand": "Natava",
@@ -6136,10 +6140,10 @@
       "unit": "g"
     },
     "price": 0.95,
-    "pack": "",
-    "boxes_per_layer": "",
-    "boxes_per_pallet": "",
-    "key": null,
+    "pack": 20,
+    "boxes_per_layer": 41,
+    "boxes_per_pallet": 410,
+    "key": "4g",
     "new": true,
     "new_date": "2026-03-01",
     "discontinued": false,
