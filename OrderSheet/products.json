@@ -1693,9 +1693,10 @@
   {
     "brand": "Lilien",
     "type": "Body Lotion",
-    "id": 8595196909500,
-    "hs": 33049900,
+    "id": "8595196909500",
+    "hs": "33049900",
     "name": "Lilien Body lotion Aloe Vera",
+    "csName": "Lilien tělové mléko Aloe Vera - cestovní balení",
     "volume": {
       "number": "50",
       "unit": "ml"
@@ -1704,11 +1705,11 @@
     "pack": 25,
     "boxes_per_layer": 25,
     "boxes_per_pallet": 350,
+    "key": "50",
     "new": false,
     "new_date": "",
-    "key": null,
-    "carton_ean": 8594008297545,
-    "csName": "Lilien tělové mléko Aloe Vera - cestovní balení"
+    "discontinued": false,
+    "discontinued_date": ""
   },
   {
     "brand": "Lilien",
@@ -1726,8 +1727,8 @@
     "boxes_per_pallet": 250,
     "new": false,
     "new_date": "",
-    "key": null,
-    "carton_ean": 8596048011082,
+    "key": "100C",
+    "carton_ean": null,
     "csName": "Lilien vlasový šampon 2v1 - cestovní balení"
   },
   {
@@ -2611,9 +2612,10 @@
   {
     "brand": "Naturalis",
     "type": "Bath Foam",
-    "id": 8595196902716,
-    "hs": 33073000,
+    "id": "8595196902716",
+    "hs": "33073000",
     "name": "Naturalis foam bath Fresh Touch (Peat)",
+    "csName": "Naturalis pěnivá koupel - Fresh Touch",
     "volume": {
       "number": "1000",
       "unit": "ml"
@@ -2622,18 +2624,19 @@
     "pack": 15,
     "boxes_per_layer": 10,
     "boxes_per_pallet": 40,
+    "key": "1000",
     "new": false,
     "new_date": "",
-    "key": 1000,
-    "carton_ean": 8595196904314,
-    "csName": "Naturalis pěnivá koupel - Fresh Touch"
+    "discontinued": true,
+    "discontinued_date": "2026-08-13"
   },
   {
     "brand": "Naturalis",
     "type": "Bath Foam",
-    "id": 8595196902723,
-    "hs": 33073000,
+    "id": "8595196902723",
+    "hs": "33073000",
     "name": "Naturalis foam bath Time To Chill (Ginseng)",
+    "csName": "Naturalis pěnivá koupel - Time to Chill",
     "volume": {
       "number": "1000",
       "unit": "ml"
@@ -2642,11 +2645,11 @@
     "pack": 15,
     "boxes_per_layer": 10,
     "boxes_per_pallet": 40,
+    "key": "1000",
     "new": false,
     "new_date": "",
-    "key": 1000,
-    "carton_ean": 8595196903058,
-    "csName": "Naturalis pěnivá koupel - Time to Chill"
+    "discontinued": true,
+    "discontinued_date": "2026-08-13"
   },
   {
     "brand": "Naturalis",
@@ -2672,9 +2675,10 @@
   {
     "brand": "Naturalis",
     "type": "Bath Foam",
-    "id": 8595196902747,
-    "hs": 33073000,
+    "id": "8595196902747",
+    "hs": "33073000",
     "name": "Naturalis foam bath Magic Moments (Lotus Blossom)",
+    "csName": "Naturalis pěnivá koupel - Magic Moments",
     "volume": {
       "number": "1000",
       "unit": "ml"
@@ -2683,11 +2687,11 @@
     "pack": 15,
     "boxes_per_layer": 10,
     "boxes_per_pallet": 40,
+    "key": "1000",
     "new": false,
     "new_date": "",
-    "key": 1000,
-    "carton_ean": 8595196903041,
-    "csName": "Naturalis pěnivá koupel - Magic Moments"
+    "discontinued": true,
+    "discontinued_date": "2026-08-13"
   },
   {
     "brand": "Naturalis",
