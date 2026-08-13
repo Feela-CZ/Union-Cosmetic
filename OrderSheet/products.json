@@ -3526,9 +3526,10 @@
   {
     "brand": "Lilien",
     "type": "Sun Care",
-    "id": 8596048002912,
-    "hs": 33049900,
+    "id": "8596048002912",
+    "hs": "33049900",
     "name": "Sun Active Panthenol Spray (4%)",
+    "csName": "Lilien Sun Active panthenol sprej po opalování",
     "volume": {
       "number": "200",
       "unit": "ml"
@@ -3537,11 +3538,11 @@
     "pack": 14,
     "boxes_per_layer": 27,
     "boxes_per_pallet": 189,
+    "key": "",
     "new": false,
     "new_date": "",
-    "key": null,
-    "carton_ean": null,
-    "csName": "Lilien Sun Active panthenol sprej po opalování"
+    "discontinued": true,
+    "discontinued_date": "2026-08-13"
   },
   {
     "brand": "Natava",
