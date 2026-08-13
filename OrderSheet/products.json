@@ -1693,9 +1693,10 @@
   {
     "brand": "Lilien",
     "type": "Body Lotion",
-    "id": 8595196909500,
-    "hs": 33049900,
+    "id": "8595196909500",
+    "hs": "33049900",
     "name": "Lilien Body lotion Aloe Vera",
+    "csName": "Lilien tělové mléko Aloe Vera - cestovní balení",
     "volume": {
       "number": "50",
       "unit": "ml"
@@ -1704,11 +1705,11 @@
     "pack": 25,
     "boxes_per_layer": 25,
     "boxes_per_pallet": 350,
+    "key": "50",
     "new": false,
     "new_date": "",
-    "key": null,
-    "carton_ean": 8594008297545,
-    "csName": "Lilien tělové mléko Aloe Vera - cestovní balení"
+    "discontinued": false,
+    "discontinued_date": ""
   },
   {
     "brand": "Lilien",
