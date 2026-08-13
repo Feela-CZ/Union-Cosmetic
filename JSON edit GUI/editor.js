@@ -62,6 +62,24 @@ function syncProductPackagingFromLogistics(product, data) {
     return changed;
 }
 
+function fillEditPackagingFromSelectedKey(overwrite = true) {
+    const brand = document.getElementById('brand')?.value?.trim();
+    const key = normalizeLogisticsKey(document.getElementById('logistics-key')?.value);
+    const data = key ? logisticsData?.[brand]?.[key] : null;
+
+    const fields = {
+        pack: data ? logisticsCount(data?.CARTON?.nr_of_items) : '',
+        boxes_per_layer: data ? logisticsCount(data?.LAYER?.nr_of_cartons) : '',
+        boxes_per_pallet: data ? logisticsCount(data?.PALLET?.nr_of_cartons) : ''
+    };
+
+    Object.entries(fields).forEach(([id, value]) => {
+        const input = document.getElementById(id);
+        if (!input) return;
+        if (overwrite || input.value.trim() === '') input.value = value;
+    });
+}
+
 function sanitizeLogisticsData(data) {
     Object.keys(data || {}).forEach(brand => {
         Object.keys(data[brand] || {}).forEach(key => {
@@ -594,6 +612,11 @@ function initUI() {
     });
     document.getElementById('logistics-key-filter').addEventListener('change', renderTable);
     document.getElementById('type-filter').addEventListener('change', renderTable);
+
+    // Stejné předvyplnění logistiky jako v modalu pro přidání produktu.
+    document.getElementById('logistics-key').addEventListener('change', function () {
+        fillEditPackagingFromSelectedKey(true);
+    });
 
     document.getElementById('choose-logistics-key-btn').addEventListener('click', function () {
         const selectedBrand = currentLogisticsBrand;
@@ -1546,6 +1569,9 @@ function editProduct(index) {
     document.getElementById('pack').value = product.pack;
     document.getElementById('boxes_per_layer').value = product.boxes_per_layer;
     document.getElementById('boxes_per_pallet').value = product.boxes_per_pallet;
+    // U starších záznamů mohl být klíč vyplněný, ale odvozená pole prázdná.
+    // Doplníme jen chybějící hodnoty; existující produktová data zachováme.
+    fillEditPackagingFromSelectedKey(false);
     document.getElementById('new').checked = product.new;
     document.getElementById('new_date').value = product.new_date;
     document.getElementById('discontinued').checked = product.discontinued === true;
@@ -2180,4 +2206,5 @@ document.getElementById('cancel-save-button').addEventListener('click', () => {
 document.getElementById('brand').addEventListener('change', function () {
     populateTypeSelect();
     populateLogisticsKeySelect();
+    fillEditPackagingFromSelectedKey(true);
 });
