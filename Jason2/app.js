@@ -185,7 +185,7 @@ function openProduct(index=null,tab='details',duplicate=false){
    for(const n of ['price','pack','boxes_per_layer','boxes_per_pallet']){const v=num(n);if(v!==''&&(!Number.isFinite(v)||v<0||['pack','boxes_per_layer','boxes_per_pallet'].includes(n)&&!Number.isInteger(v)))throw Error('numeric');}
    const id=str('id');if(!id)throw Error('EAN_REQUIRED');if(!str('brand'))throw Error('KEY_REQUIRED');
    const patch={brand:str('brand'),type:str('type'),id,hs:str('hs'),name:str('name'),csName:str('csName'),volume:{...(p.volume||{}),number:preserve('volume',p.volume?.number,str('volume-number')),unit:str('volume-unit')},price:preserve('price',p.price,num('price')),key:preserve('key',p.key,str('key')||null),carton_ean:preserve('carton_ean',p.carton_ean,str('carton_ean')||null),...Object.fromEntries(['pack','boxes_per_layer','boxes_per_pallet'].map(n=>[n,preserve(n,p[n],num(n))]))};
-   for(const v of ['new','discontinued']){patch[v]=elements[v].checked;patch[v+'_date']=elements[v].checked?(str(v+'_date')||today()):'';}
+   for(const v of ['new','discontinued']){const checked=elements[v].checked,flagChanged=(p[v]===true)!==checked;patch[v]=flagChanged?checked:p[v];patch[v+'_date']=flagChanged?(checked?(str(v+'_date')||today()):''):preserve(v+'_date',p[v+'_date'],str(v+'_date'));}
    const flagList=[...new Set(str('flags').split(',').map(s=>s.trim()).filter(Boolean))];if(p.flags!==undefined||flagList.length)patch.flags=flagList;
    const target=duplicate?null:index;const record=M.saveProduct(duplicate?p:original,patch,state.products,target,state.logistics);
    // If an EAN changes (or a product is copied), retain its visible photo at the new filename.
