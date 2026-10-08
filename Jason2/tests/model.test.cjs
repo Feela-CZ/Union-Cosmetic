@@ -14,3 +14,26 @@ test('bad imports are rejected, safe extension fields retained',()=>{for(const v
 test('placeholder keys excluded without deleting original data',()=>{const data={Lilien:{null:{x:1},___:{x:2},'500':{x:3}}};assert.equal(M.keyEntries(data).length,1);assert.deepEqual(data.Lilien.null,{x:1});assert.equal(M.key('null'),null);});
 
 test('historical duplicate EAN does not block unrelated edits but new duplicates are rejected',()=>{const rows=[product,{...product,name:'Historical duplicate'}];assert.equal(M.saveProduct(product,{price:2},rows,0,logistics).price,2);assert.throws(()=>M.saveProduct(product,{id:product.id},rows,null,logistics),/EAN_DUPLICATE/);});
+
+const duplicateIssues=products=>M.issues({products,logistics}).filter(r=>r.code==='eanDuplicate');
+test('real Honey and Oat replacement sharing a discontinued EAN is not a duplicate',()=>{
+ const rows=JSON.parse(fs.readFileSync(require('node:path').join(__dirname,'../../OrderSheet/products.json'),'utf8')).filter(p=>String(p.id)==='8596048005128');
+ assert.equal(rows.length,2);assert.equal(rows.filter(p=>p.discontinued===true).length,1);assert.notEqual(rows[0].price,rows[1].price);
+ const before=M.clone(rows);assert.deepEqual(duplicateIssues(rows),[]);assert.deepEqual(duplicateIssues([...rows].reverse()),[]);assert.deepEqual(rows,before);
+});
+test('active duplicates remain findings even with different prices and legacy status values',()=>{
+ for(const discontinued of [false,null,undefined]){
+  const rows=[{...product,discontinued},{...product,id:Number(product.id),price:2,discontinued:false}];
+  assert.deepEqual(duplicateIssues(rows).map(r=>r.index),[0,1]);
+ }
+});
+test('multiple active duplicates are each reported once and discontinued records excluded',()=>{
+ const rows=[{...product,discontinued:true},product,{...product,price:2},{...product,price:3}];
+ assert.deepEqual(duplicateIssues(rows).map(r=>r.index),[1,2,3]);
+ assert.deepEqual(duplicateIssues(rows.map(p=>({...p,discontinued:true}))),[]);
+});
+test('discontinued records still receive other data checks',()=>{
+ const rows=M.issues({products:[{...product,discontinued:true,id:'invalid',price:-1,key:'unknown'}],logistics});
+ for(const code of ['eanInvalid','priceInvalid','keyUnknown'])assert.ok(rows.some(r=>r.code===code));
+});
+

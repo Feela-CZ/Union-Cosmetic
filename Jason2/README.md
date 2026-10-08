@@ -13,10 +13,11 @@ Třetí volba na úvodní stránce Union Cosmetic. Původní Jason a OrderSheet 
 
 ## Funkce
 
-Hledání bez diakritiky, filtry, řazení, stránkování, detail produktu, kopírování, logistické klíče se sdílenými počty balení, původní příznaky i vlastní příznaky, hromadné změny, kontroly dat, fotografie, JSON zálohy, XLSX export, čeština/angličtina a vrácení změn. Neznámá pole JSON a původní typy nezměněných hodnot se zachovávají. Kontroly existující nesoulady automaticky neopravují.
+Hledání bez diakritiky, filtry, řazení, stránkování, detail produktu, kopírování, logistické klíče se sdílenými počty balení, původní příznaky i vlastní příznaky, hromadné změny, kontroly dat, fotografie, JSON zálohy, XLSX export, čeština/angličtina a vrácení změn. Neznámá pole JSON a původní typy nezměněných hodnot se zachovávají. Kontroly existující nesoulady automaticky neopravují. Duplicitní EAN se hlásí pouze mezi aktivními produkty (`discontinued !== true`); ukončená varianta může mít stejný EAN jako její náhrada. Odlišná cena není výjimkou z kontroly.
 
 Statická aplikace bez sestavení a bez nových služeb. Excel používá stávající `JSON edit GUI/xlsx.full.min.js`; export logistiky zachovává matici hodnot, vizuální styl starého ExcelJS exportu nekopíruje.
 
 ## Ověření
 
 Node 24+: `npm install`, `npm test`. Testy prověřují model, uživatelské postupy v simulovaném DOM a API adaptér s testovacími odpověďmi; nemění produkční data. Živý web je zvlášť zkontrolován v prohlížeči bez ukládání změn do katalogu.
+

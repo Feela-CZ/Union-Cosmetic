@@ -65,8 +65,11 @@ function filterProducts(products,f={}){
 function eanValid(value){ const s=String(value);if(!/^\d{13}$/.test(s))return false;return (10-[...s.slice(0,12)].reduce((a,v,i)=>a+Number(v)*(i%2?3:1),0)%10)%10===Number(s[12]); }
 function issues(state){
  const out=[],ids=new Map();
+ // A discontinued version may share its EAN with its active replacement.
+ // Count only active records and report each conflicting record once.
+ state.products.forEach(p=>{if(p.id&&p.discontinued!==true){const id=String(p.id);ids.set(id,(ids.get(id)||0)+1);}});
  state.products.forEach((p,i)=>{const add=(code,field)=>out.push({kind:'product',index:i,code,field});
-  if(!p.id)add('eanMissing','id');else{if(ids.has(String(p.id))){add('eanDuplicate','id');out.push({kind:'product',index:ids.get(String(p.id)),code:'eanDuplicate',field:'id'});}ids.set(String(p.id),i);if(!eanValid(p.id))add('eanInvalid','id');}
+  if(!p.id)add('eanMissing','id');else{if(p.discontinued!==true&&ids.get(String(p.id))>1)add('eanDuplicate','id');if(!eanValid(p.id))add('eanInvalid','id');}
   for(const f of ['brand','type','name','csName'])if(!p[f])add('missing',f);
   if(p.price==null||p.price===''||!Number.isFinite(Number(p.price))||Number(p.price)<0)add('priceInvalid','price');
   const k=key(p.key),l=k?state.logistics[p.brand]?.[k]:null;
@@ -85,3 +88,4 @@ function issues(state){
 const api={clone,sections,key,fold,count,validateProducts,validateLogistics,emptyLogistics,syncPackaging,saveProduct,keyEntries,applyLogistics,renameKey,filterProducts,eanValid,issues};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.JasonModel=api;
 })(typeof window!=='undefined'?window:globalThis);
+

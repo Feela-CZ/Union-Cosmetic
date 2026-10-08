@@ -43,6 +43,16 @@ async function setup(shared=false,initialRemote=null){
  await test('language switches core UI, product types and forms',async()=>{click('[data-lang=en]');await wait(()=>$('h1').textContent==='Products');click('#create');assert.equal($('#tab-packaging').textContent,'Packaging & logistics');click('#editor-close');});
  await test('backup restoration keeps data/photos and disconnects',async()=>{const s=await saved();await upload('backup',{format:'jason-backup',version:1,products:s.products,logistics:s.logistics,photos:{}});assert.equal((await saved()).connected,false);assert.deepEqual((await saved()).products,s.products);});
  assert.deepEqual(errors,[]);c.dom.window.close();
+ const history=await setup();
+ await test('checks suppress discontinued EAN replacements and expose active duplicates',async()=>{
+  const rows=JSON.parse(fs.readFileSync(path.join(__dirname,'../../OrderSheet/products.json'),'utf8')).filter(p=>String(p.id)==='8596048005128');
+  await history.upload('products',rows);history.click('[data-view=checks]');
+  assert.ok(!history.$('#content').textContent.includes('Duplicitní EAN'));
+  await history.upload('products',rows.map(p=>({...p,discontinued:false})));
+  assert.equal(history.$$('tbody tr').filter(r=>r.textContent.includes('Duplicitní EAN / ID mezi aktivními produkty')).length,2);
+  assert.deepEqual(history.errors,[]);
+ });
+ history.dom.window.close();
  // Deterministic API adapter checks using fake responses, no network.
  const d=await setup();let remote={products:[clone(fixture)],logistics:clone(logistics)},puts=[],fail=false,conflict=false;
  d.w.fetch=async(url,args={})=>{const n=new URL(url).pathname.split('/').pop();if(!String(url).startsWith('https://mock.test'))return {ok:false,status:404,text:async()=>''};if(args.method==='PUT'){const value=JSON.parse(args.body);puts.push({name:n,data:value});if(n==='products'&&fail)return {ok:false,status:500,text:async()=>'TEST FAILURE'};if(n!=='upload-image')remote[n]=value;return {ok:true,status:200};}return {ok:true,status:200,json:async()=>clone(conflict&&n==='products'?[{...fixture,name:'OTHER USER'}]:remote[n])};};
@@ -64,3 +74,4 @@ async function setup(shared=false,initialRemote=null){
  await test('automatic refresh never overwrites an open product form',async()=>{f.click('[data-edit="0"]');f.input('#field-name','DRAFT');live.products[0].name='ANOTHER EDIT';f.w.dispatchEvent(new f.w.Event('focus'));await sleep(30);assert.equal(f.$('#field-name').value,'DRAFT');assert.equal((await f.saved()).products[0].name,'LEGACY UPDATED');});
  f.dom.window.close();console.log(`ALL ${passed} DOM/API FLOW CHECKS PASSED`);
 })().catch(e=>{console.error(e);process.exit(1);});
+
