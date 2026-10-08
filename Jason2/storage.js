@@ -1,0 +1,10 @@
+(function(root){
+'use strict';
+let dbPromise;
+function db(){return dbPromise||(dbPromise=new Promise((resolve,reject)=>{const req=indexedDB.open(window.JASON_CONFIG?.workspaceName||'jason-workspace-v2',1);req.onupgradeneeded=()=>req.result.createObjectStore('workspace');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);}));}
+async function get(name){const d=await db();return new Promise((resolve,reject)=>{const tx=d.transaction('workspace');const r=tx.objectStore('workspace').get(name);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
+async function put(name,value){const d=await db();return new Promise((resolve,reject)=>{const tx=d.transaction('workspace','readwrite');tx.objectStore('workspace').put(value,name);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);});}
+async function request(base,name,method='GET',data){const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),30000);try{const r=await fetch(`${base.replace(/\/$/,'')}/api/${name}${method==='GET'?'?ts='+Date.now():''}`,{method,headers:method==='PUT'?{'Content-Type':'application/json'}:{},body:method==='PUT'?JSON.stringify(data):undefined,signal:controller.signal,cache:'no-store'});if(!r.ok)throw Error(`HTTP ${r.status}: ${(await r.text()).slice(0,180)}`);if(method==='GET')return await r.json();return true;}finally{clearTimeout(timeout);}}
+async function jpeg(file){if(!/^image\/(jpeg|png|webp)$/.test(file.type))throw Error('PHOTO_TYPE');if(file.size>15*1024*1024)throw Error('PHOTO_SIZE');const image=await createImageBitmap(file);const scale=Math.min(1,2000/Math.max(image.width,image.height));const canvas=document.createElement('canvas');canvas.width=Math.round(image.width*scale);canvas.height=Math.round(image.height*scale);const ctx=canvas.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(image,0,0,canvas.width,canvas.height);image.close();return canvas.toDataURL('image/jpeg',0.92);}
+root.JasonStorage={get,put,request,jpeg};
+})(window);

@@ -104,6 +104,11 @@
             line-height: 1.25;
         }
 
+        .app-btn-preview { background: #196650; }
+        .app-btn-preview:hover { background: #124c3c; }
+        .preview-label { display: block; margin-top: 5px; font-size: 0.52em; font-weight: 400; opacity: 0.85; }
+        body { padding: 30px 0; }
+
         @media (max-width: 560px) {
             main {
                 width: min(100% - 28px, 700px);
@@ -169,8 +174,23 @@
                 </span>
                 <span class="app-label">„Fredy“ (Objednávkový formulář)</span>
             </button>
+
+            <button class="app-btn app-btn-preview" type="button"
+                onclick="window.open('./Jason2/', '_blank')"
+                aria-label="Open Jason 2.0 data editor, test version">
+                <span class="app-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                        <path d="M3 9h18"></path>
+                        <path d="M9 9v11"></path>
+                        <path d="m13 15 2 2 4-4"></path>
+                    </svg>
+                </span>
+                <span class="app-label">„Jason 2.0“ <small class="preview-label">Testovací verze / Preview</small></span>
+            </button>
         </div>
     </main>
 </body>
 
 </html>
+
