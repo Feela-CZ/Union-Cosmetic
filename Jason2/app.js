@@ -3,7 +3,7 @@
 'use strict';
 const M=JasonModel,S=JasonStorage,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const icons={products:'▦',keys:'◇',checks:'✓',data:'↔',help:'?',undo:'↶',redo:'↷',export:'↓',plus:'+'};
+const icons={products:'▦',keys:'◇',checks:'✓',data:'↔',undo:'↶',redo:'↷',export:'↓',plus:'+'};
 let lang='cs',view='products',page=1,pageSize=30,sort={field:'name',asc:true},selected=new Set(),history=[],future=[],busy=false,editorDirty=false,editorSave=null,toastTimer,syncing=false,storageError=false;
 let state={products:[],logistics:M.clone(window.JASON_SEED_LOGISTICS||{}),photos:{},pendingPhotos:[],connected:false,api:JASON_CONFIG.apiBase,imageBase:JASON_CONFIG.imageBase,baseline:{},updated:null};
 let filters={search:'',brand:'',type:'',key:'',status:'active',flag:'',scope:''};
@@ -80,19 +80,17 @@ function render(){
  $$('[data-text]').forEach(e=>e.textContent=t(e.dataset.text));$$('[data-lang]').forEach(e=>{e.classList.toggle('active',e.dataset.lang===lang);e.setAttribute('aria-pressed',e.dataset.lang===lang);});
  $('#nav').innerHTML=['products','keys','checks'].map(v=>`<button class="nav-button ${view===v?'active':''}" data-view="${v}" ${view===v?'aria-current="page"':''}><span class="nav-icon">${icons[v]}</span>${esc(t(v))}<span class="nav-count">${v==='products'?state.products.length:v==='keys'?M.keyEntries(state.logistics).length:M.issues(state).length}</span></button>`).join('');
  $$('[data-view]').forEach(b=>b.onclick=()=>changeView(b.dataset.view));
- $('#data-button').innerHTML=`<span class="nav-icon">↔</span>${esc(t('data'))}`;$('#help-button').innerHTML=`<span class="nav-icon">?</span>${esc(t('help'))}`;
+ $('#data-button').innerHTML=`<span class="nav-icon">↔</span>${esc(t('data'))}`;
  $('#crumb').textContent=t(view);$('#page-title').textContent=t(view);$('#page-description').textContent=t(view==='products'?'subtitle':view==='keys'?'keyHelp':'checksHint');
  $('#undo').textContent=icons.undo;$('#undo').title=t('undo');$('#undo').setAttribute('aria-label',t('undo'));$('#undo').disabled=!history.length;
  $('#redo').textContent=icons.redo;$('#redo').title=t('redo');$('#redo').setAttribute('aria-label',t('redo'));$('#redo').disabled=!future.length;
  $('#export').textContent=`↓ ${t('export')}`;$('#create').textContent=`+ ${t(view==='keys'?'addKey':'addProduct')}`;$('#create').hidden=view==='checks';$('#create').disabled=refreshing||(JASON_CONFIG.sharedOnly&&JASON_CONFIG.autoConnect&&!state.connected);
- const active=state.products.filter(p=>p.discontinued!==true).length;
- $('#stats').innerHTML=[['products',state.products.length,`${active} ${t('active').toLowerCase()}`],['keys',M.keyEntries(state.logistics).length,t('packaging')],['checks',M.issues(state).length,t('checks')]].map(([v,n,sub])=>`<button class="stat-card ${v===view?'current':''}" data-stat="${v}"><span>${esc(t(v))}</span><strong>${n.toLocaleString(lang==='cs'?'cs-CZ':'en-GB')}</strong><small>${esc(sub)}</small></button>`).join('');
- $$('[data-stat]').forEach(b=>b.onclick=()=>changeView(b.dataset.stat));renderToolbar();renderContent();renderStatus();
+ renderToolbar();renderContent();renderStatus();
 }
 function changeView(next){view=next;page=1;selected.clear();filters={search:'',brand:'',type:'',key:'',status:'active',flag:'',scope:''};location.hash=next;render();}
 function renderToolbar(){
  const searchPlaceholder=t(view==='products'?'search':view==='keys'?'keySearch':'issueSearch');
- let html=`<label class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="${esc(searchPlaceholder)}" aria-label="${esc(searchPlaceholder)}" value="${esc(filters.search)}"><kbd>Ctrl K</kbd></label>`;
+ let html=`<label class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="${esc(searchPlaceholder)}" aria-label="${esc(searchPlaceholder)}" value="${esc(filters.search)}"></label>`;
  html+=selectHTML('filter-brand','brand',brands(),filters.brand,'allBrands');
  if(view==='products'){
   html+=selectHTML('filter-type','type',[...new Set([...types(),...state.products.map(p=>p.type)])].filter(Boolean).map(v=>({value:v,label:typeLabel(v)})),filters.type,'allTypes');
@@ -281,30 +279,24 @@ function openExport(){
  }
  function fillExportKeys(){const b=$('#export-brand').value,include=$('#include-empty').checked;$('#export-key-list').innerHTML=M.keyEntries(state.logistics).map((r,i)=>({r,i})).filter(({r})=>(!b||r.brand===b)&&(include||completion(r.data)>0)).map(({r,i})=>`<label class="checkbox-label"><input type="checkbox" data-export-key="${i}" checked>${esc(r.brand)} / <strong>${esc(r.key)}</strong><small>${completion(r.data)}%</small></label>`).join('')||`<p class="muted">${t('nothing')}</p>`;}
  $('#export-tab-products').onclick=()=>{mode='products';options();};$('#export-tab-keys').onclick=()=>{mode='keys';options();};options();
- $('#export-form').onsubmit=e=>{e.preventDefault();try{if(mode==='products')exportProducts();else exportLogistics($$('[data-export-key]:checked').map(c=>M.keyEntries(state.logistics)[Number(c.dataset.exportKey)]));}catch(err){error(err);}};attachCancel();
+ $('#export-form').onsubmit=e=>{e.preventDefault();void runForm(async()=>{if(mode==='products')await exportProducts();else await exportLogistics($$('[data-export-key]:checked').map(c=>M.keyEntries(state.logistics)[Number(c.dataset.exportKey)]));});};attachCancel();
 }
-function exportProducts(){
+async function exportProducts(){
  const rows=filteredProducts();if(!rows.length)throw Error(t('nothing'));
  const names=['brand','type','id','hs','name','csName','volume','price','key','pack','boxes_per_layer','boxes_per_pallet','carton_ean','new','new_date','discontinued','discontinued_date','flags'];
- const data=[names.map(n=>t(n==='id'?'ean':n)),...rows.map(({p})=>names.map(n=>n==='volume'?`${p.volume?.number??''} ${p.volume?.unit||''}`.trim():n==='flags'?(p.flags||[]).join(', '):n==='type'?typeLabel(p[n]):['id','hs','carton_ean'].includes(n)?String(p[n]??''):p[n]??''))];
- const ws=XLSX.utils.aoa_to_sheet(data);ws['!cols']=names.map(n=>({wch:['name','csName'].includes(n)?45:n==='flags'?30:18}));ws['!autofilter']={ref:ws['!ref']};const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Products');XLSX.writeFile(wb,`products-${today()}.xlsx`);
+ const data=rows.map(({p})=>names.map(n=>n==='volume'?`${p.volume?.number??''} ${p.volume?.unit||''}`.trim():n==='flags'?(p.flags||[]).join(', '):n==='type'?typeLabel(p[n]):['id','hs','carton_ean'].includes(n)?String(p[n]??''):['new','discontinued'].includes(n)?(p[n]===true?t('yes'):t('no')):p[n]??''));
+ const wb=JasonExport.products({fields:names,headers:names.map(n=>t(n==='id'?'ean':n)),rows:data,title:t('exportProducts'),date:today(),count:rows.length,countLabel:t('countProducts')});
+ await JasonExport.download(wb,`products-${today()}.xlsx`);
 }
-function exportLogistics(entries){
- if(!entries.length)throw Error(t('nothing'));const wb=XLSX.utils.book_new();
- const byBrand=Object.groupBy?Object.groupBy(entries,r=>r.brand):entries.reduce((a,r)=>{(a[r.brand]||(a[r.brand]=[])).push(r);return a;},Object.create(null));
- for(const [brand,groups]of Object.entries(byBrand)){
-  const data=[[`LOGISTICS DATA – ${brand}`],['Section','Attribute',...groups.map(r=>r.key)]],merges=[{s:{r:0,c:0},e:{r:0,c:groups.length+1}}];
-  for(const [s,fs]of Object.entries(M.sections)){const start=data.length;for(const f of fs)data.push([s,`${JasonText.en[f]}${['length','width','height','weight'].includes(f)?'':''}`,...groups.map(r=>{const v=M.count(r.data[s]?.[f]);return v===''?'':v;})]);merges.push({s:{r:start,c:0},e:{r:data.length-1,c:0}});}
-  const ws=XLSX.utils.aoa_to_sheet(data);ws['!merges']=merges;ws['!cols']=[{wch:12},{wch:24},...groups.map(()=>({wch:15}))];
-  const base=brand.replace(/[\\/?*\[\]:]/g,' ').slice(0,28)||'Logistics';let name=base,n=1;while(wb.SheetNames.includes(name))name=base+' '+n++;XLSX.utils.book_append_sheet(wb,ws,name);
- }
- XLSX.writeFile(wb,`logistics-${today()}.xlsx`);
+async function exportLogistics(entries){
+ if(!entries.length)throw Error(t('nothing'));
+ const wb=JasonExport.logistics({entries,sections:M.sections,count:M.count,labels:JasonText.en});
+ await JasonExport.download(wb,`logistics-${today()}.xlsx`);
 }
-$('#editor-close').onclick=closeEditor;$('#editor').oncancel=e=>{e.preventDefault();void closeEditor();};$('#photo-close').onclick=()=>$('#photo-dialog').close();$('#data-button').onclick=openData;$('#help-button').onclick=()=>openEditor(t('help'),'JASON / QUICK START',`<div class="form-content"><p class="help-copy">${esc(t('helpText'))}</p></div>`,true);$('#export').onclick=openExport;$('#create').onclick=()=>view==='keys'?openKey():openProduct();$('#undo').onclick=()=>undo();$('#redo').onclick=()=>undo(true);$('#retry').onclick=()=>syncRemote();$$('[data-lang]').forEach(b=>b.onclick=async()=>{if($('#editor').open)await closeEditor();if($('#editor').open)return;lang=b.dataset.lang;await persist();render();});
+$('#editor-close').onclick=closeEditor;$('#editor').oncancel=e=>{e.preventDefault();void closeEditor();};$('#photo-close').onclick=()=>$('#photo-dialog').close();$('#data-button').onclick=openData;$('#export').onclick=openExport;$('#create').onclick=()=>view==='keys'?openKey():openProduct();$('#undo').onclick=()=>undo();$('#redo').onclick=()=>undo(true);$('#retry').onclick=()=>syncRemote();$$('[data-lang]').forEach(b=>b.onclick=async()=>{if($('#editor').open)await closeEditor();if($('#editor').open)return;lang=b.dataset.lang;await persist();render();});
 window.addEventListener('beforeunload',e=>{if(syncing||storageError||editorDirty||hasPending()){e.preventDefault();e.returnValue='';}});
 document.addEventListener('keydown',e=>{
  const mod=e.ctrlKey||e.metaKey;if(!mod||$('#confirm-dialog').open)return;
- if(e.key.toLowerCase()==='k'){e.preventDefault();if(!$('#editor').open)$('#search').focus();}
  if(e.key.toLowerCase()==='s'){e.preventDefault();if(editorSave)void editorSave();else if(!$('#editor').open)backup();}
  if(e.key.toLowerCase()==='z'&&!e.target.closest('input,textarea,[contenteditable]')){e.preventDefault();if(!$('#editor').open)void undo(e.shiftKey);}
 });
@@ -338,3 +330,4 @@ window.addEventListener('focus',()=>{if(state.connected&&Date.now()-lastRefresh>
 
 void boot();
 })();
+

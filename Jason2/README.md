@@ -15,7 +15,7 @@ Třetí volba na úvodní stránce Union Cosmetic. Původní Jason a OrderSheet 
 
 Hledání bez diakritiky, filtry, řazení, stránkování, detail produktu, kopírování, logistické klíče se sdílenými počty balení, původní příznaky i vlastní příznaky, hromadné změny, kontroly dat, fotografie, JSON zálohy, XLSX export, čeština/angličtina a vrácení změn. Neznámá pole JSON a původní typy nezměněných hodnot se zachovávají. Kontroly existující nesoulady automaticky neopravují. Duplicitní EAN se hlásí pouze mezi aktivními produkty (`discontinued !== true`); ukončená varianta může mít stejný EAN jako její náhrada. Odlišná cena není výjimkou z kontroly.
 
-Statická aplikace bez sestavení a bez nových služeb. Excel používá stávající `JSON edit GUI/xlsx.full.min.js`; export logistiky zachovává matici hodnot, vizuální styl starého ExcelJS exportu nekopíruje.
+Statická aplikace bez sestavení a bez nových služeb. Rozhraní používá modré barvy a originální logo Union Cosmetic. Excel export používá lokálně uložený ExcelJS 4.3.0 (stejná verze jako původní Jason) s barevnými záhlavími, rámečky, zamknutými řádky a nastavením tisku. Logistika zachovává původní matici a bloky ITEM / CARTON / LAYER / PALLET, včetně jednotek cm a kg; produktový export zachovává filtry, textové identifikátory a číselné ceny. Licence závislosti je v `vendor/exceljs-LICENSE`. Firemní logo pochází z https://www.unioncosmetic.cz/data/filecache/96/logo.png.
 
 ## Ověření
 
