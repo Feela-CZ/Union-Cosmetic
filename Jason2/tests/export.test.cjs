@@ -12,7 +12,7 @@ test('saved product workbook retains styles, identifiers, numeric prices and nat
 });
 test('saved logistics workbook retains section merges, colors, borders, units and zero values',async()=>{
  const data=M.emptyLogistics();data.ITEM.length='12,5 cm';data.ITEM.weight='0 kg';data.CARTON.nr_of_items=12;
- const wb=await roundtrip(E.logistics({entries:[{brand:'Lilien',key:'001A',data}],sections:M.sections,count:M.count,labels:{length:'Length',weight:'Weight'}})),ws=wb.getWorksheet('Lilien');
+ const wb=await roundtrip(E.logistics({entries:[{brand:'Lilien',key:'001A',data}],sections:M.sections,count:M.count,labels:{length:'Length (cm)',weight:'Weight'}})),ws=wb.getWorksheet('Lilien');
  assert.equal(ws.getCell('C2').value,'001A');assert.equal(ws.getCell('C3').value,12.5);assert.equal(ws.getCell('C6').value,0);assert.equal(ws.getCell('C11').value,12);assert.equal(ws.getCell('C4').value,'');assert.equal(ws.getCell('B3').value,'Length (cm)');assert.equal(ws.getCell('B6').value,'Weight (kg)');
  assert.ok(ws.getCell('A6').isMerged);assert.notEqual(ws.getCell('A3').fill.fgColor.argb,ws.getCell('A7').fill.fgColor.argb);assert.equal(ws.getCell('C7').border.top.style,'medium');assert.equal(ws.getCell('C6').border.bottom.style,'medium');assert.equal(ws.views[0].xSplit,2);assert.equal(ws.pageSetup.printTitlesRow,'1:2');
 });

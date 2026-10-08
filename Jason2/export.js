@@ -69,7 +69,8 @@ function logistics({entries,sections,count,labels}){
    const start=ws.rowCount+1,background=sectionColors[sectionIndex++%sectionColors.length];
    for(const attribute of attributes){
     const unit=attribute==='weight'?' (kg)':['length','width','height'].includes(attribute)?' (cm)':'';
-    const row=ws.addRow([section,(labels[attribute]||attribute)+unit,...groups.map(r=>{const v=count(r.data[section]?.[attribute]);return v===''?'':v;})]);
+    const label=labels[attribute]||attribute;
+    const row=ws.addRow([section,(unit?label.replace(/\s*\((?:cm|kg)\)$/i,''):label)+unit,...groups.map(r=>{const v=count(r.data[section]?.[attribute]);return v===''?'':v;})]);
     row.height=25;
     for(let col=1;col<=lastColumn;col++){
      const cell=row.getCell(col);cellStyle(cell,col<=2?background:colors.white);
