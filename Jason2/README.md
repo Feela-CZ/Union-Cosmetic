@@ -33,3 +33,5 @@ Node 24+: `npm install`, `npm test`. Testy prověřují model, uživatelské pos
 
 
 V detailu produktu na záložce Balení a logistika se zobrazují všechny standardní údaje přiřazeného klíče (ITEM / CARTON / LAYER / PALLET). Samostatný detail klíče se otevře nad formulářem a zachová jeho rozpracované změny. Excel lze stáhnout přímo ze záložky i z tohoto detailu; obsahuje pouze aktuálně přiřazený klíč ve stejné formátované matici jako hlavní logistický export. Zobrazení a export klíče nic neukládají.
+
+Počty balení se v detailu produktu zobrazují pouze v přehledu klíče; nemají samostatné editační vstupy. Změna přiřazení při uložení doplní počty z klíče. Ostatní úpravy produktu zachovávají původní hodnoty `pack`, `boxes_per_layer` a `boxes_per_pallet`, včetně historických nesouladů.
