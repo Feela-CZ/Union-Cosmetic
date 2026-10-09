@@ -1,5 +1,5 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-global.ExcelJS=require('../vendor/exceljs.min.js');require('../export-assets.js');require('../export.js');
+global.ExcelJS=require('../vendor/exceljs.min.js');require('../export.js');
 const M=require('../model.js'),E=global.JasonExport;
 const fields=['brand','type','id','hs','name','csName','volume','price','key','pack','boxes_per_layer','boxes_per_pallet','carton_ean','new','new_date','discontinued','discontinued_date','flags'];
 test('Excel export loads and serializes without dynamic code evaluation',async()=>{
@@ -12,20 +12,24 @@ test('Excel export loads and serializes without dynamic code evaluation',async()
  assert.equal(loaded.getWorksheet('Products').getCell('A4').value,'0000000000000');
 });
 async function roundtrip(wb){const next=new ExcelJS.Workbook();await next.xlsx.load(await wb.xlsx.writeBuffer());return next;}
-test('logistics artwork is embedded in every export and survives saving without network',async()=>{
+test('brand sheets are adjacent color-matched pairs without artwork or footer gaps',async()=>{
  const entries=['Lilien','Natava','Naturalis','Sunnoré','Twister'].map(brand=>({brand,key:'001A',data:M.emptyLogistics()}));
+ const brandColors=['FF1669A8','FF607B55','FF38816C','FFAE792B','FF655AA7'];
  for(const includeProducts of [false,true]){
   const wb=await roundtrip(E.logistics({entries,sections:M.sections,count:M.count,labels:{},includeProducts}));
-  for(const ws of wb.worksheets){const images=ws.getImages();assert.equal(images.length,ws.name.startsWith('Sunnoré')?3:2);for(const image of images){const asset=wb.getImage(image.imageId);assert.ok(asset.buffer.length>1000);assert.ok(image.range.tl.nativeRow>=3);assert.ok(image.range.ext.width>0);}}
-  assert.equal(wb.getWorksheet('Lilien').getCell('C2').value,'001A');assert.equal(wb.getWorksheet('Lilien').views[0].xSplit,2);
+  assert.deepEqual(wb.worksheets.map(ws=>ws.name),entries.flatMap(e=>includeProducts?[`${e.brand} Data`,`${e.brand} Products`]:[`${e.brand} Data`]));
+  entries.forEach((e,i)=>{const data=wb.getWorksheet(`${e.brand} Data`);assert.equal(data.properties.tabColor.argb,brandColors[i]);assert.equal(data.getCell('A1').fill.fgColor.argb,brandColors[i]);assert.equal(data.rowCount,20);assert.equal(data.pageSetup.printArea,'A1:C20');if(includeProducts){const products=wb.getWorksheet(`${e.brand} Products`);assert.equal(products.properties.tabColor.argb,brandColors[i]);assert.equal(products.getCell('A1').fill.fgColor.argb,brandColors[i]);assert.equal(products.getCell('A2').fill.fgColor.argb,data.getCell('A2').fill.fgColor.argb);assert.equal(products.rowCount,3);}});
+  for(const ws of wb.worksheets)assert.equal(ws.getImages().length,0);
+  assert.equal(wb.media.length,0);
+  assert.equal(wb.getWorksheet('Lilien Data').getCell('C2').value,'001A');assert.equal(wb.getWorksheet('Lilien Data').views[0].xSplit,2);
  }
 });
 test('optional list matches brand and selected keys, preserves text EANs and flags discontinued rows',async()=>{
  const entries=[{brand:'Lilien',key:'001A',data:M.emptyLogistics()},{brand:'Lilien',key:'750',data:M.emptyLogistics()}];
  const products=[{brand:'Natava',key:'001A',name:'Other brand',id:'111'}, {brand:'Lilien',key:'not-selected',name:'Other key',id:'222'}, {brand:'Lilien',key:750,name:'Numeric key',id:8596048008129}, {brand:'Lilien',key:'001A',name:'Original',id:'0000000000001',carton_ean:'00000000000001'}, {brand:'Lilien',key:'001A',csName:'Náhradní název',id:'0000000000001',discontinued:true}];
  const before=JSON.stringify(products),options={entries,sections:M.sections,count:M.count,labels:{},products};
- const plain=await roundtrip(E.logistics(options)),plainWs=plain.getWorksheet('Lilien');assert.ok(!plainWs.getColumn(1).values.includes('PRODUCTS'));assert.equal(plainWs.getImages().length,2);
- const wb=await roundtrip(E.logistics({...options,includeProducts:true})),matrix=wb.getWorksheet('Lilien'),ws=wb.getWorksheet('Lilien Products'),heading=2;
+ const plain=await roundtrip(E.logistics(options)),plainWs=plain.getWorksheet('Lilien Data');assert.ok(!plainWs.getColumn(1).values.includes('PRODUCTS'));assert.equal(plainWs.getImages().length,0);
+ const wb=await roundtrip(E.logistics({...options,includeProducts:true})),matrix=wb.getWorksheet('Lilien Data'),ws=wb.getWorksheet('Lilien Products'),heading=2;
  assert.equal(ws.getCell(heading,2).value,'PRODUCT NAME');
  assert.deepEqual([0,1,2].map(i=>ws.getCell(heading+1+i,1).value),['001A','001A','750']);
  assert.deepEqual([0,1,2].map(i=>ws.getCell(heading+1+i,2).value),['Original','Náhradní název (Discontinued)','Numeric key']);
@@ -35,17 +39,17 @@ test('optional list matches brand and selected keys, preserves text EANs and fla
 });
 test('selected unused keys get an explicit empty product list rather than unrelated products',async()=>{
  const wb=await roundtrip(E.logistics({entries:[{brand:'Lilien',key:'unused',data:M.emptyLogistics()}],sections:M.sections,count:M.count,labels:{},includeProducts:true,products:[{brand:'Lilien',key:'750',name:'Excluded'}]}));
- const ws=wb.getWorksheet('Lilien Products');assert.equal(ws.getCell('A3').value,'No products assigned to the selected keys.');assert.equal(ws.getImages().length,2);
+ const ws=wb.getWorksheet('Lilien Products');assert.equal(ws.getCell('A3').value,'No products assigned to the selected keys.');assert.equal(ws.getImages().length,0);
 });
 test('many selected keys never widen the product list or add horizontal frozen panes',async()=>{
  const entries=Array.from({length:24},(_,i)=>({brand:'Lilien',key:String(i),data:M.emptyLogistics()}));
  const options={entries,sections:M.sections,count:M.count,labels:{},products:entries.map(e=>({brand:e.brand,key:e.key,name:'A product with a descriptive name',id:'0000000000001',carton_ean:'00000000000001'}))};
  const plain=await roundtrip(E.logistics(options)),listed=await roundtrip(E.logistics({...options,includeProducts:true}));
- assert.equal(plain.worksheets.length,1);assert.equal(listed.getWorksheet('Lilien').columnCount,26);
+ assert.equal(plain.worksheets.length,1);assert.equal(listed.getWorksheet('Lilien Data').columnCount,26);
  const ws=listed.getWorksheet('Lilien Products');assert.equal(ws.columnCount,4);assert.equal(ws.views[0].xSplit,0);assert.equal(ws.views[0].ySplit,2);assert.equal(ws.views[0].topLeftCell,'A3');
  assert.equal(ws.getCell('C2').value,'PRODUCT EAN');assert.equal(ws.getCell('D2').value,'CARTON EAN');
  assert.equal(ws.getCell('C26').value,'0000000000001');assert.equal(ws.getCell('D26').value,'00000000000001');assert.equal(ws.getCell('B26').isMerged,false);assert.equal(ws.autoFilter,'A2:D26');
- assert.deepEqual(listed.getWorksheet('Lilien').model,plain.getWorksheet('Lilien').model);
+ assert.deepEqual(listed.getWorksheet('Lilien Data').model,plain.getWorksheet('Lilien Data').model);
 });
 test('saved product workbook retains styles, identifiers, numeric prices and native Excel controls',async()=>{
  const row=['Lilien','Soap','0000000000000','00123456','Soap','Mýdlo','4x50 g',1.16,'500A',12,13,65,'00123456789012','Yes','','No','','Promo'];
@@ -56,7 +60,7 @@ test('saved product workbook retains styles, identifiers, numeric prices and nat
 });
 test('saved logistics workbook retains section merges, colors, borders, units and zero values',async()=>{
  const data=M.emptyLogistics();data.ITEM.length='12,5 cm';data.ITEM.weight='0 kg';data.CARTON.nr_of_items=12;
- const wb=await roundtrip(E.logistics({entries:[{brand:'Lilien',key:'001A',data}],sections:M.sections,count:M.count,labels:{length:'Length (cm)',weight:'Weight'}})),ws=wb.getWorksheet('Lilien');
+ const wb=await roundtrip(E.logistics({entries:[{brand:'Lilien',key:'001A',data}],sections:M.sections,count:M.count,labels:{length:'Length (cm)',weight:'Weight'}})),ws=wb.getWorksheet('Lilien Data');
  assert.equal(ws.getCell('C2').value,'001A');assert.equal(ws.getCell('C3').value,12.5);assert.equal(ws.getCell('C6').value,0);assert.equal(ws.getCell('C11').value,12);assert.equal(ws.getCell('C4').value,'');assert.equal(ws.getCell('B3').value,'Length (cm)');assert.equal(ws.getCell('B6').value,'Weight (kg)');
  assert.equal(ws.getCell('A1').value,'LOGISTICS DATA');assert.equal(ws.getCell('A1').font.size,13);assert.equal(ws.getCell('B1').master.address,'A1');assert.equal(ws.getCell('C1').isMerged,false);assert.equal(ws.getCell('C1').value,null);
  assert.equal(new Set(['A3','B3','A7','B7','A12','B12','A14','B14'].map(c=>ws.getCell(c).fill.fgColor.argb)).size,1);
