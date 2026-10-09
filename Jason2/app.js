@@ -2,6 +2,8 @@
 (function(){
 'use strict';
 const M=JasonModel,S=JasonStorage,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const sandbox=JASON_CONFIG.sandbox===true;
+function isolate(next){if(sandbox){next.connected=false;next.api='';next.imageBase=JASON_CONFIG.imageBase;next.baseline={};next.pendingPhotos=[];}return next;}
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const icons={products:'▦',keys:'◇',checks:'✓',data:'↔',undo:'↶',redo:'↷',export:'↓',plus:'+'};
 let lang='cs',view='products',page=1,pageSize=30,sort={field:'name',asc:true},selected=new Set(),history=[],future=[],busy=false,editorDirty=false,editorSave=null,toastTimer,syncing=false,storageError=false;
@@ -16,24 +18,24 @@ const flags=()=>[...new Set(state.products.flatMap(p=>p.flags||[]))].sort();
 const sig=v=>JSON.stringify(v,(_,x)=>x&&typeof x==='object'&&!Array.isArray(x)?Object.fromEntries(Object.keys(x).sort().map(k=>[k,x[k]])):x);
 const dirty=n=>state.connected&&sig(state[n])!==state.baseline[n];
 let refreshing=false,lastRefresh=0,refreshFailed=false;
-const hasPending=()=>dirty('products')||dirty('logistics')||state.pendingPhotos.length>0;
+const hasPending=()=>!sandbox&&(dirty('products')||dirty('logistics')||state.pendingPhotos.length>0);
 const option=(value,label,sel)=>`<option value="${esc(value)}" ${String(value)===String(sel)?'selected':''}>${esc(label)}</option>`;
 const button=(id,label,cls='')=>`<button type="button" id="${id}" class="${cls}">${esc(t(label))}</button>`;
 function selectHTML(id,label,items,value,empty){return `<label class="filter"><span>${esc(t(label))}</span><select id="${id}">${option('',t(empty),value)}${items.map(x=>option(typeof x==='object'?x.value:x,typeof x==='object'?x.label:x,value)).join('')}</select></label>`;}
 function toast(text,error=false){const e=$('#toast');e.textContent=text;e.className=error?'error':'';e.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{e.hidden=true;},error?9000:3500);}
 function error(e){const msg=e?.message||String(e);toast(`${t('failed')}: ${t(msg)}`,true);console.error(e);}
-async function persist(){try{await S.put('state',{state,lang});storageError=false;}catch(e){storageError=true;toast(t('localError'),true);}renderStatus();}
+async function persist(){isolate(state);try{await S.put('state',{state,lang});storageError=false;}catch(e){storageError=true;toast(t('localError'),true);}renderStatus();}
 function renderStatus(){
- $('#connection-label').textContent=t(state.connected?'connected':'local');$('.connection .dot').classList.toggle('online',state.connected);
+ $('#connection-label').textContent=t(sandbox?'sandboxLocal':state.connected?'connected':'local');$('.connection .dot').classList.toggle('online',state.connected);
  $('#save-status').textContent=storageError?t('localError'):syncing?t('saving'):hasPending()?t('pending'):t(state.connected?'synced':'saved');
  $('#save-status').classList.toggle('warning',hasPending()||storageError);$('#retry').hidden=!state.connected||!hasPending()||syncing;$('#retry').textContent=t('retry');
- if($('#refresh')){$('#refresh').hidden=!JASON_CONFIG.autoConnect&&!state.connected;$('#refresh').textContent=t('refresh');$('#refresh').disabled=refreshing||syncing||busy;}
+ if($('#refresh')){$('#refresh').hidden=sandbox||!JASON_CONFIG.autoConnect&&!state.connected;$('#refresh').textContent=t('refresh');$('#refresh').disabled=refreshing||syncing||busy;}
  if(refreshing)$('#save-status').textContent=t('connecting');else if(refreshFailed)$('#save-status').textContent=t('refreshFailed');
 }
 async function commit(next,label='updated'){
  // Make the restore point durable before applying changes.
  try{await S.put('recovery',M.clone(state));}catch(e){storageError=true;toast(t('localError'),true);throw e;}
- history.push(M.clone(state));if(history.length>12)history.shift();future=[];state=next;state.updated=new Date().toISOString();
+ history.push(M.clone(state));if(history.length>12)history.shift();future=[];state=isolate(next);state.updated=new Date().toISOString();
  selected.clear();await persist();render();toast(t(label));if(state.connected)void syncRemote();
 }
 async function undo(redo=false){if(busy||editorDirty)return;const source=redo?future:history,target=redo?history:future;if(!source.length)return;const current=M.clone(state),next=source.pop();target.push(current);
@@ -42,7 +44,7 @@ async function undo(redo=false){if(busy||editorDirty)return;const source=redo?fu
  next.pendingPhotos=Object.keys(next.photos).filter(id=>next.photos[id]!==state.photos[id]||state.pendingPhotos.includes(id));
  state=next;await persist();selected.clear();render();toast(t(redo?'redo':'undo'));if(state.connected)void syncRemote();}
 async function syncRemote(){
- if(syncing||!state.connected)return;
+ if(sandbox||syncing||!state.connected)return;
  syncing=true;renderStatus();
  try{
   while(state.connected&&hasPending()){
@@ -76,11 +78,13 @@ function openEditor(title,caption,html,small=false){
 async function runForm(action){if(busy)return;busy=true;$$('#editor button[type="submit"]').forEach(b=>{b.disabled=true;b.dataset.original=b.textContent;b.textContent=t('saving');});try{await action();}catch(e){error(e);}finally{busy=false;$$('#editor button[type="submit"]').forEach(b=>{b.disabled=false;b.textContent=b.dataset.original||t('save');});}}
 function formClose(){editorDirty=false;editorSave=null;$('#editor').close();}
 function render(){
- document.documentElement.lang=lang;document.title=`Jason · ${t(view)}`;
- $$('[data-text]').forEach(e=>e.textContent=t(e.dataset.text));$$('[data-lang]').forEach(e=>{e.classList.toggle('active',e.dataset.lang===lang);e.setAttribute('aria-pressed',e.dataset.lang===lang);});
+ document.documentElement.lang=lang;document.title=`Jason 2.0 · ${t(sandbox?'sandboxVersion':'liveVersion')} · ${t(view)}`;
+ $$('[data-text]').forEach(e=>e.textContent=t(sandbox&&e.dataset.text==='readonlyNote'?'sandboxFooter':e.dataset.text));$$('[data-lang]').forEach(e=>{e.classList.toggle('active',e.dataset.lang===lang);e.setAttribute('aria-pressed',e.dataset.lang===lang);});
+ $('#workspace-mode').textContent=`JASON 2.0 / ${t(sandbox?'sandboxVersion':'liveVersion')}`;
+ $('#sandbox-banner').hidden=!sandbox;$('#sandbox-banner').textContent=t('sandboxNote');
  $('#nav').innerHTML=['products','keys','checks'].map(v=>`<button class="nav-button ${view===v?'active':''}" data-view="${v}" ${view===v?'aria-current="page"':''}><span class="nav-icon">${icons[v]}</span>${esc(t(v))}<span class="nav-count">${v==='products'?state.products.length:v==='keys'?M.keyEntries(state.logistics).length:M.issues(state).length}</span></button>`).join('');
  $$('[data-view]').forEach(b=>b.onclick=()=>changeView(b.dataset.view));
- $('#data-button').innerHTML=`<span class="nav-icon">↔</span>${esc(t('data'))}`;
+ $('#data-button').innerHTML=`<span class="nav-icon">↔</span>${esc(t(sandbox?'sandboxData':'data'))}`;
  $('#crumb').textContent=t(view);$('#page-title').textContent=t(view);$('#page-description').textContent=t(view==='products'?'subtitle':view==='keys'?'keyHelp':'checksHint');
  $('#undo').textContent=icons.undo;$('#undo').title=t('undo');$('#undo').setAttribute('aria-label',t('undo'));$('#undo').disabled=!history.length;
  $('#redo').textContent=icons.redo;$('#redo').title=t('redo');$('#redo').setAttribute('aria-label',t('redo'));$('#redo').disabled=!future.length;
@@ -159,7 +163,7 @@ function openProduct(index=null,tab='details',duplicate=false){
  <section id="section-details" class="tab-section" role="tabpanel" aria-labelledby="tab-details"><div class="section-intro"><h3>${t('details')}</h3><span>${t('unknownFields')}</span></div><div class="form-grid">${field('brand','brand',p.brand,'text','list="brands" required')}${field('type','type',p.type,'text','list="types"')}${field('id','ean',p.id,'text','required inputmode="numeric"',t('required'))}${field('hs','hs',p.hs,'text','inputmode="numeric"')}${field('name','name',p.name)}${field('csName','csName',p.csName)}<label class="field"><span>${t('volume')}</span><div class="input-group"><input name="volume-number" type="text" inputmode="decimal" value="${esc(p.volume?.number??'')}"><input name="volume-unit" list="units" value="${esc(p.volume?.unit||'ml')}" aria-label="${lang==='cs'?'Jednotka':'Unit'}"></div></label>${field('price','price',p.price,'number','min="0" step="any"')}</div>${datalist('brands',brands())}${datalist('types',[...new Set([...types(),...state.products.map(p=>p.type)])].filter(Boolean))}${datalist('units',['ml','g','pc','l','kg'])}<p class="notice" id="draft-warning" hidden>${t('draftWarning')}</p></section>
  <section id="section-packaging" class="tab-section" role="tabpanel" aria-labelledby="tab-packaging"><div class="section-intro"><h3>${t('packaging')}</h3></div><p class="notice">${t('keyHint')}</p><div class="form-grid"><label class="field"><span>${t('key')}</span><select name="key" id="product-key"></select></label>${field('carton_ean','carton_ean',p.carton_ean)}${field('pack','pack',p.pack,'number','min="0" step="1"')}${field('boxes_per_layer','boxes_per_layer',p.boxes_per_layer,'number','min="0" step="1"')}${field('boxes_per_pallet','boxes_per_pallet',p.boxes_per_pallet,'number','min="0" step="1"')}</div><p class="muted" id="key-summary"></p></section>
  <section id="section-flags" class="tab-section" role="tabpanel" aria-labelledby="tab-flags"><h3>${t('flags')}</h3>${['new','discontinued'].map(v=>`<div class="flag-card"><label class="checkbox-label"><input type="checkbox" name="${v}" ${p[v]===true?'checked':''}>${t(v)}</label>${field(v+'_date',v+'_date',p[v+'_date'],'date')}</div>`).join('')}<div class="form-grid">${field('flags','customFlags',(p.flags||[]).join(', '),'text','',t('flagsHint'))}</div><p class="muted">${t('localOnly')}</p></section>
- <section id="section-photo" class="tab-section" role="tabpanel" aria-labelledby="tab-photo"><h3>${t('photo')}</h3><div class="photo-layout"><button type="button" class="photo-drop" id="photo-drop"><img id="photo-preview" alt="${esc(t('photo'))}" hidden><span id="photo-placeholder">+<small>${t('choosePhoto')}</small></span></button><div><p>${t('photoHint')}</p><input type="file" accept="image/jpeg,image/png,image/webp" id="photo-input" hidden>${button('photo-choose','choosePhoto')}${button('photo-download','downloadPhoto')}${button('photo-view','viewPhoto')}<p class="muted">${state.pendingPhotos.includes(p.id)?t('photoPending'):''}</p></div></div></section>
+ <section id="section-photo" class="tab-section" role="tabpanel" aria-labelledby="tab-photo"><h3>${t('photo')}</h3><div class="photo-layout"><button type="button" class="photo-drop" id="photo-drop"><img id="photo-preview" alt="${esc(t('photo'))}" hidden><span id="photo-placeholder">+<small>${t('choosePhoto')}</small></span></button><div><p>${t(sandbox?'sandboxPhotoHint':'photoHint')}</p><input type="file" accept="image/jpeg,image/png,image/webp" id="photo-input" hidden>${button('photo-choose','choosePhoto')}${button('photo-download','downloadPhoto')}${button('photo-view','viewPhoto')}<p class="muted">${state.pendingPhotos.includes(p.id)?t('photoPending'):''}</p></div></div></section>
  </div>${formFooter()}</form>`);
  const form=$('#product-form'),elements=form.elements;
  const showTab=v=>{$$('[data-tab]').forEach(b=>{b.setAttribute('aria-selected',b.dataset.tab===v);b.tabIndex=b.dataset.tab===v?0:-1;});$$('.tab-section').forEach(s=>{s.hidden=s.id!==`section-${v}`;});};
@@ -237,14 +241,15 @@ function downloadData(url,name){const a=document.createElement('a');a.href=url;a
 function downloadJSON(value,name){downloadBlob(new Blob([JSON.stringify(value,null,2)+'\n'],{type:'application/json;charset=utf-8'}),name);}
 function backup(){downloadJSON({format:'jason-backup',version:1,createdAt:new Date().toISOString(),products:state.products,logistics:state.logistics,photos:state.photos,pendingPhotos:state.pendingPhotos},`jason-backup-${today()}.json`);}
 function openData(){
- openEditor(t('dataTitle'),'JASON / DATA',`<div class="form-content data-content"><p>${t('dataHint')}</p>${JASON_CONFIG.sharedOnly?'<p class="notice amber">'+t('sharedOnly')+'</p>':''}<section class="data-section"><h3>${t('import')}</h3><div class="button-grid">${button('import-products','importProducts')}${button('import-logistics','importLogistics')}${button('restore-backup','restore')}${button('download-backup','backup','primary')}</div><div class="button-grid">${button('download-products','jsonProducts')}${button('download-logistics','jsonLogistics')}</div></section><section class="data-section"><h3>${t('connection')}</h3><p class="muted">${t('connectHint')}</p><div class="form-grid">${field('api','api',state.api,'url')}${field('images','images',state.imageBase,'url')}</div><div class="connection-actions">${button('connect','connect','primary')}${button('disconnect','disconnect')}<span>${t(state.connected?'connected':'local')}</span></div></section><p class="muted">${t('localOnly')}</p></div>`,true);
+ openEditor(t(sandbox?'sandboxData':'dataTitle'),'JASON / DATA',`<div class="form-content data-content"><p>${t(sandbox?'sandboxNote':'dataHint')}</p>${JASON_CONFIG.sharedOnly?'<p class="notice amber">'+t('sharedOnly')+'</p>':''}<section class="data-section"><h3>${t('import')}</h3><div class="button-grid">${button('import-products','importProducts')}${button('import-logistics','importLogistics')}${button('restore-backup','restore')}${button('download-backup','backup','primary')}</div><div class="button-grid">${button('download-products','jsonProducts')}${button('download-logistics','jsonLogistics')}</div></section>${sandbox?'<section class="data-section"><h3>'+t('sandboxResetTitle')+'</h3><p>'+t('sandboxResetHint')+'</p>'+button('reset-sandbox','sandboxReset')+'</section>':`<section class="data-section"><h3>${t('connection')}</h3><p class="muted">${t('connectHint')}</p><div class="form-grid">${field('api','api',state.api,'url')}${field('images','images',state.imageBase,'url')}</div><div class="connection-actions">${button('connect','connect','primary')}${button('disconnect','disconnect')}<span>${t(state.connected?'connected':'local')}</span></div></section>`}<p class="muted">${t('localOnly')}</p></div>`,true);
  $('#import-products').onclick=()=>importFile('products');$('#import-logistics').onclick=()=>importFile('logistics');$('#restore-backup').onclick=()=>importFile('backup');$('#download-backup').onclick=backup;$('#download-products').onclick=()=>downloadJSON(state.products,'products.json');$('#download-logistics').onclick=()=>downloadJSON(state.logistics,'logistics.json');
+ if(sandbox){$('#reset-sandbox').onclick=resetSandbox;return;}
  if(JASON_CONFIG.sharedOnly){$('#field-api').readOnly=true;$('#field-images').readOnly=true;for(const id of ['import-products','import-logistics','restore-backup'])$('#'+id).disabled=!state.connected;}
  $('#connect').onclick=async()=>{const api=JASON_CONFIG.sharedOnly?JASON_CONFIG.apiBase:$('#field-api').value.trim().replace(/\/$/,''),imageBase=JASON_CONFIG.sharedOnly?JASON_CONFIG.imageBase:$('#field-images').value.trim().replace(/\/$/,'');try{for(const url of [api,imageBase]){const u=new URL(url);if(u.protocol!=='https:'&&!(u.protocol==='http:'&&['localhost','127.0.0.1'].includes(u.hostname)))throw Error(lang==='cs'?'Použijte adresu HTTPS.':'Use an HTTPS address.');}if(await confirm('connectConfirm',t('connectConfirmHint'),'connect'))await connect(api,imageBase);}catch(e){error(e);}};
  $('#disconnect').hidden=!!JASON_CONFIG.sharedOnly;$('#disconnect').disabled=!state.connected;$('#disconnect').onclick=async()=>{if(hasPending()&&!await confirm('disconnect',t('unsent'),'disconnect'))return;state.connected=false;await persist();render();openData();};
 }
 async function connect(api,imageBase,automatic=false){
- if(syncing||busy)return;busy=true;renderStatus();try{
+ if(sandbox||syncing||busy)return;busy=true;renderStatus();try{
   const [p,l]=await Promise.all([S.request(api,'products'),S.request(api,'logistics')]);M.validateProducts(p);M.validateLogistics(l);
   const next={...M.clone(state),products:p,logistics:l,photos:{},pendingPhotos:[],api,imageBase,connected:true,baseline:{products:sig(p),logistics:sig(l)}};
   await commit(next,'loaded');formClose();
@@ -302,6 +307,7 @@ document.addEventListener('keydown',e=>{
 });
 window.addEventListener('hashchange',()=>{const v=location.hash.slice(1);if(['products','keys','checks'].includes(v)&&v!==view)changeView(v);});
 async function refreshShared(automatic=false){
+ if(sandbox)return;
  if(refreshing||syncing||busy||automatic&&($('#editor').open||editorDirty||hasPending()))return;
  if(hasPending()&&!await confirm('connectConfirm',t('connectConfirmHint'),'refresh'))return;
  refreshing=true;refreshFailed=false;renderStatus();$('#create').disabled=true;
@@ -315,11 +321,24 @@ async function refreshShared(automatic=false){
  }catch(e){refreshFailed=true;toast(t(state.products.length?'refreshFailed':'sharedNotLoaded'),true);}
  finally{refreshing=false;render();}
 }
+function sandboxSeed(){
+ const seed=window.JASON_SANDBOX_SEED;
+ if(!seed)throw Error('SANDBOX_SEED_MISSING');
+ M.validateProducts(seed.products);M.validateLogistics(seed.logistics);
+ return isolate({...M.clone(state),products:M.clone(seed.products),logistics:M.clone(seed.logistics),photos:{},updated:seed.snapshotAt});
+}
+async function resetSandbox(){
+ if(!sandbox||busy||!await confirm('sandboxResetTitle',t('sandboxResetHint'),'sandboxReset'))return;
+ try{const next=sandboxSeed();await S.put('recovery',null);state=next;history=[];future=[];selected.clear();await persist();formClose();render();toast(t('loaded'));}catch(e){error(e);}
+}
 async function boot(){
- try{const saved=await S.get('state');if(saved?.state){M.validateProducts(saved.state.products);M.validateLogistics(saved.state.logistics);state={...state,...saved.state};lang=saved.lang==='en'?'en':'cs';const recovery=await S.get('recovery');if(recovery)history=[recovery];}}
+ let hasSavedState=false;
+ try{const saved=await S.get('state');if(saved?.state){M.validateProducts(saved.state.products);M.validateLogistics(saved.state.logistics);state=isolate({...state,...saved.state});hasSavedState=true;lang=saved.lang==='en'?'en':'cs';const recovery=await S.get('recovery');if(recovery)history=[recovery];}}
  catch(e){storageError=true;toast(t('localError'),true);}
+ if(sandbox&&!hasSavedState){try{state=sandboxSeed();await persist();}catch(e){error(e);}}
  if(JASON_CONFIG.sharedOnly){state.api=JASON_CONFIG.apiBase;state.imageBase=JASON_CONFIG.imageBase;}
  view=['products','keys','checks'].includes(location.hash.slice(1))?location.hash.slice(1):'products';render();
+ if(sandbox)return;
  if(JASON_CONFIG.autoConnect||state.connected){if(!hasPending())await refreshShared(true);}
  else if(location.protocol!=='file:'&&['localhost','127.0.0.1'].includes(location.hostname)){
   try{const [pr,lr]=await Promise.all([fetch(JASON_CONFIG.legacyProducts),fetch(JASON_CONFIG.logisticsFile)]);if(pr.ok&&lr.ok){const p=await pr.json(),l=await lr.json();M.validateProducts(p);M.validateLogistics(l);state.products=p;state.logistics=l;await persist();render();}}catch{}

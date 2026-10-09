@@ -11,3 +11,28 @@ products:'Products',keys:'Logistics keys',checks:'Data checks',workspace:'Worksp
 Object.assign(window.JasonText.cs,{readonlyNote:'Testovací verze · Uložené změny se projeví také v původním Jasonovi.',noProductsHint:'Čekám na načtení společných produktů. Pokud se nenačtou, použijte Načíst aktuální data.',refresh:'Načíst aktuální data',refreshFailed:'Aktuální společná data se nepodařilo načíst. Zobrazuji poslední pracovní kopii.',sharedOnly:'Jason 2.0 používá stejná společná data jako původní Jason. Úpravy jsou skutečné i v této testovací verzi.',connecting:'Načítám společná data…',sharedNotLoaded:'Společná data nejsou načtená. Zkuste Načíst aktuální data.',dataHint:'Tato verze pracuje se stejnou databází jako původní Jason. Pracovní kopie chrání neodeslané změny; není to oddělená databáze.',connectHint:'Připojení používá společné API původního Jasona. Uložené změny se projeví také v původním editoru a objednávkovém formuláři.'});
 Object.assign(window.JasonText.en,{readonlyNote:'Preview · Saved changes also appear in the original Jason.',noProductsHint:'Waiting for shared products. If loading fails, use Reload shared data.',refresh:'Reload shared data',refreshFailed:'Could not load current shared data. Showing the last working copy.',sharedOnly:'Jason 2.0 uses the same shared data as the original Jason. Changes are real in this preview too.',connecting:'Loading shared data…',sharedNotLoaded:'Shared data have not loaded. Try Reload shared data.',dataHint:'This version uses the same database as the original Jason. The working copy protects unsent changes; it is not a separate database.',connectHint:'The connection uses the original Jason’s shared API. Saved changes also appear in the original editor and order form.'});
 
+
+Object.assign(window.JasonText.cs,{
+ liveVersion:'Ostrá verze',sandboxVersion:'Testovací verze',
+ readonlyNote:'Ostrá verze · Uložené změny se projeví také v původním Jasonovi.',
+ sharedOnly:'Jason 2.0 používá stejná společná data jako původní Jason. Uložené úpravy mění skutečná data.',
+ sandboxLocal:'Testovací verze · Pouze v tomto prohlížeči',sandboxData:'Testovací data',
+ sandboxNote:'Bezpečné pískoviště · Kopie dat z 9. 10. 2026. Změny zůstávají pouze v tomto prohlížeči a neovlivní ostrá data ani ostatní kolegy.',
+ sandboxResetTitle:'Vrátit výchozí testovací data',sandboxReset:'Vrátit výchozí data',
+ sandboxResetHint:'Všechny vaše testovací úpravy a fotografie budou nahrazeny výchozí kopií z 9. 10. 2026. Případně si nejprve stáhněte zálohu.',
+ sandboxPhotoHint:'Fotografie se uloží pouze do testovací kopie v tomto prohlížeči.',
+ SANDBOX_OFFLINE:'Testovací verze nemá přístup ke společnému API.',SANDBOX_SEED_MISSING:'Výchozí testovací data se nepodařilo načíst. Obnovte stránku.'
+});
+Object.assign(window.JasonText.en,{
+ liveVersion:'Live version',sandboxVersion:'Test version',
+ readonlyNote:'Live version · Saved changes also appear in the original Jason.',
+ sharedOnly:'Jason 2.0 uses the same shared data as the original Jason. Saved edits change real data.',
+ sandboxLocal:'Test version · This browser only',sandboxData:'Test data',
+ sandboxNote:'Safe sandbox · Data snapshot from 9 October 2026. Changes stay in this browser and do not affect live data or other colleagues.',
+ sandboxResetTitle:'Restore initial test data',sandboxReset:'Restore initial data',
+ sandboxResetHint:'All your test edits and photos will be replaced by the initial snapshot from 9 October 2026. Download a backup first if needed.',
+ sandboxPhotoHint:'Photos are saved only in this browser’s test copy.',
+ SANDBOX_OFFLINE:'The test version cannot access the shared API.',SANDBOX_SEED_MISSING:'Initial test data could not be loaded. Reload the page.'
+});
+Object.assign(window.JasonText.cs,{sandboxFooter:'Testovací verze · Změny se ukládají pouze v tomto prohlížeči.'});
+Object.assign(window.JasonText.en,{sandboxFooter:'Test version · Changes are saved only in this browser.'});
