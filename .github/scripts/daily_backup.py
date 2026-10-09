@@ -6,7 +6,7 @@ import os
 import re
 import sys
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from urllib.error import HTTPError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
@@ -16,6 +16,7 @@ PRODUCTS_PATH = "OrderSheet/products.json"
 LOGISTICS_PATH = "JSON edit GUI/logistics.json"
 BRANCH = "main"
 LOCAL_TIMEZONE = "Europe/Prague"
+RETENTION_DAYS = 30
 
 
 class ApiError(RuntimeError):
@@ -153,6 +154,80 @@ def publish(api, path, snapshot):
     raise RuntimeError("Could not append backup")
 
 
+def backup_date(path):
+    """Recognize only archive files we own; ignore README and other content."""
+    daily = re.fullmatch(r"backups/daily/(\d{4})/(\d{2})/(\d{4}-\d{2}-\d{2})\.json", path)
+    manual = re.fullmatch(r"backups/manual/(\d{4}-\d{2}-\d{2})/\d{6}Z-[\w-]+\.json", path)
+    value = daily[3] if daily else manual[1] if manual else None
+    if value is None:
+        return None
+    try:
+        day = date.fromisoformat(value)
+    except ValueError:
+        return None
+    if daily and (daily[1], daily[2]) != (day.strftime("%Y"), day.strftime("%m")):
+        return None
+    return day
+
+
+def expired_archives(entries, protected_path):
+    # Anchor retention to the new archive's Prague date, including a delayed
+    # overnight daily run. Keep that day and the preceding 29 calendar days.
+    reference = backup_date(protected_path)
+    if reference is None:
+        raise ValueError("Invalid protected archive path")
+    cutoff = reference - timedelta(days=RETENTION_DAYS - 1)
+    return sorted(entry["path"] for entry in entries
+                  if entry.get("type") == "blob" and entry["path"] != protected_path
+                  and (day := backup_date(entry["path"])) is not None and day < cutoff)
+
+
+def prune(api, protected_path):
+    """Remove expired archive files only after confirming a valid new backup.
+
+    Git retains old commits. This bounds the working folder, not Git history.
+    Every retry rebuilds the deletion list on the current head.
+    """
+    for attempt in range(4):
+        parent = api.call("GET", f"/git/ref/heads/{BRANCH}")["object"]["sha"]
+        tree_sha = api.call("GET", f"/git/commits/{parent}")["tree"]["sha"]
+        root = api.call("GET", f"/git/trees/{tree_sha}")
+        if root.get("truncated"):
+            raise ValueError("Incomplete repository tree; retention skipped")
+        folder = next((entry for entry in root["tree"]
+                       if entry["path"] == "backups" and entry["type"] == "tree"), None)
+        if folder is None:
+            raise ValueError("Backup folder missing; retention skipped")
+        result = api.call("GET", f"/git/trees/{folder['sha']}?recursive=1")
+        if result.get("truncated"):
+            raise ValueError("Incomplete backup tree; retention skipped")
+        entries = [{**entry, "path": "backups/" + entry["path"]} for entry in result["tree"]]
+        if not any(entry["path"] == protected_path and entry["type"] == "blob" for entry in entries):
+            raise ValueError("Current archive missing; no older backup deleted")
+        saved = json.loads(read_file(api, protected_path, parent))
+        if saved.get("format") != "jason-backup" or saved.get("version") != 1:
+            raise ValueError("Current archive invalid; no older backup deleted")
+        validate(saved.get("products"), saved.get("logistics"))
+        paths = expired_archives(entries, protected_path)
+        if not paths:
+            return 0
+        tree = api.call("POST", "/git/trees", {
+            "base_tree": tree_sha,
+            "tree": [{"path": path, "mode": "100644", "type": "blob", "sha": None} for path in paths]
+        })["sha"]
+        commit = api.call("POST", "/git/commits", {
+            "message": f"backup: remove {len(paths)} archives outside {RETENTION_DAYS}-day retention",
+            "tree": tree, "parents": [parent]
+        })["sha"]
+        try:
+            api.call("PATCH", f"/git/refs/heads/{BRANCH}", {"sha": commit, "force": False})
+            return len(paths)
+        except ApiError as error:
+            if error.status not in (409, 422) or attempt == 3:
+                raise
+    raise RuntimeError("Could not prune old archives")
+
+
 def main():
     repository = os.environ["GITHUB_REPOSITORY"]
     token = os.environ["GH_TOKEN"]
@@ -164,13 +239,16 @@ def main():
     api = GitHub(repository, token)
     snapshot = capture(api, repository, now)
     created = publish(api, path, snapshot)
+    removed = prune(api, path)
     message = f"{'Created' if created else 'Already archived'}: {path}"
     print(message)
+    print(f"Retention: {RETENTION_DAYS} calendar days; removed {removed} expired archives")
     summary = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary:
         with open(summary, "a", encoding="utf-8") as output:
             output.write(f"## Jason data backup\n\n{message}\n\n")
             output.write(f"Products: {len(snapshot['products'])}. Source commit: `{snapshot['source']['commit']}`.\n")
+            output.write(f"Retention: **{RETENTION_DAYS} calendar days**. Removed expired archives: **{removed}**. Git history is retained.\n\n")
             output.write("Restore the JSON through **Data a připojení → Obnovit zálohu Jason**.\n")
 
 
@@ -180,3 +258,4 @@ if __name__ == "__main__":
     except Exception as error:
         print(f"Backup failed: {error}", file=sys.stderr)
         sys.exit(1)
+

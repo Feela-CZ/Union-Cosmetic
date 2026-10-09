@@ -29,9 +29,12 @@ jobs:
           sparse-checkout: .github/scripts
           sparse-checkout-cone-mode: false
           persist-credentials: false
-      - name: Archive common Jason data
+      - name: Verify backup and retention rules
+        run: python3 .github/scripts/test_daily_backup.py
+      - name: Archive Jason data and retain 30 days
         env:
           GH_TOKEN: ${{ github.token }}
           BACKUP_KIND: ${{ github.event_name == 'schedule' && 'daily' || 'manual' }}
         run: python3 .github/scripts/daily_backup.py
+
 

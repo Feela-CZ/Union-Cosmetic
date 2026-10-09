@@ -5,9 +5,11 @@ Automatická archivace společných dat probíhá každý den kolem **23:45 v č
 - **Denní zálohy:** `backups/daily/RRRR/MM/RRRR-MM-DD.json`.
 - **Ruční a úvodní zálohy:** `backups/manual/RRRR-MM-DD/HHMMSSZ-ID.json`.
 - Zálohu vytvoří GitHub Actions **Daily Jason data backup**. V záložce Actions lze kdykoli použít **Run workflow** na větvi `main`.
-- Žádné zálohy se automaticky nemažou. Denní soubor se nepřepisuje; ruční běhy mají vlastní názvy.
+- **Uchovávání: 30 kalendářních dní**, včetně data právě vytvořené zálohy. Denní soubor se nepřepisuje; ruční běhy mají vlastní názvy. Starší denní i ruční soubory se automaticky odstraňují až po vytvoření a ověření nové zálohy. Pokud zálohování selže, úklid neproběhne.
 - Produkty a logistické klíče pocházejí z **jednoho přesně určeného commitu**, takže souběžná úprava mezi čtením souborů nemůže namíchat dvě verze.
-- Archivace přidává pouze soubory do `backups/`. Nikdy nepřepisuje živý katalog ani logistiku. Souběžné změny zachová a nepoužívá force push.
+- Archivace a úklid mění pouze rozpoznané soubory záloh v `backups/daily/` a `backups/manual/`. Nikdy nepřepisují živý katalog, logistiku, fotografie ani tento návod. Souběžné změny zachovají a nepoužívají force push.
+
+Odstranění souborů udržuje přehlednou aktuální složku záloh. **Git stále uchovává starší commity a jejich obsah**, takže se tím nezmenšuje historie repozitáře. Fotografie se do denních záloh nekopírují; při současné velikosti dat má jedna záloha přibližně 200 kB a 30 denních záloh přibližně 6 MB (ruční zálohy navíc). Historie se automaticky nepřepisuje.
 
 ## Obnova produktů a logistiky
 
@@ -25,3 +27,4 @@ Fotografie již mají verze v GitHubu. Aby se každý den zbytečně nekopírova
 ## Ověření běhů
 
 Úspěšný běh má zelenou značku v **Actions → Daily Jason data backup** a ve shrnutí uvádí cestu zálohy i zdrojový commit. Při chybě se neplatná nebo náhradní stará data nearchivují. Pro kontrolu vytváření existuje také denní úkol v ChatGPT, který ověří dnešní zálohu a při chybějícím souboru vytvoří stejný archiv přes GitHub konektor. Vyžaduje zachované připojení GitHubu k ChatGPT; běžné zálohování GitHub Actions na něm nezávisí.
+
