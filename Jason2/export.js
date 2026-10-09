@@ -55,18 +55,17 @@ function products({fields,headers,rows,title:label,date,count,countLabel='produc
 function logistics({entries,sections,count,labels}){
  const wb=base(),byBrand=new Map();
  for(const r of entries){if(!byBrand.has(r.brand))byBrand.set(r.brand,[]);byBrand.get(r.brand).push(r);}
- const sectionColors=['FFE8EFF8','FFEDF4FA','FFDCE8F5','FFEAF0FA'];
  for(const [brand,groups]of byBrand){
   const baseName=String(brand).replace(/[\\/?*\[\]:']/g,' ').trim().slice(0,31)||'Logistics';
   let name=baseName,n=1;while(wb.getWorksheet(name)){const suffix=` ${n++}`;name=baseName.slice(0,31-suffix.length)+suffix;}
   const ws=wb.addWorksheet(name,{properties:{tabColor:{argb:colors.navy}},views:[{state:'frozen',xSplit:2,ySplit:2,showGridLines:false}]});
-  const lastColumn=groups.length+2;title(ws,`LOGISTICS DATA – ${brand}`,lastColumn);
+  const lastColumn=groups.length+2;title(ws,'LOGISTICS DATA',2);ws.getCell('A1').font={...ws.getCell('A1').font,size:13};ws.getRow(1).height=32;
+  for(let col=3;col<=lastColumn;col++)ws.getCell(1,col).fill=fill(colors.navy);
   ws.addRow(['Section','Attribute',...groups.map(r=>String(r.key))]);header(ws.getRow(2),lastColumn);
   ws.getColumn(1).width=13;ws.getColumn(2).width=23;
   groups.forEach((r,i)=>{ws.getColumn(i+3).width=Math.max(12,Math.min(28,String(r.key).length+3));ws.getCell(2,i+3).numFmt='@';});
-  let sectionIndex=0;
   for(const [section,attributes]of Object.entries(sections)){
-   const start=ws.rowCount+1,background=sectionColors[sectionIndex++%sectionColors.length];
+   const start=ws.rowCount+1,background=colors.pale;
    for(const attribute of attributes){
     const unit=attribute==='weight'?' (kg)':['length','width','height'].includes(attribute)?' (cm)':'';
     const label=labels[attribute]||attribute;

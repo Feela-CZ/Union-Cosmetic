@@ -23,13 +23,16 @@ test('saved logistics workbook retains section merges, colors, borders, units an
  const data=M.emptyLogistics();data.ITEM.length='12,5 cm';data.ITEM.weight='0 kg';data.CARTON.nr_of_items=12;
  const wb=await roundtrip(E.logistics({entries:[{brand:'Lilien',key:'001A',data}],sections:M.sections,count:M.count,labels:{length:'Length (cm)',weight:'Weight'}})),ws=wb.getWorksheet('Lilien');
  assert.equal(ws.getCell('C2').value,'001A');assert.equal(ws.getCell('C3').value,12.5);assert.equal(ws.getCell('C6').value,0);assert.equal(ws.getCell('C11').value,12);assert.equal(ws.getCell('C4').value,'');assert.equal(ws.getCell('B3').value,'Length (cm)');assert.equal(ws.getCell('B6').value,'Weight (kg)');
- assert.ok(ws.getCell('A6').isMerged);assert.notEqual(ws.getCell('A3').fill.fgColor.argb,ws.getCell('A7').fill.fgColor.argb);assert.equal(ws.getCell('C7').border.top.style,'medium');assert.equal(ws.getCell('C6').border.bottom.style,'medium');assert.equal(ws.views[0].xSplit,2);assert.equal(ws.pageSetup.printTitlesRow,'1:2');
+ assert.equal(ws.getCell('A1').value,'LOGISTICS DATA');assert.equal(ws.getCell('A1').font.size,13);assert.equal(ws.getCell('B1').master.address,'A1');assert.equal(ws.getCell('C1').isMerged,false);assert.equal(ws.getCell('C1').value,null);
+ assert.equal(new Set(['A3','B3','A7','B7','A12','B12','A14','B14'].map(c=>ws.getCell(c).fill.fgColor.argb)).size,1);
+ assert.ok(ws.getCell('A6').isMerged);assert.equal(ws.getCell('A3').fill.fgColor.argb,ws.getCell('A7').fill.fgColor.argb);assert.equal(ws.getCell('C7').border.top.style,'medium');assert.equal(ws.getCell('C6').border.bottom.style,'medium');assert.equal(ws.views[0].xSplit,2);assert.equal(ws.pageSetup.printTitlesRow,'1:2');
 });
 test('real logistics export includes all keys across brands and safe unique worksheet names',async()=>{
  const logistics=JSON.parse(fs.readFileSync(path.join(__dirname,'../../JSON edit GUI/logistics.json'),'utf8')),entries=M.keyEntries(logistics);
  const long='Long brand name with more than thirty-one characters';
  entries.push({brand:long+'?',key:'test',data:M.emptyLogistics()},{brand:long+'*',key:'test',data:M.emptyLogistics()});
  const wb=await roundtrip(E.logistics({entries,sections:M.sections,count:M.count,labels:{}}));
+ for(const ws of wb.worksheets){assert.equal(ws.getCell('A1').value,'LOGISTICS DATA');assert.equal(ws.getCell('B1').master.address,'A1');assert.equal(ws.getCell('C1').isMerged,false);}
  assert.equal(wb.worksheets.reduce((n,ws)=>n+ws.columnCount-2,0),entries.length);
  assert.equal(new Set(wb.worksheets.map(ws=>ws.name)).size,wb.worksheets.length);assert.ok(wb.worksheets.every(ws=>ws.name.length<=31));
 });
