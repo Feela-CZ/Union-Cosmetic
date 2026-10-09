@@ -1,0 +1,37 @@
+name: Daily Jason data backup
+
+on:
+  schedule:
+    - cron: '45 23 * * *'
+      timezone: Europe/Prague
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/daily-backup.yml'
+      - '.github/scripts/daily_backup.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: jason-data-backup
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out backup script
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          sparse-checkout: .github/scripts
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Archive common Jason data
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BACKUP_KIND: ${{ github.event_name == 'schedule' && 'daily' || 'manual' }}
+        run: python3 .github/scripts/daily_backup.py
+
