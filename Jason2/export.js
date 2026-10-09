@@ -66,29 +66,36 @@ function artwork(wb,ws,brand,imageIds){
  add(assets.union,2,64,64);
  return row+2;
 }
-function productList(ws,groups,products,lastColumn){
+function worksheet(wb,label,views){
+ const baseName=String(label).replace(/[\\/?*\[\]:']/g,' ').trim().slice(0,31)||'Logistics';
+ let name=baseName,n=1;while(wb.worksheets.some(ws=>ws.name.toLowerCase()===name.toLowerCase())){const suffix=` ${n++}`;name=baseName.slice(0,31-suffix.length)+suffix;}
+ return wb.addWorksheet(name,{properties:{tabColor:{argb:colors.navy}},views});
+}
+function productList(wb,groups,products,imageIds){
+ const ws=worksheet(wb,`${groups[0].brand} Products`,[{state:'frozen',ySplit:2,showGridLines:false}]);
  const order=new Map(groups.map((r,i)=>[String(r.key).trim(),i]));
  const rows=products.filter(p=>p.brand===groups[0].brand&&order.has(String(p.key??'').trim()))
   .map((p,i)=>({p,i})).sort((a,b)=>order.get(String(a.p.key).trim())-order.get(String(b.p.key).trim())||a.i-b.i);
- const ranges=[[1,1],[2,lastColumn-2],[lastColumn-1,lastColumn-1],[lastColumn,lastColumn]],start=ws.rowCount+1;
- ws.getColumn(lastColumn-1).width=Math.max(20,ws.getColumn(lastColumn-1).width||12);ws.getColumn(lastColumn).width=Math.max(20,ws.getColumn(lastColumn).width||12);
+ const lastColumn=4;
+ [18,64,22,22].forEach((width,i)=>{ws.getColumn(i+1).width=width;});
+ title(ws,'PRODUCTS',lastColumn);
  const write=(row,values,head=false)=>{
   ws.getRow(row).height=head?34:30;
-  ranges.forEach(([first,last],i)=>{if(last>first)ws.mergeCells(row,first,row,last);const c=ws.getCell(row,first);cellStyle(c,head?colors.pale:row%2?colors.stripe:colors.white);c.value=String(values[i]??'');c.numFmt='@';c.alignment.horizontal=i===1?'left':'center';if(head)c.font={...c.font,bold:true,color:{argb:colors.navy}};});
+  values.forEach((value,i)=>{const c=ws.getCell(row,i+1);cellStyle(c,head?colors.pale:row%2?colors.stripe:colors.white);c.value=String(value??'');c.numFmt='@';c.alignment.horizontal=i===1?'left':'center';if(head)c.font={...c.font,bold:true,color:{argb:colors.navy}};});
  };
- ws.mergeCells(start,1,start,lastColumn);const titleCell=ws.getCell(start,1);titleCell.value='PRODUCTS';titleCell.font={name:'Calibri',size:13,bold:true,color:{argb:colors.navy}};ws.getRow(start).height=28;
- write(start+1,['LOGISTICS KEY','PRODUCT NAME','PRODUCT EAN','CARTON EAN'],true);
- if(!rows.length){ws.mergeCells(start+2,1,start+2,lastColumn);ws.getCell(start+2,1).value='No products assigned to the selected keys.';ws.getCell(start+2,1).font={name:'Calibri',size:11,color:{argb:colors.ink}};ws.getRow(start+2).height=28;}
- rows.forEach(({p},i)=>{const row=start+2+i,name=String(p.name||p.csName||'')+(p.discontinued===true?' (Discontinued)':'');write(row,[String(p.key??'').trim(),name,String(p.id??''),String(p.carton_ean??'')]);let width=0;for(let c=ranges[1][0];c<=ranges[1][1];c++)width+=ws.getColumn(c).width||12;ws.getRow(row).height=Math.max(30,Math.ceil(name.length/Math.max(15,width-6))*15+10);});
+ write(2,['LOGISTICS KEY','PRODUCT NAME','PRODUCT EAN','CARTON EAN'],true);
+ if(!rows.length){ws.mergeCells(3,1,3,lastColumn);ws.getCell('A3').value='No products assigned to the selected keys.';ws.getCell('A3').font={name:'Calibri',size:11,color:{argb:colors.ink}};ws.getRow(3).height=28;}
+ rows.forEach(({p},i)=>{const row=3+i,name=String(p.name||p.csName||'')+(p.discontinued===true?' (Discontinued)':'');write(row,[String(p.key??'').trim(),name,String(p.id??''),String(p.carton_ean??'')]);ws.getRow(row).height=Math.max(30,Math.ceil(name.length/58)*15+10);});
+ if(rows.length)ws.autoFilter={from:{row:2,column:1},to:{row:2+rows.length,column:lastColumn}};
+ const nextRow=artwork(wb,ws,groups[0].brand,imageIds);ws.getRow(nextRow).height=12;
+ printSetup(ws,nextRow,lastColumn,2);
 }
 function logistics({entries,sections,count,labels,products=[],includeProducts=false}){
  const wb=base(),byBrand=new Map(),imageIds=new Map();
  for(const r of entries){if(!byBrand.has(r.brand))byBrand.set(r.brand,[]);byBrand.get(r.brand).push(r);}
  for(const [brand,groups]of byBrand){
-  const baseName=String(brand).replace(/[\\/?*\[\]:']/g,' ').trim().slice(0,31)||'Logistics';
-  let name=baseName,n=1;while(wb.getWorksheet(name)){const suffix=` ${n++}`;name=baseName.slice(0,31-suffix.length)+suffix;}
-  const ws=wb.addWorksheet(name,{properties:{tabColor:{argb:colors.navy}},views:[{state:'frozen',xSplit:2,ySplit:2,showGridLines:false}]});
-  const matrixLastColumn=groups.length+2,lastColumn=Math.max(matrixLastColumn,includeProducts?6:3);title(ws,'LOGISTICS DATA',2);ws.getCell('A1').font={...ws.getCell('A1').font,size:13};ws.getRow(1).height=32;
+  const ws=worksheet(wb,brand,[{state:'frozen',xSplit:2,ySplit:2,showGridLines:false}]);
+  const matrixLastColumn=groups.length+2,lastColumn=Math.max(matrixLastColumn,3);title(ws,'LOGISTICS DATA',2);ws.getCell('A1').font={...ws.getCell('A1').font,size:13};ws.getRow(1).height=32;
   for(let col=3;col<=matrixLastColumn;col++)ws.getCell(1,col).fill=fill(colors.navy);
   ws.addRow(['Section','Attribute',...groups.map(r=>String(r.key))]);header(ws.getRow(2),matrixLastColumn);
   ws.getColumn(1).width=13;ws.getColumn(2).width=23;
@@ -116,9 +123,9 @@ function logistics({entries,sections,count,labels,products=[],includeProducts=fa
    c.alignment={vertical:'middle',horizontal:'center',wrapText:true};
   }
   const nextRow=artwork(wb,ws,brand,imageIds);ws.getRow(nextRow).height=12;
-  if(includeProducts)productList(ws,groups,products,lastColumn);
   printSetup(ws,Math.max(ws.rowCount,nextRow),lastColumn,2);
  }
+ if(includeProducts)for(const groups of byBrand.values())productList(wb,groups,products,imageIds);
  return wb;
 }
 async function download(wb,filename){

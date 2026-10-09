@@ -16,7 +16,7 @@ test('logistics artwork is embedded in every export and survives saving without 
  const entries=['Lilien','Natava','Naturalis','Sunnoré','Twister'].map(brand=>({brand,key:'001A',data:M.emptyLogistics()}));
  for(const includeProducts of [false,true]){
   const wb=await roundtrip(E.logistics({entries,sections:M.sections,count:M.count,labels:{},includeProducts}));
-  for(const ws of wb.worksheets){const images=ws.getImages();assert.equal(images.length,ws.name==='Sunnoré'?3:2);for(const image of images){const asset=wb.getImage(image.imageId);assert.ok(asset.buffer.length>1000);assert.ok(image.range.tl.nativeRow>=20);assert.ok(image.range.ext.width>0);}}
+  for(const ws of wb.worksheets){const images=ws.getImages();assert.equal(images.length,ws.name.startsWith('Sunnoré')?3:2);for(const image of images){const asset=wb.getImage(image.imageId);assert.ok(asset.buffer.length>1000);assert.ok(image.range.tl.nativeRow>=3);assert.ok(image.range.ext.width>0);}}
   assert.equal(wb.getWorksheet('Lilien').getCell('C2').value,'001A');assert.equal(wb.getWorksheet('Lilien').views[0].xSplit,2);
  }
 });
@@ -25,16 +25,27 @@ test('optional list matches brand and selected keys, preserves text EANs and fla
  const products=[{brand:'Natava',key:'001A',name:'Other brand',id:'111'}, {brand:'Lilien',key:'not-selected',name:'Other key',id:'222'}, {brand:'Lilien',key:750,name:'Numeric key',id:8596048008129}, {brand:'Lilien',key:'001A',name:'Original',id:'0000000000001',carton_ean:'00000000000001'}, {brand:'Lilien',key:'001A',csName:'Náhradní název',id:'0000000000001',discontinued:true}];
  const before=JSON.stringify(products),options={entries,sections:M.sections,count:M.count,labels:{},products};
  const plain=await roundtrip(E.logistics(options)),plainWs=plain.getWorksheet('Lilien');assert.ok(!plainWs.getColumn(1).values.includes('PRODUCTS'));assert.equal(plainWs.getImages().length,2);
- const wb=await roundtrip(E.logistics({...options,includeProducts:true})),ws=wb.getWorksheet('Lilien'),heading=ws.getColumn(1).values.indexOf('LOGISTICS KEY');
- assert.ok(heading>20);assert.equal(ws.getCell(heading,2).value,'PRODUCT NAME');
+ const wb=await roundtrip(E.logistics({...options,includeProducts:true})),matrix=wb.getWorksheet('Lilien'),ws=wb.getWorksheet('Lilien Products'),heading=2;
+ assert.equal(ws.getCell(heading,2).value,'PRODUCT NAME');
  assert.deepEqual([0,1,2].map(i=>ws.getCell(heading+1+i,1).value),['001A','001A','750']);
  assert.deepEqual([0,1,2].map(i=>ws.getCell(heading+1+i,2).value),['Original','Náhradní název (Discontinued)','Numeric key']);
- assert.equal(ws.getCell(heading+1,5).value,'0000000000001');assert.equal(ws.getCell(heading+1,6).value,'00000000000001');assert.equal(ws.getCell(heading+3,5).value,'8596048008129');assert.equal(ws.getCell(heading+1,5).numFmt,'@');
- assert.equal(ws.getCell('C2').value,'001A');assert.equal(ws.getCell('D2').value,'750');assert.ok(ws.pageSetup.printArea.endsWith('F'+ws.rowCount));assert.equal(JSON.stringify(products),before);
+ assert.equal(ws.getCell(heading+1,3).value,'0000000000001');assert.equal(ws.getCell(heading+1,4).value,'00000000000001');assert.equal(ws.getCell(heading+3,3).value,'8596048008129');assert.equal(ws.getCell(heading+1,3).numFmt,'@');
+ assert.equal(matrix.getCell('C2').value,'001A');assert.equal(matrix.getCell('D2').value,'750');assert.ok(ws.pageSetup.printArea.endsWith('D'+ws.rowCount));assert.equal(JSON.stringify(products),before);
+ assert.equal(wb.worksheets.length,2);assert.equal(ws.columnCount,4);assert.equal(ws.autoFilter,'A2:D5');assert.equal(ws.views[0].xSplit,0);assert.equal(ws.views[0].ySplit,2);
 });
 test('selected unused keys get an explicit empty product list rather than unrelated products',async()=>{
  const wb=await roundtrip(E.logistics({entries:[{brand:'Lilien',key:'unused',data:M.emptyLogistics()}],sections:M.sections,count:M.count,labels:{},includeProducts:true,products:[{brand:'Lilien',key:'750',name:'Excluded'}]}));
- const ws=wb.getWorksheet('Lilien');assert.ok(ws.getColumn(1).values.includes('No products assigned to the selected keys.'));assert.equal(ws.getImages().length,2);
+ const ws=wb.getWorksheet('Lilien Products');assert.equal(ws.getCell('A3').value,'No products assigned to the selected keys.');assert.equal(ws.getImages().length,2);
+});
+test('many selected keys never widen the product list or add horizontal frozen panes',async()=>{
+ const entries=Array.from({length:24},(_,i)=>({brand:'Lilien',key:String(i),data:M.emptyLogistics()}));
+ const options={entries,sections:M.sections,count:M.count,labels:{},products:entries.map(e=>({brand:e.brand,key:e.key,name:'A product with a descriptive name',id:'0000000000001',carton_ean:'00000000000001'}))};
+ const plain=await roundtrip(E.logistics(options)),listed=await roundtrip(E.logistics({...options,includeProducts:true}));
+ assert.equal(plain.worksheets.length,1);assert.equal(listed.getWorksheet('Lilien').columnCount,26);
+ const ws=listed.getWorksheet('Lilien Products');assert.equal(ws.columnCount,4);assert.equal(ws.views[0].xSplit,0);assert.equal(ws.views[0].ySplit,2);assert.equal(ws.views[0].topLeftCell,'A3');
+ assert.equal(ws.getCell('C2').value,'PRODUCT EAN');assert.equal(ws.getCell('D2').value,'CARTON EAN');
+ assert.equal(ws.getCell('C26').value,'0000000000001');assert.equal(ws.getCell('D26').value,'00000000000001');assert.equal(ws.getCell('B26').isMerged,false);assert.equal(ws.autoFilter,'A2:D26');
+ assert.deepEqual(listed.getWorksheet('Lilien').model,plain.getWorksheet('Lilien').model);
 });
 test('saved product workbook retains styles, identifiers, numeric prices and native Excel controls',async()=>{
  const row=['Lilien','Soap','0000000000000','00123456','Soap','Mýdlo','4x50 g',1.16,'500A',12,13,65,'00123456789012','Yes','','No','','Promo'];
