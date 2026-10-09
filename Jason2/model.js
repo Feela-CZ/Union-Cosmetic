@@ -30,6 +30,16 @@ function validateLogistics(value) {
  return value;
 }
 function emptyLogistics(){return Object.fromEntries(Object.entries(sections).map(([s,fs])=>[s,Object.fromEntries(fs.map(f=>[f,null]))]));}
+// Display-only estimate in cm; never saved into PALLET.height or product data.
+function estimatedPalletHeight(data){
+ const raw=data?.CARTON?.height,layers=count(data?.PALLET?.nr_of_layers);
+ if(raw==null||raw==='')return '';
+ const match=String(raw).replace(',','.').match(/^\s*(\d+(?:\.\d+)?)\s*(cm|mm|m)?\s*$/i);
+ if(!match||!Number.isInteger(layers)||layers<=0)return '';
+ const height=Number(match[1])*({cm:1,mm:.1,m:100}[(match[2]||'cm').toLowerCase()]);
+ const estimate=14.4+height*layers;
+ return height>0&&Number.isFinite(estimate)?Math.round(estimate*10)/10:'';
+}
 function saveProduct(original,patch,products,index,logistics){
  const p=P.cleanProduct({...clone(original||{}),...clone(patch)});
  p.id=String(p.id??'').trim();
@@ -83,7 +93,7 @@ function issues(state){
  }
  return out;
 }
-const api={clone,sections,key,fold,count,validateProducts,validateLogistics,emptyLogistics,cleanProducts,packaging,saveProduct,keyEntries,applyLogistics,renameKey,filterProducts,eanValid,issues};
+const api={clone,sections,key,fold,count,validateProducts,validateLogistics,emptyLogistics,estimatedPalletHeight,cleanProducts,packaging,saveProduct,keyEntries,applyLogistics,renameKey,filterProducts,eanValid,issues};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.JasonModel=api;
 })(typeof window!=='undefined'?window:globalThis);
 

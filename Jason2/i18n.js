@@ -42,3 +42,6 @@ Object.assign(window.JasonText.en,{exportSelectedScope:'selected items',exportFi
 
 Object.assign(window.JasonText.cs,{keyData:'Údaje logistického klíče',openKeyDetail:'Otevřít detail klíče'});
 Object.assign(window.JasonText.en,{keyData:'Logistics key data',openKeyDetail:'Open key details'});
+
+Object.assign(window.JasonText.cs,{palletItems:'Kusů na paletě',palletWeight:'Hmotnost palety (kg)',estimatedHeight:'Orientační výška palety (cm)',estimatedHeightHint:'Výška europalety 14,4 cm + výška kartonu × počet vrstev. Nezahrnuje proložky ani přesahy obalu.',keyOverviewHint:'Kusy a hmotnost z logistického klíče. Orientační výška: výška kartonu × počet vrstev + europaleta 14,4 cm.'});
+Object.assign(window.JasonText.en,{palletItems:'Items per pallet',palletWeight:'Pallet weight (kg)',estimatedHeight:'Estimated pallet height (cm)',estimatedHeightHint:'Euro pallet height 14.4 cm + carton height × number of layers. Excludes interlayer sheets and packaging overhang.',keyOverviewHint:'Items and weight from the logistics key. Estimated height: carton height × number of layers + Euro pallet 14.4 cm.'});

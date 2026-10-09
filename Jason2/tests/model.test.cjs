@@ -1,6 +1,18 @@
 const test=require('node:test'),assert=require('node:assert/strict'),M=require('../model.js'),fs=require('node:fs');
 const logistics={Lilien:{'500':{...M.emptyLogistics(),CARTON:{nr_of_items:10},LAYER:{nr_of_cartons:12,nr_of_items:120},PALLET:{nr_of_cartons:120,nr_of_items:1200,nr_of_layers:10},extra:{supplier:'keep'}}}};
 const product={brand:'Lilien',type:'Liquid Soap',id:'8596048008129',name:'Soap',csName:'Mýdlo',price:1.2,key:'500',pack:10,boxes_per_layer:12,boxes_per_pallet:120,carton_ean:'00123456789012',volume:{number:'500',unit:'ml',precision:'keep'},custom:{nested:['keep']},new:true,new_date:'2025-01-01'};
+test('estimated pallet height converts units and leaves stored dimensions untouched',()=>{
+ for(const height of [12,'12 cm','120 mm','0,12 m']){
+  const data={CARTON:{height},PALLET:{nr_of_layers:10,height:'142 cm',weight:'193 kg'}};const before=M.clone(data);
+  assert.equal(M.estimatedPalletHeight(data),134.4);assert.deepEqual(data,before);
+ }
+ assert.equal(M.estimatedPalletHeight({CARTON:{height:'12,35 cm'},PALLET:{nr_of_layers:7}}),100.9);
+});
+test('estimated height stays missing for incomplete or invalid inputs without using stored pallet height',()=>{
+ for(const height of [null,'','bad','-12 cm','0 cm','12 inches','Infinity'])assert.equal(M.estimatedPalletHeight({CARTON:{height},PALLET:{nr_of_layers:10,height:142}}),'');
+ for(const layers of [null,'','bad',0,-1,1.5,Infinity])assert.equal(M.estimatedPalletHeight({CARTON:{height:12},PALLET:{nr_of_layers:layers,height:142}}),'');
+ assert.equal(M.estimatedPalletHeight(null),'');
+});
 test('archive logistics passes structural validation and remains byte-equivalent after clone',()=>{const input=JSON.parse(fs.readFileSync(require('node:path').join(__dirname,'../../JSON edit GUI/logistics.json'),'utf8'));assert.deepEqual(M.validateLogistics(M.clone(input)),input);});
 test('editing preserves unknown fields, carton EAN and volume metadata',()=>{const p=M.saveProduct(product,{name:'Revised',volume:{...product.volume,number:'600'}},[product],0,logistics);assert.deepEqual(p.custom,product.custom);assert.equal(p.carton_ean,product.carton_ean);assert.equal(p.volume.precision,'keep');assert.equal(product.name,'Soap');});
 test('duplicate IDs are rejected but unchanged IDs accepted',()=>{assert.throws(()=>M.saveProduct(null,product,[product],null,logistics),/EAN_DUPLICATE/);assert.equal(M.saveProduct(product,{price:0},[product],0,logistics).price,0);});

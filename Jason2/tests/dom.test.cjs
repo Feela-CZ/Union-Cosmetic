@@ -27,6 +27,18 @@ async function setup(shared=false,initialRemote=null){
 (async()=>{
  let passed=0;const c=await setup(),{w,$,$$,click,input,change,saved,upload,submit,errors}=c;
  async function test(name,fn){await fn();passed++;console.log('PASS',name);}
+ await test('key overview shows pallet items, weight and display-only estimated height with plain legends',async()=>{
+  const n=await setup(),keys=clone(logistics);keys.Lilien['500A'].PALLET.weight='500,5 kg';keys.Lilien['missing']=n.w.JasonModel.emptyLogistics();
+  await n.upload('products',[fixture]);await n.upload('logistics',keys);const before=await n.saved();
+  n.click('[data-view=keys]');const headings=n.$$('thead th').map(e=>e.textContent);
+  assert.deepEqual(headings.slice(2,5),['Kusů na paletě','Hmotnost palety (kg)','Orientační výška palety (cm)']);
+  assert.ok(!headings.includes('Kusů v kartonu'));
+  let cells=n.$$('tbody tr')[0].querySelectorAll('td');assert.equal(cells[2].textContent.replace(/\s/g,''),'1920');assert.equal(cells[3].textContent,'500,5');assert.equal(cells[4].textContent,'≈ 174,4');assert.match(cells[4].title,/14,4/);
+  assert.deepEqual(Array.from(n.$$('tbody tr')[1].querySelectorAll('td')).slice(2,5).map(e=>e.textContent),['—','—','—']);
+  n.click('[data-lang=en]');await wait(()=>n.$$('thead th')[4].textContent==='Estimated pallet height (cm)');assert.equal(n.$$('tbody tr')[0].querySelectorAll('td')[4].textContent,'≈ 174.4');
+  n.click('[data-key-edit="Lilien"][data-key-name="500A"]');assert.deepEqual(n.$$('#logistics-fields legend').map(e=>e.textContent),['Item','Carton','Layer','Pallet']);assert.equal(n.$('.section-letter'),null);
+  n.click('#editor-close');assert.deepEqual(await n.saved(),before);assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
  await test('imports remove old packaging counts and reassignment reads only the new key',async()=>{
   const n=await setup(),original={...fixture,pack:'99',boxes_per_layer:'01',boxes_per_pallet:null},keys=clone(logistics);
   keys.Lilien['500B']=clone(keys.Lilien['500A']);keys.Lilien['500B'].CARTON.nr_of_items=24;keys.Lilien['500B'].LAYER.nr_of_cartons=10;keys.Lilien['500B'].PALLET.nr_of_cartons=80;
