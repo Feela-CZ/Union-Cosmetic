@@ -8,7 +8,7 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const icons={products:'▦',keys:'◇',checks:'✓',data:'↔',undo:'↶',redo:'↷',export:'↓',plus:'+'};
 let lang='cs',view='products',page=1,pageSize=30,sort={field:'name',asc:true},selected=new Set(),history=[],future=[],busy=false,editorDirty=false,editorSave=null,toastTimer,syncing=false,storageError=false;
 let state={products:[],logistics:M.clone(window.JASON_SEED_LOGISTICS||{}),photos:{},pendingPhotos:[],connected:false,api:JASON_CONFIG.apiBase,imageBase:JASON_CONFIG.imageBase,baseline:{},updated:null};
-let filters={search:'',brand:'',type:'',key:'',status:'active',flag:'',scope:''};
+let filters={search:'',brand:'',type:'',key:'',status:'active',new:'',flag:'',scope:''};
 const t=k=>JasonText[lang][k]||JasonText.cs[k]||k;
 const types=()=>Object.keys(JasonTypes.en);
 const typeLabel=v=>JasonTypes[lang][v]||v;
@@ -91,7 +91,7 @@ function render(){
  $('#export').textContent=`↓ ${t('export')}`;$('#create').textContent=`+ ${t(view==='keys'?'addKey':'addProduct')}`;$('#create').hidden=view==='checks';$('#create').disabled=refreshing||(JASON_CONFIG.sharedOnly&&JASON_CONFIG.autoConnect&&!state.connected);
  renderToolbar();renderContent();renderStatus();
 }
-function changeView(next){view=next;page=1;selected.clear();filters={search:'',brand:'',type:'',key:'',status:'active',flag:'',scope:''};location.hash=next;render();}
+function changeView(next){view=next;page=1;selected.clear();filters={search:'',brand:'',type:'',key:'',status:'active',new:'',flag:'',scope:''};location.hash=next;render();}
 function renderToolbar(){
  const searchPlaceholder=t(view==='products'?'search':view==='keys'?'keySearch':'issueSearch');
  let html=`<label class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="${esc(searchPlaceholder)}" aria-label="${esc(searchPlaceholder)}" value="${esc(filters.search)}"></label>`;
@@ -99,13 +99,14 @@ function renderToolbar(){
  if(view==='products'){
   html+=selectHTML('filter-type','type',[...new Set([...types(),...state.products.map(p=>p.type)])].filter(Boolean).map(v=>({value:v,label:typeLabel(v)})),filters.type,'allTypes');
   html+=selectHTML('filter-key','key',[...new Set(M.keyEntries(state.logistics).filter(k=>!filters.brand||k.brand===filters.brand).map(k=>k.key))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})),filters.key,'allKeys');
-  html+=`<label class="filter"><span>${t('status')}</span><select id="filter-status">${['active','all','new','discontinued'].map(v=>option(v,t(v),filters.status)).join('')}</select></label>`;
+  html+=`<label class="filter"><span>${t('status')}</span><select id="filter-status">${['active','all','discontinued'].map(v=>option(v,t(v),filters.status)).join('')}</select></label>`;
+  html+=selectHTML('filter-new','new',[{value:'yes',label:t('yes')},{value:'no',label:t('no')}],filters.new,'all');
   if(flags().length)html+=selectHTML('filter-flag','flag',flags(),filters.flag,'allFlags');
  }else if(view==='keys')html+=selectHTML('filter-scope','keyScope',[{value:'used',label:t('used')},{value:'unused',label:t('unused')},{value:'incomplete',label:t('incomplete')}],filters.scope,'allScopes');
  html+=`<button class="reset-button" id="reset">${t('reset')}</button>`;$('#toolbar').innerHTML=html;
  $('#search').oninput=e=>{filters.search=e.target.value;page=1;selected.clear();renderContent();};
- for(const f of ['brand','type','key','status','flag','scope']){const el=$(`#filter-${f}`);if(el)el.onchange=e=>{filters[f]=e.target.value;if(f==='brand')filters.key='';page=1;selected.clear();renderToolbar();renderContent();};}
- $('#reset').onclick=()=>{filters={search:'',brand:'',type:'',key:'',status:'active',flag:'',scope:''};page=1;selected.clear();renderToolbar();renderContent();};
+ for(const f of ['brand','type','key','status','new','flag','scope']){const el=$(`#filter-${f}`);if(el)el.onchange=e=>{filters[f]=e.target.value;if(f==='brand')filters.key='';page=1;selected.clear();renderToolbar();renderContent();};}
+ $('#reset').onclick=()=>{filters={search:'',brand:'',type:'',key:'',status:'active',new:'',flag:'',scope:''};page=1;selected.clear();renderToolbar();renderContent();};
 }
 function filteredProducts(){const list=M.filterProducts(state.products,filters);return list.sort((a,b)=>{const value=p=>sort.field==='name'?(lang==='cs'?p.csName||p.name:p.name):sort.field==='volume'?Number(p.volume?.number)||0:p[sort.field];const av=value(a.p),bv=value(b.p);return (typeof av==='number'&&typeof bv==='number'?av-bv:String(av??'').localeCompare(String(bv??''),lang,{numeric:true}))*(sort.asc?1:-1);});}
 function productExportRows(){const rows=filteredProducts();return selected.size?rows.filter(r=>selected.has(r.index)):rows;}
@@ -126,10 +127,10 @@ function renderContent(){
  renderBulk();
 }
 function renderProductTable(items){
- const headers=[['name','product'],['brand','brand'],['id','ean'],['volume','volume'],['price','price'],['key','key'],['new','status']];
+ const headers=[['name','product'],['brand','brand'],['id','ean'],['volume','volume'],['price','price'],['key','key'],['discontinued','status']];
  $('#content').innerHTML=`<div class="table-scroll"><table><thead><tr><th class="select-cell"><input type="checkbox" id="select-page" aria-label="${esc(t('selectAll'))}" ${items.every(x=>selected.has(x.index))?'checked':''}></th>${headers.map(([f,label])=>`<th><button class="sort-button" data-sort="${f}">${esc(t(label))}${sort.field===f?(sort.asc?' ↑':' ↓'):''}</button></th>`).join('')}<th class="actions-cell">${t('actions')}</th></tr></thead><tbody>${items.map(({p,index})=>{
  const title=lang==='cs'?p.csName||p.name:p.name||p.csName;const secondary=lang==='cs'?p.name:p.csName;
- return `<tr class="${selected.has(index)?'selected':''}"><td class="select-cell"><input type="checkbox" data-select="${index}" aria-label="${esc(t('select')+' '+title)}" ${selected.has(index)?'checked':''}></td><td class="product-cell"><button class="product-link" data-edit="${index}"><span><strong>${esc(title||'—')}</strong><small>${esc(typeLabel(p.type))}${secondary&&secondary!==title?' · '+esc(secondary):''}</small></span></button></td><td>${badge(p.brand||'—','brand-'+M.fold(p.brand).replace(/[^a-z]/g,''))}</td><td class="mono">${esc(p.id||'—')}<small class="cell-sub">${p.hs?'HS '+esc(p.hs):''}</small></td><td class="nowrap">${esc(p.volume?.number??'')} ${esc(p.volume?.unit||'')}</td><td class="numeric">${p.price==null||p.price===''?'—':esc(Number.isFinite(Number(p.price))?Number(p.price).toLocaleString(lang==='cs'?'cs-CZ':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:4}):p.price)}</td><td><button class="key-link" data-product-key="${index}">${esc(M.key(p.key)||'—')}</button><small class="cell-sub">${p.pack!==''&&p.pack!=null?esc(p.pack)+' '+(lang==='cs'?'ks / karton':'items / carton'):''}</small></td><td class="status-cell">${p.discontinued===true?badge(t('discontinued'),'status-discontinued'):p.new===true?badge(t('new'),'status-new'):badge(t('active'),'status-active')}${(p.flags||[]).map(f=>badge(f,'custom')).join('')}<small class="cell-sub">${esc(p.discontinued?p.discontinued_date:p.new?p.new_date:'')}</small></td><td class="actions-cell"><button data-edit="${index}" class="row-edit">${t('edit')}</button><button data-more="${index}" class="more-button" aria-label="${esc(t('actions')+' '+title)}">•••</button></td></tr>`;
+ return `<tr class="${selected.has(index)?'selected':''}"><td class="select-cell"><input type="checkbox" data-select="${index}" aria-label="${esc(t('select')+' '+title)}" ${selected.has(index)?'checked':''}></td><td class="product-cell"><button class="product-link" data-edit="${index}"><span><strong>${esc(title||'—')}</strong><small>${esc(typeLabel(p.type))}${secondary&&secondary!==title?' · '+esc(secondary):''}</small></span></button></td><td>${badge(p.brand||'—','brand-'+M.fold(p.brand).replace(/[^a-z]/g,''))}</td><td class="mono">${esc(p.id||'—')}<small class="cell-sub">${p.hs?'HS '+esc(p.hs):''}</small></td><td class="nowrap">${esc(p.volume?.number??'')} ${esc(p.volume?.unit||'')}</td><td class="numeric">${p.price==null||p.price===''?'—':esc(Number.isFinite(Number(p.price))?Number(p.price).toLocaleString(lang==='cs'?'cs-CZ':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:4}):p.price)}</td><td><button class="key-link" data-product-key="${index}">${esc(M.key(p.key)||'—')}</button><small class="cell-sub">${p.pack!==''&&p.pack!=null?esc(p.pack)+' '+(lang==='cs'?'ks / karton':'items / carton'):''}</small></td><td class="status-cell"><span class="status-entry">${p.discontinued===true?badge(t('discontinued'),'status-discontinued'):badge(t('active'),'status-active')}${p.discontinued===true&&p.discontinued_date?'<small class="cell-sub">'+esc(p.discontinued_date)+'</small>':''}</span>${p.new===true?'<span class="status-entry">'+badge(t('new'),'status-new')+(p.new_date?'<small class="cell-sub">'+esc(p.new_date)+'</small>':'')+'</span>':''}${(p.flags||[]).map(f=>badge(f,'custom')).join('')}</td><td class="actions-cell"><button data-edit="${index}" class="row-edit">${t('edit')}</button><button data-more="${index}" class="more-button" aria-label="${esc(t('actions')+' '+title)}">•••</button></td></tr>`;
  }).join('')}</tbody></table></div>`;
  $$('[data-sort]').forEach(b=>b.onclick=()=>{sort={field:b.dataset.sort,asc:sort.field===b.dataset.sort?!sort.asc:true};renderContent();});
  $$('[data-edit]').forEach(b=>b.onclick=()=>openProduct(Number(b.dataset.edit)));

@@ -12,3 +12,5 @@ dialog{border:1px solid #dbe0e7;border-radius:14px;color:var(--ink);box-shadow:v
 .sandbox-banner{border:1px solid #c5d5eb;border-left:4px solid var(--accent);background:#e8eff8;color:#214a84;border-radius:8px;padding:14px 18px;margin:0 0 20px;font-size:12px;line-height:1.7}.sandbox-banner[hidden]{display:none}
 
 .badge.status-active{background:#eaf4ed;color:#52775e}.badge.status-new{background:#eaf0fa;color:#506f98}.badge.status-discontinued{background:#f5eded;color:#956a70}
+
+.status-entry{display:inline-block;vertical-align:top;margin-right:4px;margin-top:3px}.status-entry .cell-sub{margin-top:3px}

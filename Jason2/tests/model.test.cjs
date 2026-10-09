@@ -16,6 +16,17 @@ test('placeholder keys excluded without deleting original data',()=>{const data=
 test('historical duplicate EAN does not block unrelated edits but new duplicates are rejected',()=>{const rows=[product,{...product,name:'Historical duplicate'}];assert.equal(M.saveProduct(product,{price:2},rows,0,logistics).price,2);assert.throws(()=>M.saveProduct(product,{id:product.id},rows,null,logistics),/EAN_DUPLICATE/);});
 
 const duplicateIssues=products=>M.issues({products,logistics}).filter(r=>r.code==='eanDuplicate');
+test('new flag is independent of active/discontinued status in every combination',()=>{
+ const rows=[{...product,id:'active',new:false},{...product,id:'active-new',new:true},{...product,id:'old',discontinued:true,new:false},{...product,id:'old-new',discontinued:true,new:true}];
+ const ids=f=>M.filterProducts(rows,f).map(r=>r.p.id);
+ assert.deepEqual(ids({status:'active'}),['active','active-new']);
+ assert.deepEqual(ids({status:'active',new:'yes'}),['active-new']);
+ assert.deepEqual(ids({status:'active',new:'no'}),['active']);
+ assert.deepEqual(ids({status:'discontinued',new:'yes'}),['old-new']);
+ assert.deepEqual(ids({status:'discontinued',new:'no'}),['old']);
+ assert.deepEqual(ids({status:'all',new:'yes'}),['active-new','old-new']);
+ assert.deepEqual(ids({status:'all',new:'no'}),['active','old']);
+});
 test('real Honey and Oat replacement sharing a discontinued EAN is not a duplicate',()=>{
  const rows=JSON.parse(fs.readFileSync(require('node:path').join(__dirname,'../../OrderSheet/products.json'),'utf8')).filter(p=>String(p.id)==='8596048005128');
  assert.equal(rows.length,2);assert.equal(rows.filter(p=>p.discontinued===true).length,1);assert.notEqual(rows[0].price,rows[1].price);

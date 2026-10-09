@@ -26,6 +26,21 @@ async function setup(shared=false,initialRemote=null){
 (async()=>{
  let passed=0;const c=await setup(),{w,$,$$,click,input,change,saved,upload,submit,errors}=c;
  async function test(name,fn){await fn();passed++;console.log('PASS',name);}
+ await test('new flag keeps its status badge and filters independently, including exports',async()=>{
+  const n=await setup();
+  const products=[{...fixture,id:'active',new:false},{...fixture,id:'active-new',new:true},{...fixture,id:'old-new',new:true,discontinued:true}];
+  await n.upload('products',products);
+  assert.deepEqual(n.$$('#filter-status option').map(o=>o.value),['active','all','discontinued']);
+  assert.equal(n.$$('tbody tr').length,2);
+  assert.equal(n.$$('tbody .status-active').length,2);assert.equal(n.$$('tbody .status-new').length,1);
+  n.change('#filter-new','yes');assert.equal(n.$$('tbody tr').length,1);assert.ok(n.$('tbody .status-active'));assert.ok(n.$('tbody .status-new'));
+  let wb;n.w.JasonExport.download=async book=>{wb=book;};n.click('#export');n.submit('#export-form');await wait(()=>wb);assert.equal(wb.getWorksheet('Products').getCell('C4').value,'active-new');assert.equal(wb.getWorksheet('Products').rowCount,4);await wait(()=>!n.$('#export-form [type=submit]').disabled);n.click('#editor-close');
+  n.change('#filter-status','discontinued');assert.equal(n.$$('tbody tr').length,1);assert.ok(n.$('tbody .status-discontinued'));assert.ok(n.$('tbody .status-new'));
+  n.change('#filter-new','no');assert.equal(n.$$('tbody tr').length,0);
+  n.change('#filter-status','active');assert.equal(n.$$('tbody tr').length,1);assert.equal(n.$('tbody .status-new'),null);
+  n.click('#reset');assert.equal(n.$('#filter-status').value,'active');assert.equal(n.$('#filter-new').value,'');assert.equal(n.$$('tbody tr').length,2);
+  assert.deepEqual((await n.saved()).products,products);n.dom.window.close();
+ });
  await test('empty catalog and archived logistics initialized',async()=>{assert.ok($('#empty-import'));assert.ok(Number($('[data-view=keys] .nav-count').textContent)>0);});
  await test('import authentic JSON structure and search without accents',async()=>{await upload('products',[fixture]);await upload('logistics',logistics);input('#search','mydlo 859');assert.equal($$('tbody tr').length,1);click('#reset');assert.equal((await saved()).products[0].hs,'00123456');});
  await test('product edit retains unknown fields and exact identifiers',async()=>{click('[data-edit="0"]');input('#field-price','2.45');click('#tab-flags');input('#field-flags','Promo, Export');submit('#product-form');await wait(()=>!$('#editor').open);const p=(await saved()).products[0];assert.equal(p.price,2.45);assert.deepEqual(p.custom,fixture.custom);assert.equal(p.volume.note,'keep');assert.equal(p.carton_ean,fixture.carton_ean);assert.deepEqual(p.flags,['Promo','Export']);});

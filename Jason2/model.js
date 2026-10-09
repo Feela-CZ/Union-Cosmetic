@@ -56,7 +56,8 @@ function filterProducts(products,f={}){
  const words=fold(f.search).split(/\s+/).filter(Boolean);
  return products.map((p,index)=>({p,index})).filter(({p})=>{
   if(f.brand&&p.brand!==f.brand||f.type&&p.type!==f.type||f.key&&key(p.key)!==f.key)return false;
-  if(f.status==='active'&&p.discontinued===true||f.status==='discontinued'&&p.discontinued!==true||f.status==='new'&&p.new!==true)return false;
+  if(f.status==='active'&&p.discontinued===true||f.status==='discontinued'&&p.discontinued!==true)return false;
+  if(f.new==='yes'&&p.new!==true||f.new==='no'&&p.new===true)return false;
   if(f.flag&&!(p.flags||[]).includes(f.flag))return false;
   const hay=fold([p.brand,p.type,p.id,p.hs,p.name,p.csName,p.volume?.number,p.volume?.unit,p.key,p.carton_ean,...(p.flags||[])].join(' '));
   return words.every(w=>hay.includes(w));
