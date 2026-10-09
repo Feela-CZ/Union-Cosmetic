@@ -2,6 +2,15 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 global.ExcelJS=require('../vendor/exceljs.min.js');require('../export.js');
 const M=require('../model.js'),E=global.JasonExport;
 const fields=['brand','type','id','hs','name','csName','volume','price','key','pack','boxes_per_layer','boxes_per_pallet','carton_ean','new','new_date','discontinued','discontinued_date','flags'];
+test('Excel export loads and serializes without dynamic code evaluation',async()=>{
+ const vm=require('node:vm'),context=vm.createContext({setTimeout,clearTimeout,TextEncoder,TextDecoder},{codeGeneration:{strings:false,wasm:false}});
+ context.self=context;
+ vm.runInContext(fs.readFileSync(path.join(__dirname,'../vendor/exceljs.min.js'),'utf8'),context);
+ vm.runInContext(fs.readFileSync(path.join(__dirname,'../export.js'),'utf8'),context);
+ const wb=context.JasonExport.products({fields:['id'],headers:['EAN'],rows:[['0000000000000']],title:'Products',count:1});
+ const bytes=await wb.xlsx.writeBuffer(),loaded=new ExcelJS.Workbook();await loaded.xlsx.load(bytes);
+ assert.equal(loaded.getWorksheet('Products').getCell('A4').value,'0000000000000');
+});
 async function roundtrip(wb){const next=new ExcelJS.Workbook();await next.xlsx.load(await wb.xlsx.writeBuffer());return next;}
 test('saved product workbook retains styles, identifiers, numeric prices and native Excel controls',async()=>{
  const row=['Lilien','Soap','0000000000000','00123456','Soap','Mýdlo','4x50 g',1.16,'500A',12,13,65,'00123456789012','Yes','','No','','Promo'];
