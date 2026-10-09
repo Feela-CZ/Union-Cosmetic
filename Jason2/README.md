@@ -31,3 +31,5 @@ Statická aplikace bez sestavení a bez nových služeb. Rozhraní používá mo
 
 Node 24+: `npm install`, `npm test`. Testy prověřují model, uživatelské postupy v simulovaném DOM a API adaptér s testovacími odpověďmi; nemění produkční data. Živý web je zvlášť zkontrolován v prohlížeči bez ukládání změn do katalogu.
 
+
+V detailu produktu na záložce Balení a logistika se zobrazují všechny standardní údaje přiřazeného klíče (ITEM / CARTON / LAYER / PALLET). Samostatný detail klíče se otevře nad formulářem a zachová jeho rozpracované změny. Excel lze stáhnout přímo ze záložky i z tohoto detailu; obsahuje pouze aktuálně přiřazený klíč ve stejné formátované matici jako hlavní logistický export. Zobrazení a export klíče nic neukládají.

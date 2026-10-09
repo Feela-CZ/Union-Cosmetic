@@ -26,6 +26,21 @@ async function setup(shared=false,initialRemote=null){
 (async()=>{
  let passed=0;const c=await setup(),{w,$,$$,click,input,change,saved,upload,submit,errors}=c;
  async function test(name,fn){await fn();passed++;console.log('PASS',name);}
+ await test('product logistics detail shows full key, exports it and preserves unsaved product draft',async()=>{
+  const n=await setup(),keys=clone(logistics);keys.Lilien['500A'].ITEM.weight='0 kg';keys.Natava={'500A':clone(keys.Lilien['500A'])};keys.Natava['500A'].CARTON.nr_of_items=24;
+  await n.upload('products',[fixture]);await n.upload('logistics',keys);const before=await n.saved();
+  n.click('[data-edit="0"]');n.input('#field-name','UNSAVED PRODUCT');n.click('#tab-packaging');
+  assert.equal(n.$$('#product-key-data section').length,4);assert.equal(n.$$('#product-key-data dd').length,18);assert.ok(n.$$('#product-key-data dd').some(el=>el.textContent==='0'));
+  let wb;n.w.JasonExport.download=async book=>{wb=book;};n.click('#product-key-export');await wait(()=>wb);assert.deepEqual(Array.from(wb.worksheets,s=>s.name),['Lilien']);assert.equal(wb.getWorksheet('Lilien').columnCount,3);assert.equal(wb.getWorksheet('Lilien').getCell('C2').value,'500A');assert.equal(wb.getWorksheet('Lilien').getCell('C6').value,0);await wait(()=>!n.$('#product-key-export').disabled);
+  n.click('#product-key-open');assert.ok(n.$('#key-preview-dialog').open);assert.equal(n.$('#key-preview-title').textContent,'Lilien / 500A');assert.equal(n.$$('#key-preview-body dd').length,18);
+  n.w.document.dispatchEvent(new n.w.KeyboardEvent('keydown',{key:'s',ctrlKey:true,bubbles:true,cancelable:true}));await sleep(20);assert.ok(n.$('#editor').open);assert.equal((await n.saved()).products[0].name,fixture.name);
+  wb=null;n.click('#key-preview-export');await wait(()=>wb);await wait(()=>!n.$('#key-preview-export').disabled);assert.equal(wb.getWorksheet('Lilien').getCell('C11').value,12);assert.equal(wb.getWorksheet('Lilien').getCell('A1').fill.fgColor.argb,'FF214A84');
+  n.click('#key-preview-close');assert.ok(n.$('#editor').open);assert.equal(n.$('#field-name').value,'UNSAVED PRODUCT');
+  n.change('#product-key','');assert.ok(n.$('#product-key-open').disabled);assert.ok(n.$('#product-key-export').disabled);assert.equal(n.$$('#product-key-data dd').length,0);
+  n.input('#field-brand','Natava');n.change('#field-brand','Natava');n.change('#product-key','500A');assert.equal(n.$('#field-pack').value,'24');
+  wb=null;n.click('#product-key-export');await wait(()=>wb);assert.deepEqual(Array.from(wb.worksheets,s=>s.name),['Natava']);assert.equal(wb.getWorksheet('Natava').getCell('C11').value,24);
+  assert.deepEqual(await n.saved(),before);assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
  await test('new flag keeps its status badge and filters independently, including exports',async()=>{
   const n=await setup();
   const products=[{...fixture,id:'active',new:false},{...fixture,id:'active-new',new:true},{...fixture,id:'old-new',new:true,discontinued:true}];

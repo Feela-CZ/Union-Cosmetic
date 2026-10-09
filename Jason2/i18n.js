@@ -39,3 +39,6 @@ Object.assign(window.JasonText.en,{sandboxFooter:'Test version · Changes are sa
 
 Object.assign(window.JasonText.cs,{exportSelectedScope:'vybrané položky',exportFilteredScope:'podle aktuálních filtrů'});
 Object.assign(window.JasonText.en,{exportSelectedScope:'selected items',exportFilteredScope:'current filters'});
+
+Object.assign(window.JasonText.cs,{keyData:'Údaje logistického klíče',openKeyDetail:'Otevřít detail klíče'});
+Object.assign(window.JasonText.en,{keyData:'Logistics key data',openKeyDetail:'Open key details'});
