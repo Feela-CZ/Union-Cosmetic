@@ -52,18 +52,48 @@ function products({fields,headers,rows,title:label,date,count,countLabel='produc
  ws.autoFilter={from:{row:3,column:1},to:{row:ws.rowCount,column:lastColumn}};
  printSetup(ws,ws.rowCount,lastColumn,3);return wb;
 }
-function logistics({entries,sections,count,labels}){
- const wb=base(),byBrand=new Map();
+function artwork(wb,ws,brand,imageIds){
+ const assets=root.JasonExportAssets;
+ if(!assets?.union)throw Error('Export artwork is unavailable. Reload the application.');
+ const key=String(brand).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z]/g,''),logo=assets[key];
+ const row=ws.rowCount+2;ws.getRow(row).height=58;ws.getRow(row+1).height=12;
+ const add=(asset,col,maxWidth,maxHeight)=>{
+  const ratio=Math.min(maxWidth/asset.width,maxHeight/asset.height);if(!imageIds.has(asset))imageIds.set(asset,wb.addImage({base64:asset.base64,extension:asset.extension}));const id=imageIds.get(asset);
+  ws.addImage(id,{tl:{col,row:row-1},ext:{width:asset.width*ratio,height:asset.height*ratio},editAs:'oneCell'});
+ };
+ if(logo)add(logo,0,key==='sunnore'?160:215,70);
+ if(key==='sunnore')add(assets.sun,1.6,42,42);
+ add(assets.union,2,64,64);
+ return row+2;
+}
+function productList(ws,groups,products,lastColumn){
+ const order=new Map(groups.map((r,i)=>[String(r.key).trim(),i]));
+ const rows=products.filter(p=>p.brand===groups[0].brand&&order.has(String(p.key??'').trim()))
+  .map((p,i)=>({p,i})).sort((a,b)=>order.get(String(a.p.key).trim())-order.get(String(b.p.key).trim())||a.i-b.i);
+ const ranges=[[1,1],[2,lastColumn-2],[lastColumn-1,lastColumn-1],[lastColumn,lastColumn]],start=ws.rowCount+1;
+ ws.getColumn(lastColumn-1).width=Math.max(20,ws.getColumn(lastColumn-1).width||12);ws.getColumn(lastColumn).width=Math.max(20,ws.getColumn(lastColumn).width||12);
+ const write=(row,values,head=false)=>{
+  ws.getRow(row).height=head?34:30;
+  ranges.forEach(([first,last],i)=>{if(last>first)ws.mergeCells(row,first,row,last);const c=ws.getCell(row,first);cellStyle(c,head?colors.pale:row%2?colors.stripe:colors.white);c.value=String(values[i]??'');c.numFmt='@';c.alignment.horizontal=i===1?'left':'center';if(head)c.font={...c.font,bold:true,color:{argb:colors.navy}};});
+ };
+ ws.mergeCells(start,1,start,lastColumn);const titleCell=ws.getCell(start,1);titleCell.value='PRODUCTS';titleCell.font={name:'Calibri',size:13,bold:true,color:{argb:colors.navy}};ws.getRow(start).height=28;
+ write(start+1,['LOGISTICS KEY','PRODUCT NAME','PRODUCT EAN','CARTON EAN'],true);
+ if(!rows.length){ws.mergeCells(start+2,1,start+2,lastColumn);ws.getCell(start+2,1).value='No products assigned to the selected keys.';ws.getCell(start+2,1).font={name:'Calibri',size:11,color:{argb:colors.ink}};ws.getRow(start+2).height=28;}
+ rows.forEach(({p},i)=>{const row=start+2+i,name=String(p.name||p.csName||'')+(p.discontinued===true?' (Discontinued)':'');write(row,[String(p.key??'').trim(),name,String(p.id??''),String(p.carton_ean??'')]);let width=0;for(let c=ranges[1][0];c<=ranges[1][1];c++)width+=ws.getColumn(c).width||12;ws.getRow(row).height=Math.max(30,Math.ceil(name.length/Math.max(15,width-6))*15+10);});
+}
+function logistics({entries,sections,count,labels,products=[],includeProducts=false}){
+ const wb=base(),byBrand=new Map(),imageIds=new Map();
  for(const r of entries){if(!byBrand.has(r.brand))byBrand.set(r.brand,[]);byBrand.get(r.brand).push(r);}
  for(const [brand,groups]of byBrand){
   const baseName=String(brand).replace(/[\\/?*\[\]:']/g,' ').trim().slice(0,31)||'Logistics';
   let name=baseName,n=1;while(wb.getWorksheet(name)){const suffix=` ${n++}`;name=baseName.slice(0,31-suffix.length)+suffix;}
   const ws=wb.addWorksheet(name,{properties:{tabColor:{argb:colors.navy}},views:[{state:'frozen',xSplit:2,ySplit:2,showGridLines:false}]});
-  const lastColumn=groups.length+2;title(ws,'LOGISTICS DATA',2);ws.getCell('A1').font={...ws.getCell('A1').font,size:13};ws.getRow(1).height=32;
-  for(let col=3;col<=lastColumn;col++)ws.getCell(1,col).fill=fill(colors.navy);
-  ws.addRow(['Section','Attribute',...groups.map(r=>String(r.key))]);header(ws.getRow(2),lastColumn);
+  const matrixLastColumn=groups.length+2,lastColumn=Math.max(matrixLastColumn,includeProducts?6:3);title(ws,'LOGISTICS DATA',2);ws.getCell('A1').font={...ws.getCell('A1').font,size:13};ws.getRow(1).height=32;
+  for(let col=3;col<=matrixLastColumn;col++)ws.getCell(1,col).fill=fill(colors.navy);
+  ws.addRow(['Section','Attribute',...groups.map(r=>String(r.key))]);header(ws.getRow(2),matrixLastColumn);
   ws.getColumn(1).width=13;ws.getColumn(2).width=23;
   groups.forEach((r,i)=>{ws.getColumn(i+3).width=Math.max(12,Math.min(28,String(r.key).length+3));ws.getCell(2,i+3).numFmt='@';});
+  for(let col=matrixLastColumn+1;col<=lastColumn;col++)ws.getColumn(col).width=18;
   for(const [section,attributes]of Object.entries(sections)){
    const start=ws.rowCount+1,background=colors.pale;
    for(const attribute of attributes){
@@ -71,21 +101,23 @@ function logistics({entries,sections,count,labels}){
     const label=labels[attribute]||attribute;
     const row=ws.addRow([section,(unit?label.replace(/\s*\((?:cm|kg)\)$/i,''):label)+unit,...groups.map(r=>{const v=count(r.data[section]?.[attribute]);return v===''?'':v;})]);
     row.height=25;
-    for(let col=1;col<=lastColumn;col++){
+    for(let col=1;col<=matrixLastColumn;col++){
      const cell=row.getCell(col);cellStyle(cell,col<=2?background:colors.white);
      cell.alignment.horizontal=col===2?'left':'center';
      if(col>=3)cell.numFmt=attribute.startsWith('nr_')?'0':'General';
      if(row.number===start)cell.border.top=edge('medium');
      if(col===1)cell.border.left=edge('medium');
-     if(col===lastColumn)cell.border.right=edge('medium');
+     if(col===matrixLastColumn)cell.border.right=edge('medium');
     }
    }
-   const end=ws.rowCount;for(let col=1;col<=lastColumn;col++)ws.getCell(end,col).border.bottom=edge('medium');
+   const end=ws.rowCount;for(let col=1;col<=matrixLastColumn;col++)ws.getCell(end,col).border.bottom=edge('medium');
    ws.mergeCells(start,1,end,1);
    const c=ws.getCell(start,1);c.font={name:'Calibri',size:11,bold:true,color:{argb:colors.navy}};
    c.alignment={vertical:'middle',horizontal:'center',wrapText:true};
   }
-  printSetup(ws,ws.rowCount,lastColumn,2);
+  const nextRow=artwork(wb,ws,brand,imageIds);ws.getRow(nextRow).height=12;
+  if(includeProducts)productList(ws,groups,products,lastColumn);
+  printSetup(ws,Math.max(ws.rowCount,nextRow),lastColumn,2);
  }
  return wb;
 }

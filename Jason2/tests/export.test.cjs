@@ -1,5 +1,5 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-global.ExcelJS=require('../vendor/exceljs.min.js');require('../export.js');
+global.ExcelJS=require('../vendor/exceljs.min.js');require('../export-assets.js');require('../export.js');
 const M=require('../model.js'),E=global.JasonExport;
 const fields=['brand','type','id','hs','name','csName','volume','price','key','pack','boxes_per_layer','boxes_per_pallet','carton_ean','new','new_date','discontinued','discontinued_date','flags'];
 test('Excel export loads and serializes without dynamic code evaluation',async()=>{
@@ -12,6 +12,30 @@ test('Excel export loads and serializes without dynamic code evaluation',async()
  assert.equal(loaded.getWorksheet('Products').getCell('A4').value,'0000000000000');
 });
 async function roundtrip(wb){const next=new ExcelJS.Workbook();await next.xlsx.load(await wb.xlsx.writeBuffer());return next;}
+test('logistics artwork is embedded in every export and survives saving without network',async()=>{
+ const entries=['Lilien','Natava','Naturalis','Sunnoré','Twister'].map(brand=>({brand,key:'001A',data:M.emptyLogistics()}));
+ for(const includeProducts of [false,true]){
+  const wb=await roundtrip(E.logistics({entries,sections:M.sections,count:M.count,labels:{},includeProducts}));
+  for(const ws of wb.worksheets){const images=ws.getImages();assert.equal(images.length,ws.name==='Sunnoré'?3:2);for(const image of images){const asset=wb.getImage(image.imageId);assert.ok(asset.buffer.length>1000);assert.ok(image.range.tl.nativeRow>=20);assert.ok(image.range.ext.width>0);}}
+  assert.equal(wb.getWorksheet('Lilien').getCell('C2').value,'001A');assert.equal(wb.getWorksheet('Lilien').views[0].xSplit,2);
+ }
+});
+test('optional list matches brand and selected keys, preserves text EANs and flags discontinued rows',async()=>{
+ const entries=[{brand:'Lilien',key:'001A',data:M.emptyLogistics()},{brand:'Lilien',key:'750',data:M.emptyLogistics()}];
+ const products=[{brand:'Natava',key:'001A',name:'Other brand',id:'111'}, {brand:'Lilien',key:'not-selected',name:'Other key',id:'222'}, {brand:'Lilien',key:750,name:'Numeric key',id:8596048008129}, {brand:'Lilien',key:'001A',name:'Original',id:'0000000000001',carton_ean:'00000000000001'}, {brand:'Lilien',key:'001A',csName:'Náhradní název',id:'0000000000001',discontinued:true}];
+ const before=JSON.stringify(products),options={entries,sections:M.sections,count:M.count,labels:{},products};
+ const plain=await roundtrip(E.logistics(options)),plainWs=plain.getWorksheet('Lilien');assert.ok(!plainWs.getColumn(1).values.includes('PRODUCTS'));assert.equal(plainWs.getImages().length,2);
+ const wb=await roundtrip(E.logistics({...options,includeProducts:true})),ws=wb.getWorksheet('Lilien'),heading=ws.getColumn(1).values.indexOf('LOGISTICS KEY');
+ assert.ok(heading>20);assert.equal(ws.getCell(heading,2).value,'PRODUCT NAME');
+ assert.deepEqual([0,1,2].map(i=>ws.getCell(heading+1+i,1).value),['001A','001A','750']);
+ assert.deepEqual([0,1,2].map(i=>ws.getCell(heading+1+i,2).value),['Original','Náhradní název (Discontinued)','Numeric key']);
+ assert.equal(ws.getCell(heading+1,5).value,'0000000000001');assert.equal(ws.getCell(heading+1,6).value,'00000000000001');assert.equal(ws.getCell(heading+3,5).value,'8596048008129');assert.equal(ws.getCell(heading+1,5).numFmt,'@');
+ assert.equal(ws.getCell('C2').value,'001A');assert.equal(ws.getCell('D2').value,'750');assert.ok(ws.pageSetup.printArea.endsWith('F'+ws.rowCount));assert.equal(JSON.stringify(products),before);
+});
+test('selected unused keys get an explicit empty product list rather than unrelated products',async()=>{
+ const wb=await roundtrip(E.logistics({entries:[{brand:'Lilien',key:'unused',data:M.emptyLogistics()}],sections:M.sections,count:M.count,labels:{},includeProducts:true,products:[{brand:'Lilien',key:'750',name:'Excluded'}]}));
+ const ws=wb.getWorksheet('Lilien');assert.ok(ws.getColumn(1).values.includes('No products assigned to the selected keys.'));assert.equal(ws.getImages().length,2);
+});
 test('saved product workbook retains styles, identifiers, numeric prices and native Excel controls',async()=>{
  const row=['Lilien','Soap','0000000000000','00123456','Soap','Mýdlo','4x50 g',1.16,'500A',12,13,65,'00123456789012','Yes','','No','','Promo'];
  const wb=await roundtrip(E.products({fields,headers:fields,rows:[row],title:'Products',date:'2026-10-08',count:1})),ws=wb.getWorksheet('Products');

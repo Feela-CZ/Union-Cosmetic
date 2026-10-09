@@ -71,7 +71,7 @@ async function confirm(title,message,yes='confirm',danger=false){
 async function closeEditor(){if(busy)return;if(editorDirty&&!await confirm('discard',t('discardHint'),'discardYes'))return;$('#editor').close();editorDirty=false;editorSave=null;}
 function openEditor(title,caption,html,small=false){
  const d=$('#editor');d.classList.toggle('small',small);$('#editor-title').textContent=title;$('#editor-caption').textContent=caption;$('#editor-body').innerHTML=html;editorDirty=false;editorSave=null;
- $('#editor-body').oninput=e=>{if(e.target.closest('form'))editorDirty=true;};$('#editor-body').onchange=e=>{if(e.target.closest('form'))editorDirty=true;};
+ $('#editor-body').oninput=e=>{if(e.target.closest('form')&&e.target.id!=='product-key-include-products')editorDirty=true;};$('#editor-body').onchange=e=>{if(e.target.closest('form')&&e.target.id!=='product-key-include-products')editorDirty=true;};
  if(!d.open)d.showModal();
  d.scrollTop=0;
 }
@@ -157,14 +157,14 @@ function productPhoto(p){return (!state.connected||state.pendingPhotos.includes(
 function logisticsOverview(data){
  return `<div class="logistics-overview">${Object.entries(M.sections).map(([section,fields])=>`<section><h4>${t(section)}</h4><dl>${fields.map(f=>{const raw=data[section]?.[f],value=M.count(raw);return `<div><dt>${esc(t(f))}</dt><dd>${raw==null||raw===''?'—':esc(value===''?String(raw):value.toLocaleString(lang==='cs'?'cs-CZ':'en-GB',{maximumFractionDigits:6}))}</dd></div>`;}).join('')}</dl></section>`).join('')}</div>`;
 }
-async function downloadKey(entry,button){
+async function downloadKey(entry,button,includeProducts=false){
  if(button.disabled)return;button.disabled=true;
- try{await exportLogistics([entry]);}catch(e){error(e);}finally{button.disabled=false;}
+ try{await exportLogistics([entry],includeProducts);}catch(e){error(e);}finally{button.disabled=false;}
 }
 function openKeyPreview(entry){
  const d=$('#key-preview-dialog');$('#key-preview-title').textContent=`${entry.brand} / ${entry.key}`;
- $('#key-preview-body').innerHTML=`${logisticsOverview(entry.data)}<div class="key-preview-actions">${button('key-preview-export','exportNow','primary')}</div>`;
- $('#key-preview-export').onclick=e=>downloadKey(entry,e.currentTarget);d.showModal();
+ $('#key-preview-body').innerHTML=`${logisticsOverview(entry.data)}<label class="checkbox-label"><input type="checkbox" id="key-preview-include-products">${t('includeProductList')}</label><p class="muted">${t('includeProductListHint')}</p><div class="key-preview-actions">${button('key-preview-export','exportNow','primary')}</div>`;
+ $('#key-preview-export').onclick=e=>downloadKey(entry,e.currentTarget,$('#key-preview-include-products').checked);d.showModal();
 }
 function openProduct(index=null,tab='details',duplicate=false){
  if(refreshing)return;
@@ -176,7 +176,7 @@ function openProduct(index=null,tab='details',duplicate=false){
  openEditor(title,original&&!duplicate?`${p.brand} / ${p.id}`:t('product'),`<form id="product-form" novalidate><div class="editor-tabs" role="tablist">${['details','packaging','flags','photo'].map(v=>`<button type="button" role="tab" id="tab-${v}" aria-controls="section-${v}" data-tab="${v}" aria-selected="${v===tab}">${t(v)}</button>`).join('')}</div>
  <div class="form-content"><div id="form-error" class="notice error-notice" role="alert" hidden></div>
  <section id="section-details" class="tab-section" role="tabpanel" aria-labelledby="tab-details"><div class="section-intro"><h3>${t('details')}</h3><span>${t('unknownFields')}</span></div><div class="form-grid">${field('brand','brand',p.brand,'text','list="brands" required')}${field('type','type',p.type,'text','list="types"')}${field('id','ean',p.id,'text','required inputmode="numeric"',t('required'))}${field('hs','hs',p.hs,'text','inputmode="numeric"')}${field('name','name',p.name)}${field('csName','csName',p.csName)}<label class="field"><span>${t('volume')}</span><div class="input-group"><input name="volume-number" type="text" inputmode="decimal" value="${esc(p.volume?.number??'')}"><input name="volume-unit" list="units" value="${esc(p.volume?.unit||'ml')}" aria-label="${lang==='cs'?'Jednotka':'Unit'}"></div></label>${field('price','price',p.price,'number','min="0" step="any"')}</div>${datalist('brands',brands())}${datalist('types',[...new Set([...types(),...state.products.map(p=>p.type)])].filter(Boolean))}${datalist('units',['ml','g','pc','l','kg'])}<p class="notice" id="draft-warning" hidden>${t('draftWarning')}</p></section>
- <section id="section-packaging" class="tab-section" role="tabpanel" aria-labelledby="tab-packaging"><div class="section-intro"><h3>${t('packaging')}</h3></div><p class="notice">${t('keyHint')}</p><div class="form-grid"><label class="field"><span>${t('key')}</span><select name="key" id="product-key"></select></label>${field('carton_ean','carton_ean',p.carton_ean)}</div><p class="muted" id="key-summary"></p><section class="product-logistics"><div class="section-intro"><h3>${t('keyData')}</h3><div class="key-detail-actions">${button('product-key-open','openKeyDetail')}${button('product-key-export','exportNow')}</div></div><div id="product-key-data"></div></section></section>
+ <section id="section-packaging" class="tab-section" role="tabpanel" aria-labelledby="tab-packaging"><div class="section-intro"><h3>${t('packaging')}</h3></div><p class="notice">${t('keyHint')}</p><div class="form-grid"><label class="field"><span>${t('key')}</span><select name="key" id="product-key"></select></label>${field('carton_ean','carton_ean',p.carton_ean)}</div><p class="muted" id="key-summary"></p><section class="product-logistics"><div class="section-intro"><h3>${t('keyData')}</h3><div class="key-detail-actions">${button('product-key-open','openKeyDetail')}${button('product-key-export','exportNow')}</div></div><label class="checkbox-label"><input type="checkbox" id="product-key-include-products">${t('includeProductList')}</label><div id="product-key-data"></div></section></section>
  <section id="section-flags" class="tab-section" role="tabpanel" aria-labelledby="tab-flags"><h3>${t('flags')}</h3>${['new','discontinued'].map(v=>`<div class="flag-card"><label class="checkbox-label"><input type="checkbox" name="${v}" ${p[v]===true?'checked':''}>${t(v)}</label>${field(v+'_date',v+'_date',p[v+'_date'],'date')}</div>`).join('')}<div class="form-grid">${field('flags','customFlags',(p.flags||[]).join(', '),'text','',t('flagsHint'))}</div><p class="muted">${t('localOnly')}</p></section>
  <section id="section-photo" class="tab-section" role="tabpanel" aria-labelledby="tab-photo"><h3>${t('photo')}</h3><div class="photo-layout"><button type="button" class="photo-drop" id="photo-drop"><img id="photo-preview" alt="${esc(t('photo'))}" hidden><span id="photo-placeholder">+<small>${t('choosePhoto')}</small></span></button><div><p>${t(sandbox?'sandboxPhotoHint':'photoHint')}</p><input type="file" accept="image/jpeg,image/png,image/webp" id="photo-input" hidden>${button('photo-choose','choosePhoto')}${button('photo-download','downloadPhoto')}${button('photo-view','viewPhoto')}<p class="muted">${state.pendingPhotos.includes(p.id)?t('photoPending'):''}</p></div></div></section>
  </div>${formFooter()}</form>`);
@@ -187,7 +187,7 @@ function openProduct(index=null,tab='details',duplicate=false){
  function updatePackaging(){const l=state.logistics[elements.brand.value]?.[M.key(elements.key.value)];$('#key-summary').textContent=l?`${elements.brand.value} / ${elements.key.value} · ${state.products.filter(x=>x.brand===elements.brand.value&&M.key(x.key)===elements.key.value).length} ${t('countProducts')}`:t('keyMissing');$('#product-key-data').innerHTML=l?logisticsOverview(l):`<p class="muted">${t('keyMissing')}</p>`;$('#product-key-open').disabled=!l;$('#product-key-export').disabled=!l;}
  keysForBrand();elements.brand.onchange=()=>keysForBrand(true);elements.key.onchange=()=>updatePackaging();
  function currentKeyEntry(){const brand=elements.brand.value,key=M.key(elements.key.value);return {brand,key,data:M.clone(state.logistics[brand][key])};}
- $('#product-key-open').onclick=()=>openKeyPreview(currentKeyEntry());$('#product-key-export').onclick=e=>downloadKey(currentKeyEntry(),e.currentTarget);
+ $('#product-key-open').onclick=()=>openKeyPreview(currentKeyEntry());$('#product-key-export').onclick=e=>downloadKey(currentKeyEntry(),e.currentTarget,$('#product-key-include-products').checked);
  for(const v of ['new','discontinued'])elements[v].onchange=()=>{elements[v+'_date'].value=elements[v].checked?(elements[v+'_date'].value||today()):'';};
  const warn=()=>{$('#draft-warning').hidden=!!elements.brand.value&&!!elements.name.value&&!!elements.csName.value&&M.eanValid(elements.id.value);};['id','brand','name','csName'].forEach(f=>elements[f].addEventListener('input',warn));warn();
  function preview(src){const img=$('#photo-preview');photoExists=false;img.hidden=true;$('#photo-placeholder').hidden=false;$('#photo-download').disabled=true;$('#photo-view').disabled=true;if(src){img.onload=()=>{photoExists=true;img.hidden=false;$('#photo-placeholder').hidden=true;$('#photo-download').disabled=false;$('#photo-view').disabled=false;};img.onerror=()=>{photoExists=false;img.hidden=true;$('#photo-placeholder').hidden=false;};img.src=src;}else img.removeAttribute('src');}
@@ -293,15 +293,15 @@ $('#import-file').onchange=async e=>{
 };
 function openExport(){
  openEditor(t('exportTitle'),'JASON / EXCEL',`<form id="export-form"><div class="form-content"><p>${t('exportHint')}</p><div class="editor-tabs"><button type="button" id="export-tab-products">${t('exportProducts')}</button><button type="button" id="export-tab-keys">${t('exportKeys')}</button></div><div id="export-options"></div></div>${formFooter('exportNow')}</form>`,true);
- let mode=view==='keys'?'keys':'products';
+ let mode=view==='keys'?'keys':'products',includeProducts=false;
  function options(){
   $('#export-tab-products').setAttribute('aria-selected',mode==='products');$('#export-tab-keys').setAttribute('aria-selected',mode==='keys');
   if(mode==='products')$('#export-options').innerHTML=`<p class="notice">${productExportRows().length} ${t('countProducts')} · ${t(selected.size?'exportSelectedScope':'exportFilteredScope')}</p>`;
-  else{$('#export-options').innerHTML=`<label class="field"><span>${t('brand')}</span><select id="export-brand">${option('',t('allBrands'),filters.brand)}${brands().map(v=>option(v,v,filters.brand)).join('')}</select></label><label class="checkbox-label"><input type="checkbox" id="include-empty">${t('includeEmpty')}</label><div class="export-controls">${button('keys-all','selectAll')}${button('keys-none','selectNone')}</div><div id="export-key-list" class="checkbox-list"></div>`;fillExportKeys();$('#export-brand').onchange=fillExportKeys;$('#include-empty').onchange=fillExportKeys;$('#keys-all').onclick=()=>$$('[data-export-key]').forEach(c=>c.checked=true);$('#keys-none').onclick=()=>$$('[data-export-key]').forEach(c=>c.checked=false);}
+  else{$('#export-options').innerHTML=`<label class="field"><span>${t('brand')}</span><select id="export-brand">${option('',t('allBrands'),filters.brand)}${brands().map(v=>option(v,v,filters.brand)).join('')}</select></label><label class="checkbox-label"><input type="checkbox" id="include-empty">${t('includeEmpty')}</label><label class="checkbox-label"><input type="checkbox" id="include-products" ${includeProducts?'checked':''}>${t('includeProductList')}</label><p class="muted" id="include-products-hint">${t('includeProductListHint')}</p><div class="export-controls">${button('keys-all','selectAll')}${button('keys-none','selectNone')}</div><div id="export-key-list" class="checkbox-list"></div>`;fillExportKeys();$('#include-products').onchange=e=>{includeProducts=e.target.checked;};$('#export-brand').onchange=fillExportKeys;$('#include-empty').onchange=fillExportKeys;$('#keys-all').onclick=()=>$$('[data-export-key]').forEach(c=>c.checked=true);$('#keys-none').onclick=()=>$$('[data-export-key]').forEach(c=>c.checked=false);}
  }
  function fillExportKeys(){const b=$('#export-brand').value,include=$('#include-empty').checked;$('#export-key-list').innerHTML=M.keyEntries(state.logistics).map((r,i)=>({r,i})).filter(({r})=>(!b||r.brand===b)&&(include||completion(r.data)>0)).map(({r,i})=>`<label class="checkbox-label"><input type="checkbox" data-export-key="${i}" checked>${esc(r.brand)} / <strong>${esc(r.key)}</strong><small>${completion(r.data)}%</small></label>`).join('')||`<p class="muted">${t('nothing')}</p>`;}
  $('#export-tab-products').onclick=()=>{mode='products';options();};$('#export-tab-keys').onclick=()=>{mode='keys';options();};options();
- $('#export-form').onsubmit=e=>{e.preventDefault();void runForm(async()=>{if(mode==='products')await exportProducts();else await exportLogistics($$('[data-export-key]:checked').map(c=>M.keyEntries(state.logistics)[Number(c.dataset.exportKey)]));});};attachCancel();
+ $('#export-form').onsubmit=e=>{e.preventDefault();void runForm(async()=>{if(mode==='products')await exportProducts();else await exportLogistics($$('[data-export-key]:checked').map(c=>M.keyEntries(state.logistics)[Number(c.dataset.exportKey)]),includeProducts);});};attachCancel();
 }
 async function exportProducts(){
  const rows=productExportRows();if(!rows.length)throw Error(t('nothing'));
@@ -310,9 +310,9 @@ async function exportProducts(){
  const wb=JasonExport.products({fields:names,headers:names.map(n=>t(n==='id'?'ean':n)),rows:data,title:t('exportProducts'),date:today(),count:rows.length,countLabel:t('countProducts')});
  await JasonExport.download(wb,`products-${today()}.xlsx`);
 }
-async function exportLogistics(entries){
+async function exportLogistics(entries,includeProducts=false){
  if(!entries.length)throw Error(t('nothing'));
- const wb=JasonExport.logistics({entries,sections:M.sections,count:M.count,labels:JasonText.en});
+ const wb=JasonExport.logistics({entries,sections:M.sections,count:M.count,labels:JasonText.en,products:state.products,includeProducts});
  await JasonExport.download(wb,`logistics-${today()}.xlsx`);
 }
 $('#editor-close').onclick=closeEditor;$('#editor').oncancel=e=>{e.preventDefault();void closeEditor();};$('#photo-close').onclick=()=>$('#photo-dialog').close();$('#key-preview-close').onclick=()=>$('#key-preview-dialog').close();$('#data-button').onclick=openData;$('#export').onclick=openExport;$('#create').onclick=()=>view==='keys'?openKey():openProduct();$('#undo').onclick=()=>undo();$('#redo').onclick=()=>undo(true);$('#retry').onclick=()=>syncRemote();$$('[data-lang]').forEach(b=>b.onclick=async()=>{if($('#editor').open)await closeEditor();if($('#editor').open)return;lang=b.dataset.lang;await persist();render();});

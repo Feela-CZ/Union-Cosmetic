@@ -14,7 +14,7 @@ async function setup(real=false){
  w.fetch=async(url,args={})=>{network.push({url,method:args.method||'GET'});throw Error('Sandbox must not access network');};
  w.eval(fs.readFileSync(path.join(__dirname,'../test/config.js'),'utf8'));w.eval(fs.readFileSync(path.join(__dirname,'../test/seed.js'),'utf8'));if(!real)w.JASON_SANDBOX_SEED=clone(seed);
  w.eval(fs.readFileSync(path.join(__dirname,'../../shared/packaging.js'),'utf8'));
- for(const file of ['model.js','storage.js','i18n.js','vendor/exceljs.min.js','export.js','app.js'])w.eval(fs.readFileSync(path.join(__dirname,'..',file),'utf8'));
+ for(const file of ['model.js','storage.js','i18n.js','vendor/exceljs.min.js','export-assets.js','export.js','app.js'])w.eval(fs.readFileSync(path.join(__dirname,'..',file),'utf8'));
  const $=s=>w.document.querySelector(s),click=s=>{const e=$(s);assert.ok(e,`Missing ${s}`);assert.ok(!e.disabled,`Disabled ${s}`);e.click();},input=(s,v)=>{const e=$(s);e.value=v;e.dispatchEvent(new w.Event('input',{bubbles:true}));},submit=s=>$(s).dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
  const saved=async()=>clone((await w.JasonStorage.get('state'))?.state);
  await wait(()=>$('#page-title').textContent==='Produkty');await wait(async()=>!!(await saved()));
