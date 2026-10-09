@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "test": "node --test tests/model.test.cjs tests/export.test.cjs && node tests/dom.test.cjs && node tests/sandbox.test.cjs"
+    "test": "node --test tests/model.test.cjs tests/export.test.cjs tests/legacy.test.cjs tests/api.test.cjs && node tests/dom.test.cjs && node tests/sandbox.test.cjs"
   },
   "devDependencies": {
     "jsdom": "30.1.2",

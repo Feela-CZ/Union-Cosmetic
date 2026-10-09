@@ -46,40 +46,15 @@ function logisticsCount(value) {
     return Number.isFinite(number) ? number : '';
 }
 
-function syncProductPackagingFromLogistics(product, data) {
-    if (!product || !data) return false;
-
-    const nextValues = {
-        pack: logisticsCount(data?.CARTON?.nr_of_items),
-        boxes_per_layer: logisticsCount(data?.LAYER?.nr_of_cartons),
-        boxes_per_pallet: logisticsCount(data?.PALLET?.nr_of_cartons)
-    };
-
-    let changed = false;
-    Object.entries(nextValues).forEach(([field, value]) => {
-        if (product[field] !== value) {
-            product[field] = value;
-            changed = true;
-        }
-    });
-    return changed;
-}
-
-function fillEditPackagingFromSelectedKey(overwrite = true) {
+function fillEditPackagingFromSelectedKey() {
     const brand = document.getElementById('brand')?.value?.trim();
     const key = normalizeLogisticsKey(document.getElementById('logistics-key')?.value);
-    const data = key ? logisticsData?.[brand]?.[key] : null;
-
-    const fields = {
-        pack: data ? logisticsCount(data?.CARTON?.nr_of_items) : '',
-        boxes_per_layer: data ? logisticsCount(data?.LAYER?.nr_of_cartons) : '',
-        boxes_per_pallet: data ? logisticsCount(data?.PALLET?.nr_of_cartons) : ''
-    };
+    const fields = UnionPackaging.fromKey({brand, key}, logisticsData);
 
     Object.entries(fields).forEach(([id, value]) => {
         const input = document.getElementById(id);
         if (!input) return;
-        if (overwrite || input.value.trim() === '') input.value = value;
+        input.value = value;
     });
 }
 
@@ -415,7 +390,7 @@ async function apiPut(name, data) {
     const res = await fetch(`${window.API_BASE}/api/${name}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify(name === 'products' ? UnionPackaging.cleanProducts(data) : data)
     });
 
     if (!res.ok) throw new Error(await res.text() || res.statusText);
@@ -477,6 +452,7 @@ function updateProductSaveStatus(error = null) {
 async function saveProductsToRepo() {
     // Každý klik ukládá vlastní neměnný snímek. Fronta zaručí pořadí PUTů
     // a žádná opožděná odpověď už nepřepíše novější lokální změny.
+    products = UnionPackaging.cleanProducts(products);
     const snapshot = JSON.parse(JSON.stringify(products));
     pendingProductSaveCount++;
     updateProductSaveStatus();
@@ -571,7 +547,7 @@ Promise.all([
     fetch(productsUrl).then(r => r.json()),
     fetch(logisticsUrl).then(r => r.json())
 ]).then(([productsData, logisticsDataRaw]) => {
-    products = productsData;
+    products = UnionPackaging.cleanProducts(productsData);
     logisticsData = logisticsDataRaw;
 
     // Neplatné pseudo-klíče (null, undefined, ___...) nejsou logistické skupiny.
@@ -637,18 +613,6 @@ function initUI() {
             price: document.getElementById('add-price').value.trim() === ''
                 ? ''
                 : parseFloat(document.getElementById('add-price').value),
-
-            pack: document.getElementById('add-pack').value.trim() === ''
-                ? ''
-                : parseInt(document.getElementById('add-pack').value, 10),
-
-            boxes_per_layer: document.getElementById('add-boxes_per_layer').value.trim() === ''
-                ? ''
-                : parseInt(document.getElementById('add-boxes_per_layer').value, 10),
-
-            boxes_per_pallet: document.getElementById('add-boxes_per_pallet').value.trim() === ''
-                ? ''
-                : parseInt(document.getElementById('add-boxes_per_pallet').value, 10),
 
             // ✅ SPRÁVNÝ KLÍČ
             key: (document.getElementById('add-logistics-key').value.trim() || null),
@@ -1472,9 +1436,6 @@ function saveProduct(event) {
     const volumeNumber = document.getElementById('volume-number').value.trim();
     const volumeUnit = document.getElementById('volume-unit').value.trim();
     const price = document.getElementById('price').value.trim();
-    const pack = document.getElementById('pack').value.trim();
-    const boxesPerLayer = document.getElementById('boxes_per_layer').value.trim();
-    const boxesPerPallet = document.getElementById('boxes_per_pallet').value.trim();
     const logisticsKey = document.getElementById('logistics-key').value.trim();
 
     if (!brand) missingFields.push('Brand');
@@ -1484,9 +1445,6 @@ function saveProduct(event) {
     if (!nameCs) missingFields.push('Name (CZ)');
     if (!volumeNumber || !volumeUnit) missingFields.push('Volume');
     if (!price) missingFields.push('Price');
-    if (!pack) missingFields.push('Pack');
-    if (!boxesPerLayer) missingFields.push('Boxes per Layer');
-    if (!boxesPerPallet) missingFields.push('Boxes per Pallet');
     if (!logisticsKey) missingFields.push('Logistics key');
 
     const product = {
@@ -1501,9 +1459,6 @@ function saveProduct(event) {
             unit: volumeUnit
         },
         price: parseFloat(price),
-        pack: parseInt(pack),
-        boxes_per_layer: parseInt(boxesPerLayer),
-        boxes_per_pallet: parseInt(boxesPerPallet),
         key: logisticsKey,
         new: document.getElementById('new').checked,
         new_date: document.getElementById('new_date').value,
@@ -1526,9 +1481,9 @@ function saveProduct(event) {
 
 async function saveProductFinal(product) {
     if (editIndex !== null) {
-        products[editIndex] = product;
+        products[editIndex] = UnionPackaging.cleanProduct({...products[editIndex], ...product});
     } else {
-        products.push(product);
+        products.push(UnionPackaging.cleanProduct(product));
     }
 
     const fileInput = document.getElementById("photo-input");
@@ -1636,12 +1591,7 @@ function editProduct(index) {
     document.getElementById('volume-number').value = vol.number || '';
     document.getElementById('volume-unit').value = vol.unit || '';
     document.getElementById('price').value = product.price;
-    document.getElementById('pack').value = product.pack;
-    document.getElementById('boxes_per_layer').value = product.boxes_per_layer;
-    document.getElementById('boxes_per_pallet').value = product.boxes_per_pallet;
-    // U starších záznamů mohl být klíč vyplněný, ale odvozená pole prázdná.
-    // Doplníme jen chybějící hodnoty; existující produktová data zachováme.
-    fillEditPackagingFromSelectedKey(false);
+    fillEditPackagingFromSelectedKey();
     document.getElementById('new').checked = product.new;
     document.getElementById('new_date').value = product.new_date;
     document.getElementById('discontinued').checked = product.discontinued === true;
@@ -1761,7 +1711,7 @@ function closeDeleteModal() {
 }
 
 /*function downloadJSON() {
-    const dataStr = JSON.stringify(products, null, 2);
+    const dataStr = JSON.stringify(UnionPackaging.cleanProducts(products), null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -2117,11 +2067,7 @@ function openLogisticsEditModal(brand, key, index = null) {
                     productChanged = true;
                 }
 
-                // Po přiřazení klíče musí být s logistikou v souladu i tři
-                // hodnoty používané objednávkovým formulářem.
-                if (syncProductPackagingFromLogistics(product, newData)) {
-                    productChanged = true;
-                }
+
             }
 
             currentLogisticsBrand = targetBrand;
@@ -2278,3 +2224,4 @@ document.getElementById('brand').addEventListener('change', function () {
     populateLogisticsKeySelect();
     fillEditPackagingFromSelectedKey(true);
 });
+

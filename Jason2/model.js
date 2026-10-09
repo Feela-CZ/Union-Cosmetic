@@ -1,6 +1,8 @@
 /* Jason data layer. The original JSON structure and unknown fields are retained. */
 (function (root) {
 'use strict';
+const P=root.UnionPackaging||(typeof require==='function'?require('../shared/packaging.js'):null);
+const cleanProducts=P.cleanProducts,packaging=P.fromKey;
 const clone = value => JSON.parse(JSON.stringify(value));
 const sections = {ITEM:['length','width','height','weight'],CARTON:['length','width','height','weight','nr_of_items'],LAYER:['nr_of_items','nr_of_cartons'],PALLET:['length','width','height','weight','nr_of_cartons','nr_of_items','nr_of_layers']};
 const invalidKeys = new Set(['','null','undefined','___','—','-','__proto__','constructor','prototype']);
@@ -14,7 +16,7 @@ function validateProducts(value) {
   if(p.volume!=null && (typeof p.volume!=='object' || Array.isArray(p.volume))) throw Error('PRODUCTS_FORMAT');
   if(p.flags!=null && (!Array.isArray(p.flags) || p.flags.some(f=>typeof f!=='string'))) throw Error('PRODUCTS_FORMAT');
  }
- return value;
+ return cleanProducts(value);
 }
 function validateLogistics(value) {
  if(!value || typeof value!=='object' || Array.isArray(value)) throw Error('LOGISTICS_FORMAT');
@@ -28,15 +30,11 @@ function validateLogistics(value) {
  return value;
 }
 function emptyLogistics(){return Object.fromEntries(Object.entries(sections).map(([s,fs])=>[s,Object.fromEntries(fs.map(f=>[f,null]))]));}
-function syncPackaging(p,l){ if(!l) return p; p.pack=count(l.CARTON?.nr_of_items);p.boxes_per_layer=count(l.LAYER?.nr_of_cartons);p.boxes_per_pallet=count(l.PALLET?.nr_of_cartons);return p; }
 function saveProduct(original,patch,products,index,logistics){
- const p={...clone(original||{}),...clone(patch)};
+ const p=P.cleanProduct({...clone(original||{}),...clone(patch)});
  p.id=String(p.id??'').trim();
  if(!p.id) throw Error('EAN_REQUIRED');
  if((index==null||!original||String(original.id)!==p.id)&&products.some((x,i)=>i!==index&&String(x.id)===p.id)) throw Error('EAN_DUPLICATE');
- const l=key(p.key)?logistics[p.brand]?.[key(p.key)]:null;
- // Preserve an existing record's packaging unless its association actually changes.
- if(l && (!original || original.brand!==p.brand || key(original.key)!==key(p.key))) syncPackaging(p,l);
  return p;
 }
 function keyEntries(logistics){return Object.entries(logistics).flatMap(([brand,groups])=>Object.entries(groups).filter(([k])=>key(k)).map(([k,data])=>({brand,key:k,data})));}
@@ -44,13 +42,13 @@ function applyLogistics(state,brand,k,data){
  if(!key(k) || !key(brand))throw Error('KEY_REQUIRED');
  const next=clone(state);if(!Object.hasOwn(next.logistics,brand)) next.logistics[brand]={};
  next.logistics[brand][k]=clone(data);
- next.products.forEach(p=>{if(p.brand===brand&&key(p.key)===k)syncPackaging(p,data);});return next;
+ next.products=cleanProducts(next.products);return next;
 }
 function renameKey(state,brand,oldKey,newKey){
  newKey=key(newKey);if(!newKey)throw Error('KEY_REQUIRED');
  if(newKey!==oldKey&&Object.hasOwn(state.logistics[brand]||{},newKey))throw Error('KEY_DUPLICATE');
  const next=clone(state);next.logistics[brand][newKey]=next.logistics[brand][oldKey];if(newKey!==oldKey)delete next.logistics[brand][oldKey];
- next.products.forEach(p=>{if(p.brand===brand&&key(p.key)===oldKey)p.key=newKey;});return next;
+ next.products=cleanProducts(next.products);next.products.forEach(p=>{if(p.brand===brand&&key(p.key)===oldKey)p.key=newKey;});return next;
 }
 function filterProducts(products,f={}){
  const words=fold(f.search).split(/\s+/).filter(Boolean);
@@ -75,7 +73,6 @@ function issues(state){
   if(p.price==null||p.price===''||!Number.isFinite(Number(p.price))||Number(p.price)<0)add('priceInvalid','price');
   const k=key(p.key),l=k?state.logistics[p.brand]?.[k]:null;
   if(!k)add('keyMissing','key');else if(!l)add('keyUnknown','key');
-  if(l){for(const [f,s,a]of [['pack','CARTON','nr_of_items'],['boxes_per_layer','LAYER','nr_of_cartons'],['boxes_per_pallet','PALLET','nr_of_cartons']])if(count(l[s]?.[a])!==''&&count(p[f])!==count(l[s]?.[a]))add('packMismatch',f);}
  });
  for(const {brand,key:k,data} of keyEntries(state.logistics)){
   const add=code=>out.push({kind:'key',brand,key:k,code});
@@ -86,7 +83,7 @@ function issues(state){
  }
  return out;
 }
-const api={clone,sections,key,fold,count,validateProducts,validateLogistics,emptyLogistics,syncPackaging,saveProduct,keyEntries,applyLogistics,renameKey,filterProducts,eanValid,issues};
+const api={clone,sections,key,fold,count,validateProducts,validateLogistics,emptyLogistics,cleanProducts,packaging,saveProduct,keyEntries,applyLogistics,renameKey,filterProducts,eanValid,issues};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.JasonModel=api;
 })(typeof window!=='undefined'?window:globalThis);
 

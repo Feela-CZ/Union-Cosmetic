@@ -34,7 +34,8 @@ export async function onRequest(context) {
         return cors(new Response('GitHub GET failed: ' + res.status, {status:502}), request);
 
       const data = await res.json();
-      const jsonStr = atob(data.content);
+      let jsonStr = new TextDecoder().decode(Uint8Array.from(atob(data.content), c=>c.charCodeAt(0)));
+      if(name==='products')jsonStr=JSON.stringify(cleanProducts(JSON.parse(jsonStr)));
 
       return cors(
         new Response(jsonStr, {
@@ -52,7 +53,7 @@ export async function onRequest(context) {
       const bodyText = await request.text();
 
       let parsed;
-      try { parsed = JSON.parse(bodyText); }
+      try { parsed = JSON.parse(bodyText); if(name==='products')parsed=cleanProducts(parsed); }
       catch(e) {
         return cors(new Response('Invalid JSON',{status:400}), request);
       }
@@ -77,7 +78,7 @@ export async function onRequest(context) {
           headers,
           body: JSON.stringify({
             message: `chore(${name}.json): update via Pages Function`,
-            content: btoa(JSON.stringify(parsed, null, 2)),
+            content: btoa(Array.from(new TextEncoder().encode(JSON.stringify(parsed, null, 2)), c=>String.fromCharCode(c)).join('')),
             sha,
             branch
           })
@@ -129,4 +130,9 @@ function preflight(req){
   r.headers.set('Access-Control-Allow-Headers','Content-Type');
   r.headers.set('Access-Control-Max-Age','86400');
   return r;
+}
+
+function cleanProducts(products){
+ if(!Array.isArray(products)||products.some(p=>!p||typeof p!=='object'||Array.isArray(p)))throw Error('Invalid products');
+ return products.map(p=>{const next={...p};for(const key of ['pack','boxes_per_layer','boxes_per_pallet'])delete next[key];return next;});
 }

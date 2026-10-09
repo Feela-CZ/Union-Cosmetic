@@ -1,7 +1,7 @@
 export async function loadProducts() {
   const r = await fetch(`/api/products?ts=${Date.now()}`);
   if (!r.ok) throw new Error('Load products failed: ' + r.status);
-  return await r.json();
+  return cleanProducts(await r.json());
 }
 
 export async function loadLogistics() {
@@ -17,7 +17,7 @@ export async function saveProducts(products) {
       const r = await fetch('/api/products', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(products)
+        body: JSON.stringify(cleanProducts(products))
       });
 
       if (!r.ok) {
@@ -47,3 +47,5 @@ export async function saveLogistics(logistics) {
   if (!r.ok) throw new Error((await r.text()) || 'Save logistics failed');
   return r.json().catch(() => ({ ok: true }));
 }
+
+function cleanProducts(products){return products.map(p=>{const next={...p};for(const key of ['pack','boxes_per_layer','boxes_per_pallet'])delete next[key];return next;});}

@@ -34,6 +34,8 @@ Node 24+: `npm install`, `npm test`. Testy prověřují model, uživatelské pos
 
 V detailu produktu na záložce Balení a logistika se zobrazují všechny standardní údaje přiřazeného klíče (ITEM / CARTON / LAYER / PALLET). Samostatný detail klíče se otevře nad formulářem a zachová jeho rozpracované změny. Excel lze stáhnout přímo ze záložky i z tohoto detailu; obsahuje pouze aktuálně přiřazený klíč ve stejné formátované matici jako hlavní logistický export. Zobrazení a export klíče nic neukládají.
 
-Počty balení se v detailu produktu zobrazují pouze v přehledu klíče; nemají samostatné editační vstupy. Změna přiřazení při uložení doplní počty z klíče. Ostatní úpravy produktu zachovávají původní hodnoty `pack`, `boxes_per_layer` a `boxes_per_pallet`, včetně historických nesouladů.
+Počty balení se vždy čtou přímo z logistického klíče stejné značky. Produkty uchovávají pouze přiřazení `key`; pole `pack`, `boxes_per_layer` a `boxes_per_pallet` se neukládají. Staré importy, zálohy i místní pracovní kopie se očistí. Bez platného klíče se počty označí jako chybějící, nikdy se nepřebírají staré produktové hodnoty.
 
 Logistický Excel má jednotnou světle modrou výplň všech bloků. Nadpis LOGISTICS DATA je sloučený pouze v A1:B1, menším písmem 13 pt; název značky je jen na listu. Ukotvení prvních dvou sloupců a řádků tak neprochází textem nadpisu.
+
+Stejnou funkci `shared/packaging.js` používá původní Jason, Jason 2.0, pískoviště i Order Sheet. Produktové XLSX zachovávají sloupce balení, ale hodnoty odvozují z klíčů při exportu. Order Sheet čeká na načtení produktů i logistiky před zpřístupněním převodů. Změna klíče nevyvolává kopírování počtů do produktů. Historické HTML vstupy přesměrují na udržované aplikace; archivní soubory zůstávají historickou zálohou.

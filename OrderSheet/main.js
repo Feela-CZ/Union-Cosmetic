@@ -65,10 +65,6 @@ function __startKickersOnce() {
 }
 
 let logisticsData = {};
-fetch(`${window.API_BASE}/api/logistics?ts=${Date.now()}`)
-    .then(r => r.json())
-    .then(data => { logisticsData = data; });
-
 let allProducts = [];
 let currentBrand = null;
 let currentType = null;
@@ -100,13 +96,18 @@ const logoMap = {
     "Sunnoré": "logo-sunnore.png"
 };
 
-fetch(`${window.API_BASE}/api/products?ts=${Date.now()}`)
-    .then(r => r.json())
-    .then(data => {
-        allProducts = data;
-        renderBrands();
-        updateCartCount();
-    });
+// Wait for both sources before enabling carton/pallet conversions.
+Promise.all(['products','logistics'].map(name =>
+    fetch(window.API_BASE+'/api/'+name+'?ts='+Date.now()).then(r => {
+        if (!r.ok) throw Error('Could not load '+name);
+        return r.json();
+    })
+)).then(([products, logistics]) => {
+    allProducts = UnionPackaging.cleanProducts(products);
+    logisticsData = logistics;
+    renderBrands();
+    updateCartCount();
+}).catch(error => { console.error(error); productContainer.textContent = 'Product or logistics data could not be loaded. Please reload.'; });
 
 function loadOrderState() {
     const saved = localStorage.getItem('orderState');
@@ -219,8 +220,9 @@ function renderProducts() {
         card.className = 'product-card';
         const ean = product.id.toString();
         const displayVolume = formatVolume(product.volume);
-        const packSize = Number(product.pack);
-        const boxesPerPallet = Number(product.boxes_per_pallet);
+        const packaging = UnionPackaging.fromKey(product, logisticsData);
+        const packSize = Number(packaging.pack);
+        const boxesPerPallet = Number(packaging.boxes_per_pallet);
         const hasPackData = Number.isFinite(packSize) && packSize > 0;
         const hasPalletData = hasPackData && Number.isFinite(boxesPerPallet) && boxesPerPallet > 0;
 
@@ -261,9 +263,9 @@ function renderProducts() {
             [`EAN:`, formatMissing(product.id)],
             [`Volume:`, formatMissing(displayVolume)],
             [`Price:`, formatMissing(`${product.price} €`)],
-            [`Pieces/Pack:`, formatMissing(product.pack)],
-            [`Boxes/Layer:`, formatMissing(product.boxes_per_layer)],
-            [`Boxes/Pallet:`, formatMissing(product.boxes_per_pallet)]
+            [`Pieces/Pack:`, formatMissing(packaging.pack === '' ? '—' : packaging.pack)],
+            [`Boxes/Layer:`, formatMissing(packaging.boxes_per_layer === '' ? '—' : packaging.boxes_per_layer)],
+            [`Boxes/Pallet:`, formatMissing(packaging.boxes_per_pallet === '' ? '—' : packaging.boxes_per_pallet)]
         ];
 
         details.forEach(([label, value]) => {
@@ -704,3 +706,4 @@ function downloadExcel(order) {
 
     XLSX.writeFile(wb, fileName);
 }
+

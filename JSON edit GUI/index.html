@@ -102,9 +102,9 @@
                     </div>
 
                     <label data-i18n="label_price"></label> <input type="number" id="price" step="any">
-                    <label data-i18n="label_pack"></label> <input type="number" id="pack">
-                    <label data-i18n="label_boxes_per_layer"></label> <input type="number" id="boxes_per_layer">
-                    <label data-i18n="label_boxes_per_pallet"></label> <input type="number" id="boxes_per_pallet">
+                    <label data-i18n="label_pack"></label> <input type="number" id="pack" readonly>
+                    <label data-i18n="label_boxes_per_layer"></label> <input type="number" id="boxes_per_layer" readonly>
+                    <label data-i18n="label_boxes_per_pallet"></label> <input type="number" id="boxes_per_pallet" readonly>
 
                     <label data-i18n="label_logistics_key"></label>
                     <select id="logistics-key">
@@ -375,7 +375,8 @@
         }
     </script>
 
-    <script src="editor.js"></script>
+    <script src="../shared/packaging.js?v=20261009-key-only"></script>
+    <script src="editor.js?v=20261009-key-only"></script>
     <script src="xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
     <div id="lightbox" class="lightbox">

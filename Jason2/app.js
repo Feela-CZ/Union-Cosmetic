@@ -3,7 +3,7 @@
 'use strict';
 const M=JasonModel,S=JasonStorage,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const sandbox=JASON_CONFIG.sandbox===true;
-function isolate(next){if(sandbox){next.connected=false;next.api='';next.imageBase=JASON_CONFIG.imageBase;next.baseline={};next.pendingPhotos=[];}return next;}
+function isolate(next){next.products=M.cleanProducts(next.products);if(next.baseline?.products){try{next.baseline.products=sig(M.cleanProducts(JSON.parse(next.baseline.products)));}catch{}}if(sandbox){next.connected=false;next.api='';next.imageBase=JASON_CONFIG.imageBase;next.baseline={};next.pendingPhotos=[];}return next;}
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const icons={products:'▦',keys:'◇',checks:'✓',data:'↔',undo:'↶',redo:'↷',export:'↓',plus:'+'};
 let lang='cs',view='products',page=1,pageSize=30,sort={field:'name',asc:true},selected=new Set(),history=[],future=[],busy=false,editorDirty=false,editorSave=null,toastTimer,syncing=false,storageError=false;
@@ -42,7 +42,7 @@ async function undo(redo=false){if(busy||editorDirty)return;const source=redo?fu
  // Keep the acknowledged remote baseline; history changes data, never connection identity.
  next.connected=state.connected;next.api=state.api;next.imageBase=state.imageBase;next.baseline=state.baseline;
  next.pendingPhotos=Object.keys(next.photos).filter(id=>next.photos[id]!==state.photos[id]||state.pendingPhotos.includes(id));
- state=next;await persist();selected.clear();render();toast(t(redo?'redo':'undo'));if(state.connected)void syncRemote();}
+ state=isolate(next);await persist();selected.clear();render();toast(t(redo?'redo':'undo'));if(state.connected)void syncRemote();}
 async function syncRemote(){
  if(sandbox||syncing||!state.connected)return;
  syncing=true;renderStatus();
@@ -52,7 +52,7 @@ async function syncRemote(){
     if(!dirty(name))continue;
     const snapshot=M.clone(state[name]);
     const remote=await S.request(state.api,name);
-    if(sig(remote)!==state.baseline[name])throw Error(lang==='cs'?'Společná data mezitím změnil jiný uživatel. Stáhněte zálohu a načtěte aktuální data před dalším odesláním.':'Shared data changed since loading. Download a backup and reload current data before sending again.');
+    if(sig(name==='products'?M.cleanProducts(remote):remote)!==state.baseline[name])throw Error(lang==='cs'?'Společná data mezitím změnil jiný uživatel. Stáhněte zálohu a načtěte aktuální data před dalším odesláním.':'Shared data changed since loading. Download a backup and reload current data before sending again.');
     await S.request(state.api,name,'PUT',snapshot);state.baseline[name]=sig(snapshot);await persist();
    }
    for(const id of [...state.pendingPhotos]){
@@ -130,7 +130,7 @@ function renderProductTable(items){
  const headers=[['name','product'],['brand','brand'],['id','ean'],['volume','volume'],['price','price'],['key','key'],['discontinued','status']];
  $('#content').innerHTML=`<div class="table-scroll"><table><thead><tr><th class="select-cell"><input type="checkbox" id="select-page" aria-label="${esc(t('selectAll'))}" ${items.every(x=>selected.has(x.index))?'checked':''}></th>${headers.map(([f,label])=>`<th><button class="sort-button" data-sort="${f}">${esc(t(label))}${sort.field===f?(sort.asc?' ↑':' ↓'):''}</button></th>`).join('')}<th class="actions-cell">${t('actions')}</th></tr></thead><tbody>${items.map(({p,index})=>{
  const title=lang==='cs'?p.csName||p.name:p.name||p.csName;const secondary=lang==='cs'?p.name:p.csName;
- return `<tr class="${selected.has(index)?'selected':''}"><td class="select-cell"><input type="checkbox" data-select="${index}" aria-label="${esc(t('select')+' '+title)}" ${selected.has(index)?'checked':''}></td><td class="product-cell"><button class="product-link" data-edit="${index}"><span><strong>${esc(title||'—')}</strong><small>${esc(typeLabel(p.type))}${secondary&&secondary!==title?' · '+esc(secondary):''}</small></span></button></td><td>${badge(p.brand||'—','brand-'+M.fold(p.brand).replace(/[^a-z]/g,''))}</td><td class="mono">${esc(p.id||'—')}<small class="cell-sub">${p.hs?'HS '+esc(p.hs):''}</small></td><td class="nowrap">${esc(p.volume?.number??'')} ${esc(p.volume?.unit||'')}</td><td class="numeric">${p.price==null||p.price===''?'—':esc(Number.isFinite(Number(p.price))?Number(p.price).toLocaleString(lang==='cs'?'cs-CZ':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:4}):p.price)}</td><td><button class="key-link" data-product-key="${index}">${esc(M.key(p.key)||'—')}</button><small class="cell-sub">${p.pack!==''&&p.pack!=null?esc(p.pack)+' '+(lang==='cs'?'ks / karton':'items / carton'):''}</small></td><td class="status-cell"><span class="status-entry">${p.discontinued===true?badge(t('discontinued'),'status-discontinued'):badge(t('active'),'status-active')}${p.discontinued===true&&p.discontinued_date?'<small class="cell-sub">'+esc(p.discontinued_date)+'</small>':''}</span>${p.new===true?'<span class="status-entry">'+badge(t('new'),'status-new')+(p.new_date?'<small class="cell-sub">'+esc(p.new_date)+'</small>':'')+'</span>':''}${(p.flags||[]).map(f=>badge(f,'custom')).join('')}</td><td class="actions-cell"><button data-edit="${index}" class="row-edit">${t('edit')}</button><button data-more="${index}" class="more-button" aria-label="${esc(t('actions')+' '+title)}">•••</button></td></tr>`;
+ return `<tr class="${selected.has(index)?'selected':''}"><td class="select-cell"><input type="checkbox" data-select="${index}" aria-label="${esc(t('select')+' '+title)}" ${selected.has(index)?'checked':''}></td><td class="product-cell"><button class="product-link" data-edit="${index}"><span><strong>${esc(title||'—')}</strong><small>${esc(typeLabel(p.type))}${secondary&&secondary!==title?' · '+esc(secondary):''}</small></span></button></td><td>${badge(p.brand||'—','brand-'+M.fold(p.brand).replace(/[^a-z]/g,''))}</td><td class="mono">${esc(p.id||'—')}<small class="cell-sub">${p.hs?'HS '+esc(p.hs):''}</small></td><td class="nowrap">${esc(p.volume?.number??'')} ${esc(p.volume?.unit||'')}</td><td class="numeric">${p.price==null||p.price===''?'—':esc(Number.isFinite(Number(p.price))?Number(p.price).toLocaleString(lang==='cs'?'cs-CZ':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:4}):p.price)}</td><td><button class="key-link" data-product-key="${index}">${esc(M.key(p.key)||'—')}</button><small class="cell-sub">${M.packaging(p,state.logistics).pack!==''?esc(M.packaging(p,state.logistics).pack)+' '+(lang==='cs'?'ks / karton':'items / carton'):''}</small></td><td class="status-cell"><span class="status-entry">${p.discontinued===true?badge(t('discontinued'),'status-discontinued'):badge(t('active'),'status-active')}${p.discontinued===true&&p.discontinued_date?'<small class="cell-sub">'+esc(p.discontinued_date)+'</small>':''}</span>${p.new===true?'<span class="status-entry">'+badge(t('new'),'status-new')+(p.new_date?'<small class="cell-sub">'+esc(p.new_date)+'</small>':'')+'</span>':''}${(p.flags||[]).map(f=>badge(f,'custom')).join('')}</td><td class="actions-cell"><button data-edit="${index}" class="row-edit">${t('edit')}</button><button data-more="${index}" class="more-button" aria-label="${esc(t('actions')+' '+title)}">•••</button></td></tr>`;
  }).join('')}</tbody></table></div>`;
  $$('[data-sort]').forEach(b=>b.onclick=()=>{sort={field:b.dataset.sort,asc:sort.field===b.dataset.sort?!sort.asc:true};renderContent();});
  $$('[data-edit]').forEach(b=>b.onclick=()=>openProduct(Number(b.dataset.edit)));
@@ -168,7 +168,7 @@ function openKeyPreview(entry){
 function openProduct(index=null,tab='details',duplicate=false){
  if(refreshing)return;
  const original=index!==null?M.clone(state.products[index]):null;
- const p=original?M.clone(original):{brand:filters.brand||'',type:'',id:'',hs:'',name:'',csName:'',volume:{number:'',unit:'ml'},price:'',key:null,pack:'',boxes_per_layer:'',boxes_per_pallet:'',new:false,new_date:'',discontinued:false,discontinued_date:'',carton_ean:null};
+ const p=original?M.clone(original):{brand:filters.brand||'',type:'',id:'',hs:'',name:'',csName:'',volume:{number:'',unit:'ml'},price:'',key:null,new:false,new_date:'',discontinued:false,discontinued_date:'',carton_ean:null};
  if(duplicate)p.id='';
  let selectedPhoto=duplicate&&original?state.photos[original.id]||null:null,photoExists=false;
  const title=duplicate?t('duplicate'):original?(lang==='cs'?p.csName||p.name:p.name)||t('edit'):t('addProduct');
@@ -202,7 +202,7 @@ function openProduct(index=null,tab='details',duplicate=false){
    const str=n=>elements[n].value.trim(),num=n=>str(n)===''?'':Number(str(n));
    const price=num('price');if(price!==''&&(!Number.isFinite(price)||price<0))throw Error('numeric');
    const id=str('id');if(!id)throw Error('EAN_REQUIRED');if(!str('brand'))throw Error('KEY_REQUIRED');
-   const patch={brand:str('brand'),type:str('type'),id,hs:str('hs'),name:str('name'),csName:str('csName'),volume:{...(p.volume||{}),number:preserve('volume',p.volume?.number,str('volume-number')),unit:str('volume-unit')},price:preserve('price',p.price,num('price')),key:preserve('key',p.key,str('key')||null),carton_ean:preserve('carton_ean',p.carton_ean,str('carton_ean')||null),...Object.fromEntries(['pack','boxes_per_layer','boxes_per_pallet'].map(n=>[n,p[n]]))};
+   const patch={brand:str('brand'),type:str('type'),id,hs:str('hs'),name:str('name'),csName:str('csName'),volume:{...(p.volume||{}),number:preserve('volume',p.volume?.number,str('volume-number')),unit:str('volume-unit')},price:preserve('price',p.price,num('price')),key:preserve('key',p.key,str('key')||null),carton_ean:preserve('carton_ean',p.carton_ean,str('carton_ean')||null)};
    for(const v of ['new','discontinued']){const checked=elements[v].checked,flagChanged=(p[v]===true)!==checked;patch[v]=flagChanged?checked:p[v];patch[v+'_date']=flagChanged?(checked?(str(v+'_date')||today()):''):preserve(v+'_date',p[v+'_date'],str(v+'_date'));}
    const flagList=[...new Set(str('flags').split(',').map(s=>s.trim()).filter(Boolean))];if(p.flags!==undefined||flagList.length)patch.flags=flagList;
    const target=duplicate?null:index;const record=M.saveProduct(duplicate?p:original,patch,state.products,target,state.logistics);
@@ -305,7 +305,7 @@ function openExport(){
 async function exportProducts(){
  const rows=productExportRows();if(!rows.length)throw Error(t('nothing'));
  const names=['brand','type','id','hs','name','csName','volume','price','key','pack','boxes_per_layer','boxes_per_pallet','carton_ean','new','new_date','discontinued','discontinued_date','flags'];
- const data=rows.map(({p})=>names.map(n=>n==='volume'?`${p.volume?.number??''} ${p.volume?.unit||''}`.trim():n==='flags'?(p.flags||[]).join(', '):n==='type'?typeLabel(p[n]):['id','hs','carton_ean'].includes(n)?String(p[n]??''):['new','discontinued'].includes(n)?(p[n]===true?t('yes'):t('no')):p[n]??''));
+ const data=rows.map(({p})=>names.map(n=>['pack','boxes_per_layer','boxes_per_pallet'].includes(n)?M.packaging(p,state.logistics)[n]:n==='volume'?`${p.volume?.number??''} ${p.volume?.unit||''}`.trim():n==='flags'?(p.flags||[]).join(', '):n==='type'?typeLabel(p[n]):['id','hs','carton_ean'].includes(n)?String(p[n]??''):['new','discontinued'].includes(n)?(p[n]===true?t('yes'):t('no')):p[n]??''));
  const wb=JasonExport.products({fields:names,headers:names.map(n=>t(n==='id'?'ean':n)),rows:data,title:t('exportProducts'),date:today(),count:rows.length,countLabel:t('countProducts')});
  await JasonExport.download(wb,`products-${today()}.xlsx`);
 }
