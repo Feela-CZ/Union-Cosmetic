@@ -377,7 +377,20 @@ function sandboxSeed(){
  const seed=window.JASON_SANDBOX_SEED;
  if(!seed)throw Error('SANDBOX_SEED_MISSING');
  M.validateProducts(seed.products);M.validateLogistics(seed.logistics);
- return isolate({...M.clone(state),products:M.clone(seed.products),logistics:M.clone(seed.logistics),photos:{},updated:seed.snapshotAt});
+ return isolate({...M.clone(state),products:M.clone(seed.products),logistics:M.clone(seed.logistics),photos:{},updated:seed.snapshotAt,sandboxNameRevision:seed.nameRevision});
+}
+async function upgradeSandboxNames(){
+ const seed=window.JASON_SANDBOX_SEED;
+ if(!sandbox||!seed?.nameRevision||state.sandboxNameRevision===seed.nameRevision)return;
+ const repair=snapshot=>{
+  for(const p of snapshot.products)for(const c of seed.nameCorrections||[]){
+   if(String(p.id)===c.id&&p[c.field]===c.before)p[c.field]=c.after;
+  }
+  snapshot.sandboxNameRevision=seed.nameRevision;
+ };
+ repair(state);history.forEach(repair);
+ if(history.length)await S.put('recovery',M.clone(history.at(-1)));
+ await persist();
 }
 async function resetSandbox(){
  if(!sandbox||busy||!await confirm('sandboxResetTitle',t('sandboxResetHint'),'sandboxReset'))return;
@@ -388,6 +401,7 @@ async function boot(){
  try{const saved=await S.get('state');if(saved?.state){M.validateProducts(saved.state.products);M.validateLogistics(saved.state.logistics);state=isolate({...state,...saved.state});hasSavedState=true;lang=saved.lang==='en'?'en':'cs';const recovery=await S.get('recovery');if(recovery)history=[recovery];}}
  catch(e){storageError=true;toast(t('localError'),true);}
  if(sandbox&&!hasSavedState){try{state=sandboxSeed();await persist();}catch(e){error(e);}}
+ if(sandbox&&hasSavedState){try{await upgradeSandboxNames();}catch(e){storageError=true;toast(t('localError'),true);}}
  if(JASON_CONFIG.sharedOnly){state.api=JASON_CONFIG.apiBase;state.imageBase=JASON_CONFIG.imageBase;}
  view=['products','keys','checks'].includes(location.hash.slice(1))?location.hash.slice(1):'products';render();
  if(sandbox)return;

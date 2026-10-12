@@ -7,14 +7,17 @@ const logistics={Lilien:{'500A':{ITEM:{length:5,width:5,height:15,weight:.5},CAR
 const seed={snapshotAt:'2026-10-09',products:[fixture],logistics};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function wait(fn){for(let i=0;i<150;i++){if(await fn())return;await sleep(10);}throw Error('Wait timed out');}
-async function setup(real=false){
+async function setup(real=false,cached=null){
  const dom=new JSDOM(fs.readFileSync(path.join(__dirname,'../test/index.html'),'utf8'),{url:'https://feela-cz.github.io/Union-Cosmetic/Jason2/test/',runScripts:'outside-only',pretendToBeVisual:true}),w=dom.window;
  w.indexedDB=real?new IDBFactory():database;w.TextEncoder=TextEncoder;w.TextDecoder=TextDecoder;
  w.HTMLElement.prototype.scrollIntoView=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};w.HTMLAnchorElement.prototype.click=function(){};w.URL.createObjectURL=()=>'blob:test';w.URL.revokeObjectURL=()=>{};
  w.fetch=async(url,args={})=>{network.push({url,method:args.method||'GET'});throw Error('Sandbox must not access network');};
  w.eval(fs.readFileSync(path.join(__dirname,'../test/config.js'),'utf8'));w.eval(fs.readFileSync(path.join(__dirname,'../test/seed.js'),'utf8'));if(!real)w.JASON_SANDBOX_SEED=clone(seed);
  w.eval(fs.readFileSync(path.join(__dirname,'../../shared/packaging.js'),'utf8'));
- for(const file of ['model.js','storage.js','i18n.js','vendor/exceljs.min.js','export.js','app.js'])w.eval(fs.readFileSync(path.join(__dirname,'..',file),'utf8'));
+ for(const file of ['model.js','storage.js','i18n.js','vendor/exceljs.min.js','export.js','app.js']){
+  if(file==='app.js'&&cached){await w.JasonStorage.put('state',{state:clone(cached.state),lang:cached.lang||'cs'});await w.JasonStorage.put('recovery',cached.recovery?clone(cached.recovery):null);}
+  w.eval(fs.readFileSync(path.join(__dirname,'..',file),'utf8'));
+ }
  const $=s=>w.document.querySelector(s),click=s=>{const e=$(s);assert.ok(e,`Missing ${s}`);assert.ok(!e.disabled,`Disabled ${s}`);e.click();},input=(s,v)=>{const e=$(s);e.value=v;e.dispatchEvent(new w.Event('input',{bubbles:true}));},submit=s=>$(s).dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
  const saved=async()=>clone((await w.JasonStorage.get('state'))?.state);
  await wait(()=>$('#page-title').textContent==='Produkty');await wait(async()=>!!(await saved()));
@@ -51,6 +54,35 @@ async function setup(real=false){
  });
  await test('sandbox reset requires confirmation and preserves live storage',async()=>{
   c.click('#data-button');c.click('#reset-sandbox');await wait(()=>c.$('#confirm-dialog').open);c.click('#confirm-no');assert.equal((await c.saved()).products[0].price,10);c.click('#reset-sandbox');await wait(()=>c.$('#confirm-dialog').open);c.click('#confirm-yes');await wait(()=>!c.$('#editor').open);const s=await c.saved();assert.deepEqual(s.products,clone(c.w.JasonModel.cleanProducts(seed.products)));assert.deepEqual(s.logistics,seed.logistics);assert.deepEqual(s.photos,{});assert.equal(c.$('#undo').disabled,true);assert.equal(c.$('#redo').disabled,true);assert.deepEqual(network,[]);assert.deepEqual(await liveState(),{sentinel:'LIVE DATA'});
+ });
+ await test('real sandbox names sort correctly in Czech and English on fresh load',async()=>{
+  const r=await setup(true),p=(await r.saved()).products;
+  assert.equal(r.$('.product-link strong').textContent,'Lilien balzám na rty - Brusinka');
+  assert.equal(p.find(x=>String(x.id)==='8596048008488').csName,'Lilien intimní sprchový gel');
+  for(const x of p)for(const field of ['name','csName'])if(typeof x[field]==='string')assert.equal(x[field],x[field].trim().replace(/\s+/gu,' '));
+  r.click('[data-lang=en]');await wait(()=>r.$('.product-link strong').textContent==='Lilien Body lotion Aloe Vera');
+  assert.deepEqual(network,[]);r.dom.window.close();
+ });
+ await test('existing sandbox and restore point get exact name corrections without losing local edits',async()=>{
+  const fresh=await setup(true),expected=await fresh.saved(),corrections=clone(fresh.w.JASON_SANDBOX_SEED.nameCorrections);
+  fresh.dom.window.close();
+  const old=clone(expected);delete old.sandboxNameRevision;
+  for(const p of old.products)for(const c of corrections)if(String(p.id)===c.id&&p[c.field]===c.after)p[c.field]=c.before;
+  const edited=old.products.find(p=>String(p.id)==='8596048008488');edited.name='My edited product name';edited.price=9.87;edited.custom={keep:['local edit']};
+  old.photos={'8596048008488':'data:image/jpeg;base64,local'};old.logistics.Lilien['500A'].ITEM.weight=42;
+  const recovery=clone(old);recovery.products.find(p=>String(p.id)==='8596048008488').price=8.76;
+  const before=clone(old),recoveryBefore=clone(recovery);
+  const repaired=s=>{const n=clone(s);for(const p of n.products)for(const c of corrections)if(String(p.id)===c.id&&p[c.field]===c.before)p[c.field]=c.after;n.sandboxNameRevision=expected.sandboxNameRevision;return n;};
+  const r=await setup(true,{state:old,recovery});
+  await wait(async()=>(await r.saved()).sandboxNameRevision===expected.sandboxNameRevision);
+  assert.deepEqual(await r.saved(),repaired(old));assert.deepEqual(clone(await r.w.JasonStorage.get('recovery')),repaired(recovery));
+  assert.deepEqual(old,before);assert.deepEqual(recovery,recoveryBefore);
+  assert.equal(r.$('.product-link strong').textContent,'Lilien balzám na rty - Brusinka');
+  r.click('#undo');await wait(async()=>(await r.saved()).products.find(p=>String(p.id)==='8596048008488').price===8.76);
+  assert.equal((await r.saved()).products.find(p=>String(p.id)==='8596048008488').csName,'Lilien intimní sprchový gel');
+  const current=await r.saved();current.products.find(p=>String(p.id)==='8596048008488').csName='Lilien - intimní sprchový gel';r.dom.window.close();
+  const again=await setup(true,{state:current});assert.deepEqual(await again.saved(),current);
+  again.dom.window.close();assert.deepEqual(network,[]);assert.deepEqual(await liveState(),{sentinel:'LIVE DATA'});
  });
  await test('real sandbox seed has 317 products, 78 keys and styled Excel export',async()=>{
   const r=await setup(true);assert.equal((await r.saved()).products.length,317);assert.equal(r.w.JasonModel.keyEntries((await r.saved()).logistics).length,78);let workbook;r.w.JasonExport.download=async wb=>{workbook=wb;};r.click('#export');r.submit('#export-form');await wait(()=>workbook);assert.equal(workbook.getWorksheet('Products').getCell('A1').fill.fgColor.argb,'FF214A84');assert.deepEqual(network,[]);r.dom.window.close();
