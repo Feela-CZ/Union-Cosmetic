@@ -36,11 +36,11 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
 (async()=>{
  let passed=0;const c=await setup(),{w,$,$$,click,input,change,saved,upload,submit,errors}=c;
  async function test(name,fn){await fn();passed++;console.log('PASS',name);}
- await test('name sorting ignores extra whitespace and punctuation in both languages and exports the same order',async()=>{
+ await test('clean product names sort alphabetically in both languages and export in the same order',async()=>{
   const n=await setup(),products=[
-   {...fixture,id:'1',name:'Lilien  liquid soap Hygiene Plus',csName:'Lilien - intimní sprchový gel'},
+   {...fixture,id:'1',name:'Lilien liquid soap Hygiene Plus',csName:'Lilien intimní sprchový gel'},
    {...fixture,id:'2',name:'Lilien Body lotion Aloe Vera',csName:'Lilien balzám na rty - Brusinka'},
-   {...fixture,id:'3',name:'  Lilien Boys Shampoo & Bath  ',csName:'  Lilien   balzám na rty - Klasik  '}
+   {...fixture,id:'3',name:'Lilien Boys Shampoo & Bath',csName:'Lilien balzám na rty - Klasik'}
   ];await n.upload('products',products);const before=await n.saved();
   const ids=()=>n.$$('tbody tr [data-select]').map(e=>products[Number(e.dataset.select)].id);
   assert.deepEqual(ids(),['2','3','1']);

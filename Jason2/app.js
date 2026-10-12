@@ -115,10 +115,9 @@ function renderToolbar(){
 }
 function filteredProducts(){
  const list=M.filterProducts(state.products,filters),byName=sort.field==='name';
- const collator=new Intl.Collator(lang,{numeric:true,...(byName?{ignorePunctuation:true,sensitivity:'base'}:{})});
- const text=v=>byName?String(v??'').trim().replace(/\s+/gu,' '):String(v??'');
+ const collator=new Intl.Collator(lang,{numeric:true});
  const value=p=>byName?(lang==='cs'?p.csName||p.name:p.name||p.csName):sort.field==='volume'?Number(p.volume?.number)||0:p[sort.field];
- return list.sort((a,b)=>{const av=value(a.p),bv=value(b.p);return (typeof av==='number'&&typeof bv==='number'?av-bv:collator.compare(text(av),text(bv)))*(sort.asc?1:-1);});
+ return list.sort((a,b)=>{const av=value(a.p),bv=value(b.p);return (typeof av==='number'&&typeof bv==='number'?av-bv:collator.compare(String(av??''),String(bv??'')))*(sort.asc?1:-1);});
 }
 function productExportRows(){const rows=filteredProducts();return selected.size?rows.filter(r=>selected.has(r.index)):rows;}
 function completion(data){let done=0,total=0;Object.entries(M.sections).forEach(([s,fs])=>fs.forEach(f=>{total++;if(data[s]?.[f]!=null&&data[s]?.[f]!=='')done++;}));return Math.round(done/total*100);}

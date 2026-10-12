@@ -56,7 +56,7 @@
     "type": "Shampoo",
     "id": 8596048006996,
     "hs": 33051000,
-    "name": "Lilien shampoo fine hair Macadamia Oil ",
+    "name": "Lilien shampoo fine hair Macadamia Oil",
     "volume": {
       "number": "350",
       "unit": "ml"
@@ -141,7 +141,7 @@
     "type": "Shampoo",
     "id": 8596048007375,
     "hs": 33051000,
-    "name": "Lilien shampoo normal hair Olive Oil ",
+    "name": "Lilien shampoo normal hair Olive Oil",
     "volume": {
       "number": "1000",
       "unit": "ml"
@@ -352,7 +352,7 @@
     "type": "Shower Gel",
     "id": 8596048005128,
     "hs": 34013000,
-    "name": "Lilien Shower Gel  Honey&Oat  (new formula, no microplastics)",
+    "name": "Lilien Shower Gel Honey&Oat (new formula, no microplastics)",
     "volume": {
       "number": "750",
       "unit": "ml"
@@ -369,7 +369,7 @@
     "type": "Shower Gel",
     "id": 8596048005135,
     "hs": 34013000,
-    "name": "Lilien Shower Gel  Passionflower (new formula, no microplastics)",
+    "name": "Lilien Shower Gel Passionflower (new formula, no microplastics)",
     "volume": {
       "number": "750",
       "unit": "ml"
@@ -398,7 +398,7 @@
     "discontinued_date": "",
     "key": "350A",
     "carton_ean": 8596048008495,
-    "csName": "Lilien - intimní sprchový gel"
+    "csName": "Lilien intimní sprchový gel"
   },
   {
     "brand": "Lilien",
@@ -643,7 +643,7 @@
     "type": "Lip Balm",
     "id": 8596048011426,
     "hs": 33049900,
-    "name": "Lilien Kids lip balm ",
+    "name": "Lilien Kids lip balm",
     "volume": {
       "number": "4",
       "unit": "g"
@@ -660,7 +660,7 @@
     "type": "Shampoo",
     "id": 8596048002318,
     "hs": 33051000,
-    "name": "Lilien Boys Shampoo & Bath ",
+    "name": "Lilien Boys Shampoo & Bath",
     "volume": {
       "number": "400",
       "unit": "ml"
@@ -677,7 +677,7 @@
     "type": "Shower Gel",
     "id": 8596048002332,
     "hs": 34013000,
-    "name": "Lilien Boys Shower Gel ",
+    "name": "Lilien Boys Shower Gel",
     "volume": {
       "number": "400",
       "unit": "ml"
@@ -694,7 +694,7 @@
     "type": "Shampoo",
     "id": 8596048002325,
     "hs": 33051000,
-    "name": "Lilien Girls Shampoo & Bath ",
+    "name": "Lilien Girls Shampoo & Bath",
     "volume": {
       "number": "400",
       "unit": "ml"
@@ -711,7 +711,7 @@
     "type": "Shower Gel",
     "id": 8596048002349,
     "hs": 34013000,
-    "name": "Lilien Girls Shower Gel ",
+    "name": "Lilien Girls Shower Gel",
     "volume": {
       "number": "400",
       "unit": "ml"
@@ -864,7 +864,7 @@
     "type": "Liquid Soap",
     "id": 8596048004572,
     "hs": 34012090,
-    "name": "Lilien Exclusive  cream soap Honey & Propolis",
+    "name": "Lilien Exclusive cream soap Honey & Propolis",
     "volume": {
       "number": "1000",
       "unit": "ml"
@@ -881,7 +881,7 @@
     "type": "Liquid Soap",
     "id": 8596048004589,
     "hs": 34012090,
-    "name": "Lilien Exclusive  cream soap Macadamia",
+    "name": "Lilien Exclusive cream soap Macadamia",
     "volume": {
       "number": "1000",
       "unit": "ml"
@@ -966,7 +966,7 @@
     "type": "Liquid Soap",
     "id": "8596048004619",
     "hs": "undefined",
-    "name": "Lilien  liquid soap Hygiene Plus",
+    "name": "Lilien liquid soap Hygiene Plus",
     "csName": "Lilien tekuté mýdlo - Hygiene Plus",
     "volume": {
       "number": "1000",
@@ -1107,7 +1107,7 @@
     "type": "Facial Cosmetics",
     "id": "8596048008280",
     "hs": 33049900,
-    "name": "Lilien face removing milk Hyaluronic Acid ",
+    "name": "Lilien face removing milk Hyaluronic Acid",
     "volume": {
       "number": "250",
       "unit": "ml"
@@ -1126,7 +1126,7 @@
     "type": "Facial Cosmetics",
     "id": "8596048008303",
     "hs": 33049900,
-    "name": "Lilien face tonic Hyaluronic Acid ",
+    "name": "Lilien face tonic Hyaluronic Acid",
     "volume": {
       "number": "250",
       "unit": "ml"
@@ -1293,7 +1293,7 @@
     "type": "Shampoo",
     "id": 8596048004312,
     "hs": 34013000,
-    "name": "Lilien MEN - ART Beard & Hair & Body shampoo WHITE 250ml ",
+    "name": "Lilien MEN - ART Beard & Hair & Body shampoo WHITE 250ml",
     "volume": {
       "number": "250",
       "unit": "ml"
@@ -1395,7 +1395,7 @@
     "type": "Hair Balsam",
     "id": 8596048003964,
     "hs": 33059000,
-    "name": "Lilien hair balsam Aloe Vera ",
+    "name": "Lilien hair balsam Aloe Vera",
     "volume": {
       "number": "50",
       "unit": "ml"
@@ -1481,7 +1481,7 @@
     "type": "Shower Gel",
     "id": 8596048010719,
     "hs": 34013000,
-    "name": "Lilien shower gel Aloe Vera ",
+    "name": "Lilien shower gel Aloe Vera",
     "volume": {
       "number": "100",
       "unit": "ml"
@@ -1498,7 +1498,7 @@
     "type": "Body Lotion",
     "id": 8596048011136,
     "hs": 33049900,
-    "name": "Lilien hand and body cream Aloe Vera ",
+    "name": "Lilien hand and body cream Aloe Vera",
     "volume": {
       "number": "100",
       "unit": "ml"
@@ -1532,7 +1532,7 @@
     "type": "Travel Kit",
     "id": "8596048004398",
     "hs": 39233010,
-    "name": "Lilien travel kit 6 pieces + PVC bag ",
+    "name": "Lilien travel kit 6 pieces + PVC bag",
     "volume": {
       "number": "6",
       "unit": "pcs"
@@ -1781,7 +1781,7 @@
     "type": "Hand Cream",
     "id": 8595196907322,
     "hs": 33049900,
-    "name": "Naturalis hand cream Cannabis ",
+    "name": "Naturalis hand cream Cannabis",
     "volume": {
       "number": "125",
       "unit": "ml"
@@ -1798,7 +1798,7 @@
     "type": "Hand Cream",
     "id": 8595196907346,
     "hs": 33049900,
-    "name": "Naturalis hand cream Aloe Vera ",
+    "name": "Naturalis hand cream Aloe Vera",
     "volume": {
       "number": "125",
       "unit": "ml"
@@ -1815,7 +1815,7 @@
     "type": "Hand Cream",
     "id": 8595196907353,
     "hs": 33049900,
-    "name": "Naturalis hand cream Calendula ",
+    "name": "Naturalis hand cream Calendula",
     "volume": {
       "number": "125",
       "unit": "ml"
@@ -1832,7 +1832,7 @@
     "type": "Hand Cream",
     "id": 8595196907360,
     "hs": 33049900,
-    "name": "Naturalis hand cream Almond Oil ",
+    "name": "Naturalis hand cream Almond Oil",
     "volume": {
       "number": "125",
       "unit": "ml"
@@ -1849,7 +1849,7 @@
     "type": "Hand Cream",
     "id": 8595196907377,
     "hs": 33049900,
-    "name": "Naturalis hand cream Beeswax ",
+    "name": "Naturalis hand cream Beeswax",
     "volume": {
       "number": "125",
       "unit": "ml"
@@ -1866,7 +1866,7 @@
     "type": "Foot Cream",
     "id": 8595196907339,
     "hs": 33049900,
-    "name": "Naturalis foot cream Cannabis ",
+    "name": "Naturalis foot cream Cannabis",
     "volume": {
       "number": "125",
       "unit": "ml"
@@ -1883,7 +1883,7 @@
     "type": "Massage Emulsion",
     "id": 8596048001922,
     "hs": 33049900,
-    "name": "Naturalis Massage Emulsion Warming Therapy Cannabis & Chilli ",
+    "name": "Naturalis Massage Emulsion Warming Therapy Cannabis & Chilli",
     "volume": {
       "number": "200",
       "unit": "g"
@@ -1900,7 +1900,7 @@
     "type": "Massage Emulsion",
     "id": 8596048001939,
     "hs": 33049900,
-    "name": "Naturalis Massage Emulsion Calming Therapy Comfrey & Chestnut ",
+    "name": "Naturalis Massage Emulsion Calming Therapy Comfrey & Chestnut",
     "volume": {
       "number": "200",
       "unit": "g"
@@ -2179,7 +2179,7 @@
     "type": "Bath Salt",
     "id": 8596048011952,
     "hs": 33073000,
-    "name": "Naturalis Bath Salt Passion Fruit  (new formula, new design, rPET)",
+    "name": "Naturalis Bath Salt Passion Fruit (new formula, new design, rPET)",
     "volume": {
       "number": "1000",
       "unit": "g"
@@ -2196,7 +2196,7 @@
     "type": "Bath Salt",
     "id": 8596048011969,
     "hs": 33073000,
-    "name": "Naturalis Bath Salt Bergamot & Lime  (new formula, new design, rPET)",
+    "name": "Naturalis Bath Salt Bergamot & Lime (new formula, new design, rPET)",
     "volume": {
       "number": "1000",
       "unit": "g"
@@ -2213,7 +2213,7 @@
     "type": "Bath Salt",
     "id": 8596048011976,
     "hs": 33073000,
-    "name": "Naturalis Bath Salt Vanilla & Banana  (new formula, new design, rPET)",
+    "name": "Naturalis Bath Salt Vanilla & Banana (new formula, new design, rPET)",
     "volume": {
       "number": "1000",
       "unit": "g"
@@ -2338,7 +2338,7 @@
     "type": "Bath Foam",
     "id": "8596048012485",
     "hs": "33073000",
-    "name": "Naturalis relaxation Bath MATCHA DELIGHT  (new design, rPET)",
+    "name": "Naturalis relaxation Bath MATCHA DELIGHT (new design, rPET)",
     "csName": "Naturalis relaxační lázěň - Matcha Delight",
     "volume": {
       "number": "1000",
@@ -2356,7 +2356,7 @@
     "type": "Bath Foam",
     "id": "8596048012492",
     "hs": "33073000",
-    "name": "Naturalis relaxation Bath GOLDEN ARGAN  (new design, rPET)",
+    "name": "Naturalis relaxation Bath GOLDEN ARGAN (new design, rPET)",
     "csName": "Naturalis relaxační lázěň - Golden Argan",
     "volume": {
       "number": "1000",
@@ -2374,7 +2374,7 @@
     "type": "Bath Foam",
     "id": "8596048012508",
     "hs": "33073000",
-    "name": "Naturalis relaxation Bath LAVENDER MAGIC  (new design, rPET)",
+    "name": "Naturalis relaxation Bath LAVENDER MAGIC (new design, rPET)",
     "csName": "Naturalis relaxační lázěň - Lavender Magic",
     "volume": {
       "number": "1000",
@@ -2392,7 +2392,7 @@
     "type": "Bath Foam",
     "id": "8596048012515",
     "hs": "33073000",
-    "name": "Naturalis Foam Bath EUCALYPTUS HARMONY  (new design, rPET)",
+    "name": "Naturalis Foam Bath EUCALYPTUS HARMONY (new design, rPET)",
     "csName": "Naturalis pěnivá koupel - Eucalyptus Harmony",
     "volume": {
       "number": "1000",
@@ -2410,7 +2410,7 @@
     "type": "Bath Foam",
     "id": "8596048012522",
     "hs": "33073000",
-    "name": "Naturalis Foam Bath LOTUS DREAM  (new design, rPET)",
+    "name": "Naturalis Foam Bath LOTUS DREAM (new design, rPET)",
     "csName": "Naturalis pěnivá koupel - Lotus Dream",
     "volume": {
       "number": "1000",
@@ -2428,7 +2428,7 @@
     "type": "Bath Foam",
     "id": "8596048012539",
     "hs": "33073000",
-    "name": "Naturalis Foam Bath GINGENG ENERGY  (new design, rPET)",
+    "name": "Naturalis Foam Bath GINGENG ENERGY (new design, rPET)",
     "csName": "Naturalis pěnivá koupel - Ginseng Energy",
     "volume": {
       "number": "1000",
@@ -2519,7 +2519,7 @@
     "type": "Bath Essence",
     "id": "8596048011198",
     "hs": 33073000,
-    "name": "Naturalis bath essence Relaxing Herbs ",
+    "name": "Naturalis bath essence Relaxing Herbs",
     "volume": {
       "number": "200",
       "unit": "ml"
@@ -2538,7 +2538,7 @@
     "type": "Bath Essence",
     "id": "8596048011204",
     "hs": 33073000,
-    "name": "Naturalis bath essence Lavender Dreaming ",
+    "name": "Naturalis bath essence Lavender Dreaming",
     "volume": {
       "number": "200",
       "unit": "ml"
@@ -2610,7 +2610,7 @@
     "type": "Fabric Softener",
     "id": 8595196905953,
     "hs": 34025010,
-    "name": "Twister fabric softener Alpine Freshness (blue) ",
+    "name": "Twister fabric softener Alpine Freshness (blue)",
     "volume": {
       "number": "2000",
       "unit": "ml"
@@ -2871,7 +2871,7 @@
     "type": "Washing Gel",
     "id": 8596048010986,
     "hs": 34025090,
-    "name": "Twister washing gel Universal  (D-PAK)",
+    "name": "Twister washing gel Universal (D-PAK)",
     "volume": {
       "number": "1000",
       "unit": "ml"
@@ -2888,7 +2888,7 @@
     "type": "Washing Gel",
     "id": 8596048010993,
     "hs": 34025090,
-    "name": "Twister washing gel Color  (D-PAK)",
+    "name": "Twister washing gel Color (D-PAK)",
     "volume": {
       "number": "1000",
       "unit": "ml"
@@ -5039,7 +5039,7 @@
     "discontinued_date": "",
     "key": null,
     "carton_ean": "8596048006033",
-    "csName": "NATAVA olejové koule do koupele - Dárková sada  4×"
+    "csName": "NATAVA olejové koule do koupele - Dárková sada 4×"
   },
   {
     "brand": "Sunnoré",
@@ -5172,8 +5172,8 @@
     "type": "Sun Care",
     "id": "8596048013628",
     "hs": "33049900",
-    "name": "Sunnoré  Panthenol Spray",
-    "csName": "Sunnoré  Panthenol Spray",
+    "name": "Sunnoré Panthenol Spray",
+    "csName": "Sunnoré Panthenol Spray",
     "volume": {
       "number": "200",
       "unit": "ml"
