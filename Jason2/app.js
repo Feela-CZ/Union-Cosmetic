@@ -9,6 +9,8 @@ const icons={products:'▦',keys:'◇',checks:'✓',data:'↔',undo:'↶',redo:'
 let lang='cs',view='products',page=1,pageSize=30,sort={field:'name',asc:true},selected=new Set(),history=[],future=[],busy=false,editorDirty=false,editorSave=null,toastTimer,syncing=false,storageError=false;
 let state={products:[],logistics:M.clone(window.JASON_SEED_LOGISTICS||{}),photos:{},pendingPhotos:[],connected:false,api:JASON_CONFIG.apiBase,imageBase:JASON_CONFIG.imageBase,baseline:{},updated:null};
 let filters={search:'',brand:'',type:'',key:'',status:'active',new:'',flag:'',scope:''};
+let photoVersion=Date.now(),photoObserver=null;
+const photoVersions=new Map(),missingThumbnails=new Set();
 const t=k=>JasonText[lang][k]||JasonText.cs[k]||k;
 const types=()=>Object.keys(JasonTypes.en);
 const typeLabel=v=>JasonTypes[lang][v]||v;
@@ -58,6 +60,7 @@ async function syncRemote(){
    for(const id of [...state.pendingPhotos]){
     const data=state.photos[id];if(!data){state.pendingPhotos=state.pendingPhotos.filter(x=>x!==id);continue;}
     await S.request(state.api,'upload-image','PUT',{path:`OrderSheet/img/${id}.jpg`,content:data.split(',')[1]});
+    photoVersions.set(String(id),Date.now());
     if(state.photos[id]===data)state.pendingPhotos=state.pendingPhotos.filter(x=>x!==id);await persist();
    }
   }
@@ -113,6 +116,7 @@ function productExportRows(){const rows=filteredProducts();return selected.size?
 function completion(data){let done=0,total=0;Object.entries(M.sections).forEach(([s,fs])=>fs.forEach(f=>{total++;if(data[s]?.[f]!=null&&data[s]?.[f]!=='')done++;}));return Math.round(done/total*100);}
 function badge(text,cls=''){return `<span class="badge ${cls}">${esc(text)}</span>`;}
 function renderContent(){
+ if(photoObserver){photoObserver.disconnect();photoObserver=null;}
  let rows,unit;
  if(view==='products'){rows=filteredProducts();unit=t('countProducts');}
  else if(view==='keys'){rows=M.keyEntries(state.logistics).filter(r=>{const used=state.products.filter(p=>p.brand===r.brand&&M.key(p.key)===r.key).length;return (!filters.brand||r.brand===filters.brand)&&M.fold(r.brand+' '+r.key).includes(M.fold(filters.search))&&(!filters.scope||filters.scope==='used'&&used>0||filters.scope==='unused'&&used===0||filters.scope==='incomplete'&&completion(r.data)<100);}).sort((a,b)=>a.brand.localeCompare(b.brand)||a.key.localeCompare(b.key,undefined,{numeric:true}));unit=t('countKeys');}
@@ -130,8 +134,9 @@ function renderProductTable(items){
  const headers=[['name','product'],['brand','brand'],['id','ean'],['volume','volume'],['price','price'],['key','key'],['discontinued','status']];
  $('#content').innerHTML=`<div class="table-scroll"><table><thead><tr><th class="select-cell"><input type="checkbox" id="select-page" aria-label="${esc(t('selectAll'))}" ${items.every(x=>selected.has(x.index))?'checked':''}></th>${headers.map(([f,label])=>`<th><button class="sort-button" data-sort="${f}">${esc(t(label))}${sort.field===f?(sort.asc?' ↑':' ↓'):''}</button></th>`).join('')}<th class="actions-cell">${t('actions')}</th></tr></thead><tbody>${items.map(({p,index})=>{
  const title=lang==='cs'?p.csName||p.name:p.name||p.csName;const secondary=lang==='cs'?p.name:p.csName;
- return `<tr class="${selected.has(index)?'selected':''}"><td class="select-cell"><input type="checkbox" data-select="${index}" aria-label="${esc(t('select')+' '+title)}" ${selected.has(index)?'checked':''}></td><td class="product-cell"><button class="product-link" data-edit="${index}"><span><strong>${esc(title||'—')}</strong><small>${esc(typeLabel(p.type))}${secondary&&secondary!==title?' · '+esc(secondary):''}</small></span></button></td><td>${badge(p.brand||'—','brand-'+M.fold(p.brand).replace(/[^a-z]/g,''))}</td><td class="mono">${esc(p.id||'—')}<small class="cell-sub">${p.hs?'HS '+esc(p.hs):''}</small></td><td class="nowrap">${esc(p.volume?.number??'')} ${esc(p.volume?.unit||'')}</td><td class="numeric">${p.price==null||p.price===''?'—':esc(Number.isFinite(Number(p.price))?Number(p.price).toLocaleString(lang==='cs'?'cs-CZ':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:4}):p.price)}</td><td><button class="key-link" data-product-key="${index}">${esc(M.key(p.key)||'—')}</button><small class="cell-sub">${M.packaging(p,state.logistics).pack!==''?esc(M.packaging(p,state.logistics).pack)+' '+(lang==='cs'?'ks / karton':'items / carton'):''}</small></td><td class="status-cell"><span class="status-entry">${p.discontinued===true?badge(t('discontinued'),'status-discontinued'):badge(t('active'),'status-active')}${p.discontinued===true&&p.discontinued_date?'<small class="cell-sub">'+esc(p.discontinued_date)+'</small>':''}</span>${p.new===true?'<span class="status-entry">'+badge(t('new'),'status-new')+(p.new_date?'<small class="cell-sub">'+esc(p.new_date)+'</small>':'')+'</span>':''}${(p.flags||[]).map(f=>badge(f,'custom')).join('')}</td><td class="actions-cell"><button data-edit="${index}" class="row-edit">${t('edit')}</button><button data-more="${index}" class="more-button" aria-label="${esc(t('actions')+' '+title)}">•••</button></td></tr>`;
+ return `<tr class="${selected.has(index)?'selected':''}"><td class="select-cell"><input type="checkbox" data-select="${index}" aria-label="${esc(t('select')+' '+title)}" ${selected.has(index)?'checked':''}></td><td class="product-cell"><div class="product-identity">${productThumbnail(p,index,title)}<button class="product-link" data-edit="${index}"><span><strong>${esc(title||'—')}</strong><small>${esc(typeLabel(p.type))}${secondary&&secondary!==title?' · '+esc(secondary):''}</small></span></button></div></td><td>${badge(p.brand||'—','brand-'+M.fold(p.brand).replace(/[^a-z]/g,''))}</td><td class="mono">${esc(p.id||'—')}<small class="cell-sub">${p.hs?'HS '+esc(p.hs):''}</small></td><td class="nowrap">${esc(p.volume?.number??'')} ${esc(p.volume?.unit||'')}</td><td class="numeric">${p.price==null||p.price===''?'—':esc(Number.isFinite(Number(p.price))?Number(p.price).toLocaleString(lang==='cs'?'cs-CZ':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:4}):p.price)}</td><td><button class="key-link" data-product-key="${index}">${esc(M.key(p.key)||'—')}</button><small class="cell-sub">${M.packaging(p,state.logistics).pack!==''?esc(M.packaging(p,state.logistics).pack)+' '+(lang==='cs'?'ks / karton':'items / carton'):''}</small></td><td class="status-cell"><span class="status-entry">${p.discontinued===true?badge(t('discontinued'),'status-discontinued'):badge(t('active'),'status-active')}${p.discontinued===true&&p.discontinued_date?'<small class="cell-sub">'+esc(p.discontinued_date)+'</small>':''}</span>${p.new===true?'<span class="status-entry">'+badge(t('new'),'status-new')+(p.new_date?'<small class="cell-sub">'+esc(p.new_date)+'</small>':'')+'</span>':''}${(p.flags||[]).map(f=>badge(f,'custom')).join('')}</td><td class="actions-cell"><button data-edit="${index}" class="row-edit">${t('edit')}</button><button data-more="${index}" class="more-button" aria-label="${esc(t('actions')+' '+title)}">•••</button></td></tr>`;
  }).join('')}</tbody></table></div>`;
+ observeProductPhotos();
  $$('[data-sort]').forEach(b=>b.onclick=()=>{sort={field:b.dataset.sort,asc:sort.field===b.dataset.sort?!sort.asc:true};renderContent();});
  $$('[data-edit]').forEach(b=>b.onclick=()=>openProduct(Number(b.dataset.edit)));
  $$('[data-more]').forEach(b=>b.onclick=()=>productActions(Number(b.dataset.more)));
@@ -153,7 +158,27 @@ function field(name,label,value,type='text',extra='',hint=''){return `<label cla
 function datalist(id,values){return `<datalist id="${id}">${values.map(v=>`<option value="${esc(v)}">${esc(id==='types'?typeLabel(v):v)}</option>`).join('')}</datalist>`;}
 function formFooter(label='save',left=''){return `<div class="form-footer"><span class="muted">${left}</span><div>${button('form-cancel','cancel')}<button type="submit" class="primary">${esc(t(label))}</button></div></div>`;}
 function attachCancel(){if($('#form-cancel'))$('#form-cancel').onclick=closeEditor;}
-function productPhoto(p){return (!state.connected||state.pendingPhotos.includes(p.id)?state.photos[p.id]:null)||(state.imageBase&&p.id?`${state.imageBase.replace(/\/$/,'')}/${encodeURIComponent(p.id)}.jpg?ts=${Date.now()}`:'');}
+function productPhoto(p,thumbnail=false){return (!state.connected||state.pendingPhotos.includes(p.id)?state.photos[p.id]:null)||(state.imageBase&&p.id?`${state.imageBase.replace(/\/$/,'')}/${thumbnail?'thumbnails/':''}${encodeURIComponent(p.id)}.jpg?v=${photoVersions.get(String(p.id))||photoVersion}`:'');}
+function productThumbnail(p,index,title){
+ const src=productPhoto(p,true),missing=!src||missingThumbnails.has(src);
+ return `<button type="button" class="product-thumb" data-row-photo="${index}" aria-label="${esc((missing?t('noPhoto'):t('viewPhoto'))+' · '+(title||p.id||''))}" title="${esc(missing?t('noPhoto'):t('viewPhoto'))}" disabled><svg class="photo-fallback" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 5-5 4 4 4-6 5 7"/></svg>${missing?'':`<img data-photo-src="${esc(src)}" alt="${esc(title||p.id||'')}" width="44" height="44" loading="lazy" decoding="async" hidden>`}</button>`;
+}
+function observeProductPhotos(){
+ const load=img=>{
+  const src=img.dataset.photoSrc,button=img.closest('.product-thumb');
+  img.onload=()=>{img.hidden=false;button.querySelector('.photo-fallback').hidden=true;button.disabled=false;};
+  img.onerror=()=>{missingThumbnails.add(src);img.hidden=true;button.disabled=true;button.title=t('noPhoto');button.setAttribute('aria-label',t('noPhoto')+' · '+img.alt);button.querySelector('.photo-fallback').hidden=false;};
+  img.hidden=false;img.src=src;
+ };
+ if(typeof IntersectionObserver==='function'){
+  photoObserver=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting){photoObserver.unobserve(entry.target);load(entry.target.querySelector('[data-photo-src]'));}},{rootMargin:'0px'});
+  $$('[data-photo-src]').forEach(img=>photoObserver.observe(img.closest('.product-thumb')));
+ }else $$('[data-photo-src]').forEach(load);
+ $$('[data-row-photo]').forEach(button=>button.onclick=()=>{
+  const p=state.products[Number(button.dataset.rowPhoto)],src=productPhoto(p);
+  if(!src)return;$('#large-photo').alt=lang==='cs'?p.csName||p.name||p.id:p.name||p.csName||p.id;$('#large-photo').src=src;$('#photo-dialog').showModal();
+ });
+}
 function logisticsOverview(data){
  return `<div class="logistics-overview">${Object.entries(M.sections).map(([section,fields])=>`<section><h4>${t(section)}</h4><dl>${fields.map(f=>{const raw=data[section]?.[f],value=M.count(raw);return `<div><dt>${esc(t(f))}</dt><dd>${raw==null||raw===''?'—':esc(value===''?String(raw):value.toLocaleString(lang==='cs'?'cs-CZ':'en-GB',{maximumFractionDigits:6}))}</dd></div>`;}).join('')}</dl></section>`).join('')}</div>`;
 }
@@ -334,6 +359,7 @@ async function refreshShared(automatic=false){
   const changed=sig(p)!==sig(state.products)||sig(l)!==sig(state.logistics);
   if(changed){history=[];future=[];selected.clear();}
   state={...state,products:p,logistics:l,api,imageBase:JASON_CONFIG.sharedOnly?JASON_CONFIG.imageBase:state.imageBase,connected:true,baseline:{products:sig(p),logistics:sig(l)},pendingPhotos:[],updated:new Date().toISOString()};
+  if(!automatic){photoVersion=Date.now();photoVersions.clear();missingThumbnails.clear();}
   lastRefresh=Date.now();await persist();
  }catch(e){refreshFailed=true;toast(t(state.products.length?'refreshFailed':'sharedNotLoaded'),true);}
  finally{refreshing=false;render();}

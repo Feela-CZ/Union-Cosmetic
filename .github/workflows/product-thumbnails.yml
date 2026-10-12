@@ -1,0 +1,40 @@
+name: Product photo thumbnails
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'OrderSheet/img/*.jpg'
+      - '.github/workflows/product-thumbnails.yml'
+      - '.github/scripts/product_thumbnails.py'
+      - '.github/scripts/test_product_thumbnails.py'
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: product-photo-thumbnails
+  cancel-in-progress: false
+
+jobs:
+  previews:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out photos and generator
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          sparse-checkout: |
+            .github/scripts
+            OrderSheet/img
+      - name: Install image tools
+        run: python3 -m pip install --quiet Pillow==12.0.0
+      - name: Verify preview generation
+        run: python3 .github/scripts/test_product_thumbnails.py
+      - name: Generate previews and publish them safely
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/product_thumbnails.py

@@ -7,12 +7,20 @@ const fixture={brand:'Lilien',type:'Liquid Soap',id:'8596048008129',hs:'00123456
 const logistics={Lilien:{'500A':{ITEM:{length:'5 cm',width:'5 cm',height:'15 cm',weight:'0.5 kg'},CARTON:{length:'30 cm',width:'20 cm',height:'20 cm',weight:'6 kg',nr_of_items:12},LAYER:{nr_of_items:240,nr_of_cartons:20},PALLET:{length:'120 cm',width:'80 cm',height:'150 cm',weight:'500 kg',nr_of_cartons:160,nr_of_items:1920,nr_of_layers:8},extra:{keep:'supplier'}}}};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function wait(fn){for(let i=0;i<150;i++){if(await fn())return;await sleep(10);}throw Error('Wait condition timed out');}
-async function setup(shared=false,initialRemote=null){
+async function setup(shared=false,initialRemote=null,withPhotoObserver=false){
  const errors=[],html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
  const dom=new JSDOM(html,{url:shared?'https://feela-cz.github.io/Union-Cosmetic/Jason2/':'https://local.test/Jason2/',runScripts:'outside-only',pretendToBeVisual:true}),w=dom.window;
  w.indexedDB=new IDBFactory();w.HTMLElement.prototype.scrollIntoView=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};w.HTMLAnchorElement.prototype.click=function(){};w.URL.createObjectURL=()=>'blob:test';w.URL.revokeObjectURL=()=>{};
  w.fetch=async()=>({ok:false,status:404,text:async()=>'',json:async()=>{throw Error('404');}});
  w.console.error=e=>errors.push(e.message||String(e));
+ const photoObservers=[];
+ if(withPhotoObserver)w.IntersectionObserver=class{
+  constructor(callback,options){this.callback=callback;this.options=options;this.targets=new Set();photoObservers.push(this);}
+  observe(target){this.targets.add(target);}
+  unobserve(target){this.targets.delete(target);}
+  disconnect(){this.disconnected=true;this.targets.clear();}
+  show(target){this.callback([{target,isIntersecting:true}]);}
+ };
  w.eval(fs.readFileSync(path.join(__dirname,'../config.js'),'utf8'));if(!shared){w.JASON_CONFIG.sharedOnly=false;w.JASON_CONFIG.autoConnect=false;w.JASON_SEED_LOGISTICS=JSON.parse(fs.readFileSync(path.join(__dirname,'../../JSON edit GUI/logistics.json'),'utf8'));}if(initialRemote)w.fetch=initialRemote;
  w.TextEncoder=TextEncoder;w.TextDecoder=TextDecoder;
  w.eval(fs.readFileSync(path.join(__dirname,'../../shared/packaging.js'),'utf8'));
@@ -22,11 +30,39 @@ async function setup(shared=false,initialRemote=null){
  const saved=async()=>clone((await w.JasonStorage.get('state'))?.state);
  async function upload(kind,data,confirm=true){click('#data-button');click(kind==='products'?'#import-products':kind==='logistics'?'#import-logistics':'#restore-backup');Object.defineProperty($('#import-file'),'files',{configurable:true,value:[{name:'test.json',size:JSON.stringify(data).length,text:async()=>JSON.stringify(data)}]});$('#import-file').dispatchEvent(new w.Event('change'));if(confirm){await wait(()=>$('#confirm-dialog').open);click('#confirm-yes');await wait(()=>!$('#editor').open);}}
  const submit=s=>{$(s).dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));};
- return {w,dom,$,$$,click,input,change,saved,upload,submit,errors};
+ return {w,dom,$,$$,click,input,change,saved,upload,submit,errors,photoObservers};
 }
 (async()=>{
  let passed=0;const c=await setup(),{w,$,$$,click,input,change,saved,upload,submit,errors}=c;
  async function test(name,fn){await fn();passed++;console.log('PASS',name);}
+ await test('row photos load only on visibility, reuse URLs and open the original without edits',async()=>{
+  const n=await setup(false,null,true),products=Array.from({length:64},(_,i)=>({...fixture,id:String(1000000000000+i),csName:'Product '+i}));
+  await n.upload('products',products);const before=await n.saved();
+  const observer=n.photoObservers.at(-1),images=n.$$('[data-photo-src]');
+  assert.equal(images.length,30);assert.equal(observer.targets.size,30);assert.equal(observer.options.rootMargin,'0px');
+  assert.ok(images.every(img=>!img.hasAttribute('src')));
+  const image=images[0],button=image.closest('.product-thumb'),url=image.dataset.photoSrc;
+  assert.match(url,/\/thumbnails\/\d+\.jpg\?v=/);assert.equal(image.getAttribute('loading'),'lazy');assert.equal(image.getAttribute('decoding'),'async');
+  observer.show(button);assert.equal(image.src,url);image.dispatchEvent(new n.w.Event('load'));
+  assert.equal(button.disabled,false);assert.equal(button.querySelector('.photo-fallback').hidden,true);
+  button.click();assert.ok(n.$('#photo-dialog').open);assert.ok(!n.$('#editor').open);
+  assert.ok(!n.$('#large-photo').src.includes('/thumbnails/'));n.click('#photo-close');
+  n.$('[data-select]').dispatchEvent(new n.w.Event('change'));
+  assert.equal(observer.disconnected,true);assert.equal(n.$('[data-photo-src]').dataset.photoSrc,url);
+  assert.equal(n.$('[data-photo-src]').hasAttribute('src'),false);
+  const failed=n.$$('[data-photo-src]')[1],failedUrl=failed.dataset.photoSrc;
+  n.photoObservers.at(-1).show(failed.closest('.product-thumb'));failed.dispatchEvent(new n.w.Event('error'));
+  assert.equal(failed.hidden,true);assert.equal(failed.closest('button').disabled,true);
+  n.change('#page-size','60');assert.ok(!n.$$('[data-photo-src]').some(img=>img.dataset.photoSrc===failedUrl));
+  assert.equal(n.$$('[data-row-photo]').length,60);assert.deepEqual(await n.saved(),before);assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
+ await test('row photos prefer local restored photos without remote downloads',async()=>{
+  const n=await setup(false,null,true),data='data:image/jpeg;base64,/9j/2Q==';
+  await n.upload('backup',{format:'jason-backup',version:1,products:[fixture],logistics,photos:{[fixture.id]:data}});
+  const image=n.$('[data-photo-src]');assert.equal(image.dataset.photoSrc,data);assert.equal(image.hasAttribute('src'),false);
+  n.photoObservers.at(-1).show(image.closest('button'));image.dispatchEvent(new n.w.Event('load'));image.closest('button').click();
+  assert.equal(n.$('#large-photo').src,data);assert.ok(n.$('#photo-dialog').open);n.dom.window.close();
+ });
  await test('key overview shows pallet items, weight and display-only estimated height with plain legends',async()=>{
   const n=await setup(),keys=clone(logistics);keys.Lilien['500A'].PALLET.weight='500,5 kg';keys.Lilien['missing']=n.w.JasonModel.emptyLogistics();
   await n.upload('products',[fixture]);await n.upload('logistics',keys);const before=await n.saved();
