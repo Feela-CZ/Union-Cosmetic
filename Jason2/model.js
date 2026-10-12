@@ -8,6 +8,7 @@ const sections = {ITEM:['length','width','height','weight'],CARTON:['length','wi
 const invalidKeys = new Set(['','null','undefined','___','—','-','__proto__','constructor','prototype']);
 const key = v => v == null || invalidKeys.has(String(v).trim().toLowerCase()) ? null : String(v).trim();
 const fold = v => String(v ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const isMissing = v => v == null || typeof v==='string' && v.trim()==='';
 const count = v => { if(v == null || v === '') return ''; const m=String(v).replace(',','.').match(/^\s*(-?\d+(?:\.\d+)?)(?:\s*[^\d.]*)?$/);return m?Number(m[1]):''; };
 function validateProducts(value) {
  if(!Array.isArray(value) || value.some(p => !p || typeof p!=='object' || Array.isArray(p))) throw Error('PRODUCTS_FORMAT');
@@ -80,23 +81,25 @@ function issues(state,photoIds=null){
  state.products.forEach((p,i)=>{
   if(p.discontinued===true)return;
   const add=(code,field)=>out.push({kind:'product',index:i,code,field});
-  if(!p.id)add('eanMissing','id');else{if(p.discontinued!==true&&ids.get(String(p.id))>1)add('eanDuplicate','id');if(!eanValid(p.id))add('eanInvalid','id');}
-  for(const f of ['brand','type','name','csName'])if(!p[f])add('missing',f);
-  if(p.price==null||p.price===''||!Number.isFinite(Number(p.price))||Number(p.price)<0)add('priceInvalid','price');
+  if(isMissing(p.id))add('eanMissing','id');else{if(ids.get(String(p.id))>1)add('eanDuplicate','id');if(!eanValid(p.id))add('eanInvalid','id');}
+  for(const f of ['brand','type','hs','name','csName','carton_ean'])if(isMissing(p[f]))add('missing',f);
+  for(const f of ['number','unit'])if(isMissing(p.volume?.[f]))add('missing','volume.'+f);
+  if(p.new===true&&isMissing(p.new_date))add('missing','new_date');
+  if(isMissing(p.price)||!Number.isFinite(Number(p.price))||Number(p.price)<0)add('priceInvalid','price');
   const k=key(p.key),l=k?state.logistics[p.brand]?.[k]:null;
   if(!k)add('keyMissing','key');else if(!l)add('keyUnknown','key');
   if(photoIds&&!state.photos?.[p.id]&&!photoIds.has(String(p.id??'')))add('photoMissing','photo');
  });
  for(const {brand,key:k,data} of keyEntries(state.logistics)){
-  const add=code=>out.push({kind:'key',brand,key:k,code});
-  if(Object.entries(sections).some(([s,fs])=>fs.some(f=>data[s]?.[f]==null||data[s]?.[f]==='')))add('keyIncomplete');
+  const add=(code,field)=>out.push({kind:'key',brand,key:k,code,...(field?{field}:{})});
+  for(const [s,fs] of Object.entries(sections))for(const f of fs)if(isMissing(data[s]?.[f]))add('keyIncomplete',s+'.'+f);
   const c=count(data.CARTON?.nr_of_items),lc=count(data.LAYER?.nr_of_cartons),pc=count(data.PALLET?.nr_of_cartons),pi=count(data.PALLET?.nr_of_items),li=count(data.LAYER?.nr_of_items),layers=count(data.PALLET?.nr_of_layers);
   if(c!==''&&pc!==''&&pi!==''&&c*pc!==pi||c!==''&&lc!==''&&li!==''&&c*lc!==li||lc!==''&&layers!==''&&pc!==''&&lc*layers!==pc)add('keyMath');
   if(!state.products.some(p=>p.brand===brand&&key(p.key)===k))add('keyUnused');
  }
  return out;
 }
-const api={clone,sections,key,fold,count,validateProducts,validateLogistics,emptyLogistics,estimatedPalletHeight,cleanProducts,packaging,saveProduct,keyEntries,applyLogistics,renameKey,filterProducts,eanValid,issues};
+const api={clone,sections,key,fold,isMissing,count,validateProducts,validateLogistics,emptyLogistics,estimatedPalletHeight,cleanProducts,packaging,saveProduct,keyEntries,applyLogistics,renameKey,filterProducts,eanValid,issues};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.JasonModel=api;
 })(typeof window!=='undefined'?window:globalThis);
 

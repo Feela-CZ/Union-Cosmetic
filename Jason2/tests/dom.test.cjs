@@ -51,6 +51,28 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
   await wait(()=>!n.$('#export-form [type=submit]').disabled);n.click('#editor-close');
   assert.deepEqual((await n.saved()).products,before.products);assert.deepEqual(n.errors,[]);n.dom.window.close();
  });
+ await test('missing product fields show translated findings and open the relevant tabs without changing data',async()=>{
+  const n=await setup();await n.upload('logistics',logistics);
+  const p={...fixture,hs:' ',carton_ean:null,volume:{number:null,unit:null},price:' ',new:true,new_date:''};
+  await n.upload('products',[p,{...p,id:'retired',discontinued:true}]);const before=await n.saved();
+  n.click('[data-view=checks]');assert.equal(n.$$('tbody tr').length,6);
+  for(const [label,tab] of [['HS kód','details'],['EAN kartonu','packaging'],['Objem / množství – hodnota','details'],['Objem / množství – jednotka','details'],['Datum novinky','flags'],['Cena','details']]){
+   n.input('#search',label);assert.equal(n.$$('tbody tr').length,1,label);
+   n.click('[data-issue]');assert.equal(n.$('#tab-'+tab).getAttribute('aria-selected'),'true');
+   if(label==='Objem / množství – jednotka')assert.equal(n.$('[name=volume-unit]').value,'');
+   n.click('#editor-close');
+  }
+  n.input('#search','');n.click('[data-lang=en]');n.input('#search','Volume / quantity – unit');
+  assert.equal(n.$$('tbody tr').length,1);assert.ok(n.$('tbody').textContent.includes('Missing value'));
+  assert.deepEqual(await n.saved(),before);assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
+ await test('logistics findings identify searchable missing fields and open the correct key',async()=>{
+  const n=await setup(),keys=clone(logistics);keys.Lilien['500A'].PALLET.weight=' ';
+  await n.upload('products',[fixture]);await n.upload('logistics',keys);const before=await n.saved();
+  n.click('[data-view=checks]');n.input('#search','Paleta / Hmotnost');assert.equal(n.$$('tbody tr').length,1);
+  n.click('[data-issue]');assert.equal(n.$('#key-form [name=key]').value,'500A');n.click('#editor-close');
+  assert.deepEqual(await n.saved(),before);assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
  await test('missing photo finding opens the photo tab and clears after saving a local photo',async()=>{
   const n=await setup(),missing={...fixture,id:'0012345678901',csName:'Missing photo'};
   await n.upload('products',[missing,{...missing,id:'retired',discontinued:true}]);

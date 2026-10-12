@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict'),M=require('../model.js'),fs=require('node:fs');
 const logistics={Lilien:{'500':{...M.emptyLogistics(),CARTON:{nr_of_items:10},LAYER:{nr_of_cartons:12,nr_of_items:120},PALLET:{nr_of_cartons:120,nr_of_items:1200,nr_of_layers:10},extra:{supplier:'keep'}}}};
-const product={brand:'Lilien',type:'Liquid Soap',id:'8596048008129',name:'Soap',csName:'Mýdlo',price:1.2,key:'500',pack:10,boxes_per_layer:12,boxes_per_pallet:120,carton_ean:'00123456789012',volume:{number:'500',unit:'ml',precision:'keep'},custom:{nested:['keep']},new:true,new_date:'2025-01-01'};
+const product={brand:'Lilien',type:'Liquid Soap',id:'8596048008129',hs:'34013000',name:'Soap',csName:'Mýdlo',price:1.2,key:'500',pack:10,boxes_per_layer:12,boxes_per_pallet:120,carton_ean:'00123456789012',volume:{number:'500',unit:'ml',precision:'keep'},custom:{nested:['keep']},new:true,new_date:'2025-01-01'};
 test('estimated pallet height converts units and leaves stored dimensions untouched',()=>{
  for(const height of [12,'12 cm','120 mm','0,12 m']){
   const data={CARTON:{height},PALLET:{nr_of_layers:10,height:'142 cm',weight:'193 kg'}};const before=M.clone(data);
@@ -37,6 +37,36 @@ test('placeholder keys excluded without deleting original data',()=>{const data=
 test('historical duplicate EAN does not block unrelated edits but new duplicates are rejected',()=>{const rows=[product,{...product,name:'Historical duplicate'}];assert.equal(M.saveProduct(product,{price:2},rows,0,logistics).price,2);assert.throws(()=>M.saveProduct(product,{id:product.id},rows,null,logistics),/EAN_DUPLICATE/);});
 
 const duplicateIssues=products=>M.issues({products,logistics}).filter(r=>r.code==='eanDuplicate');
+test('every missing catalogue field is a finding only for active products without modifying data',()=>{
+ const required=['id','brand','type','hs','name','csName','carton_ean','volume.number','volume.unit','price','key','new_date'];
+ for(const field of required)for(const value of [undefined,null,'',' \t\n ']){
+  const p=M.clone(product),parts=field.split('.'),target=parts.length===2?p[parts[0]]:p;
+  if(value===undefined)delete target[parts.at(-1)];else target[parts.at(-1)]=value;
+  const state={products:[{...p,discontinued:true},p],logistics,photos:{}},before=M.clone(state);
+  const findings=M.issues(state,new Set([product.id])).filter(r=>r.kind==='product');
+  assert.ok(findings.some(r=>r.index===1&&r.field===field),field+' missing '+String(value));
+  assert.ok(findings.every(r=>r.index===1));assert.deepEqual(state,before);
+ }
+ const p={...product};delete p.volume;
+ assert.deepEqual(M.issues({products:[p],logistics}).filter(r=>r.field?.startsWith('volume.')).map(r=>r.field),['volume.number','volume.unit']);
+});
+test('optional metadata, inactive dates and valid zero values are not missing fields',()=>{
+ const p={...product,hs:34013000,price:0,volume:{number:0,unit:'pc'},new:false,new_date:'',flags:[],custom:{empty:null}};
+ delete p.discontinued;delete p.discontinued_date;
+ assert.deepEqual(M.issues({products:[p],logistics},new Set([p.id])).filter(r=>r.kind==='product'),[]);
+ assert.ok(M.issues({products:[{...p,new:true}],logistics}).some(r=>r.field==='new_date'));
+ for(const value of [0,'0',false])assert.equal(M.isMissing(value),false);
+});
+test('each missing logistics field reports its exact section and respects whitespace and zero',()=>{
+ const complete=Object.fromEntries(Object.entries(M.sections).map(([section,fields])=>[section,Object.fromEntries(fields.map(field=>[field,1]))]));
+ for(const [section,fields] of Object.entries(M.sections))for(const field of fields)for(const value of [undefined,null,'',' \t ']){
+  const data=M.clone(complete);if(value===undefined)delete data[section][field];else data[section][field]=value;
+  const state={products:[product],logistics:{Lilien:{'500':data}}},before=M.clone(state);
+  assert.deepEqual(M.issues(state).filter(r=>r.code==='keyIncomplete'),[{kind:'key',brand:'Lilien',key:'500',code:'keyIncomplete',field:section+'.'+field}]);
+  assert.deepEqual(state,before);
+ }
+ complete.ITEM.weight=0;assert.deepEqual(M.issues({products:[product],logistics:{Lilien:{'500':complete}}}).filter(r=>r.code==='keyIncomplete'),[]);
+});
 test('missing photos are findings only for active products with a verified photo index',()=>{
  const products=[product,{...product,id:'absent',new:true},{...product,id:'retired',discontinued:true}];
  const state={products,logistics,photos:{}},before=M.clone(state);

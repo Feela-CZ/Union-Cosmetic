@@ -48,3 +48,6 @@ Object.assign(window.JasonText.en,{palletItems:'Items per pallet',palletWeight:'
 
 Object.assign(window.JasonText.cs,{photoMissing:'Chybí fotografie',photoCheckUnavailable:'Seznam fotografií se nepodařilo načíst. Obnovte stránku, aby bylo možné ověřit chybějící fotografie.'});
 Object.assign(window.JasonText.en,{photoMissing:'Photo missing',photoCheckUnavailable:'The photo index could not be loaded. Reload the page to check for missing photos.'});
+
+Object.assign(window.JasonText.cs,{'volume.number':'Objem / množství – hodnota','volume.unit':'Objem / množství – jednotka'});
+Object.assign(window.JasonText.en,{'volume.number':'Volume / quantity – value','volume.unit':'Volume / quantity – unit'});
