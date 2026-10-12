@@ -64,8 +64,22 @@ test('multiple active duplicates are each reported once and discontinued records
  assert.deepEqual(duplicateIssues(rows).map(r=>r.index),[1,2,3]);
  assert.deepEqual(duplicateIssues(rows.map(p=>({...p,discontinued:true}))),[]);
 });
-test('discontinued records still receive other data checks',()=>{
- const rows=M.issues({products:[{...product,discontinued:true,id:'invalid',price:-1,key:'unknown'}],logistics});
- for(const code of ['eanInvalid','priceInvalid','keyUnknown'])assert.ok(rows.some(r=>r.code===code));
+test('discontinued products have no findings and checks resume on reactivation',()=>{
+ for(const fields of [{id:'invalid',price:-1,key:'unknown'},{id:'',price:null,key:null,brand:'',type:'',name:'',csName:''}]){
+  const p={...product,...fields,discontinued:true,new:true},before=M.clone(p);
+  assert.deepEqual(M.issues({products:[p],logistics}).filter(r=>r.kind==='product'),[]);
+  assert.deepEqual(p,before);
+  const active=M.issues({products:[{...p,discontinued:false}],logistics}).filter(r=>r.kind==='product');
+  for(const code of fields.id?['eanInvalid','priceInvalid','keyUnknown']:['eanMissing','priceInvalid','keyMissing','missing'])assert.ok(active.some(r=>r.code===code));
+ }
+});
+test('skipping discontinued products preserves active indices and shared logistics checks',()=>{
+ const invalid={...product,id:'invalid',price:-1,key:'unknown'};
+ const state={products:[{...invalid,discontinued:true},invalid],logistics:M.clone(logistics)};
+ state.logistics.Lilien['500'].PALLET.nr_of_items=7;
+ const rows=M.issues(state);
+ assert.ok(rows.filter(r=>r.kind==='product').every(r=>r.index===1));
+ for(const code of ['eanInvalid','priceInvalid','keyUnknown'])assert.ok(rows.some(r=>r.index===1&&r.code===code));
+ assert.ok(rows.some(r=>r.kind==='key'&&r.code==='keyMath'));
 });
 

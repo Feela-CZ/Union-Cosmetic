@@ -77,7 +77,9 @@ function issues(state){
  // A discontinued version may share its EAN with its active replacement.
  // Count only active records and report each conflicting record once.
  state.products.forEach(p=>{if(p.id&&p.discontinued!==true){const id=String(p.id);ids.set(id,(ids.get(id)||0)+1);}});
- state.products.forEach((p,i)=>{const add=(code,field)=>out.push({kind:'product',index:i,code,field});
+ state.products.forEach((p,i)=>{
+  if(p.discontinued===true)return;
+  const add=(code,field)=>out.push({kind:'product',index:i,code,field});
   if(!p.id)add('eanMissing','id');else{if(p.discontinued!==true&&ids.get(String(p.id))>1)add('eanDuplicate','id');if(!eanValid(p.id))add('eanInvalid','id');}
   for(const f of ['brand','type','name','csName'])if(!p[f])add('missing',f);
   if(p.price==null||p.price===''||!Number.isFinite(Number(p.price))||Number(p.price)<0)add('priceInvalid','price');
