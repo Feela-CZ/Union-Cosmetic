@@ -11,6 +11,8 @@ let state={products:[],logistics:M.clone(window.JASON_SEED_LOGISTICS||{}),photos
 let filters={search:'',brand:'',type:'',key:'',status:'active',new:'',flag:'',scope:''};
 let photoVersion=Date.now(),photoObserver=null;
 const photoVersions=new Map(),missingThumbnails=new Set();
+const photoIds=Array.isArray(window.JASON_PHOTO_IDS)&&window.JASON_PHOTO_IDS.every(id=>typeof id==='string')?new Set(window.JASON_PHOTO_IDS):null;
+const dataIssues=()=>M.issues(state,photoIds);
 const t=k=>JasonText[lang][k]||JasonText.cs[k]||k;
 const types=()=>Object.keys(JasonTypes.en);
 const typeLabel=v=>JasonTypes[lang][v]||v;
@@ -85,7 +87,7 @@ function render(){
  $$('[data-text]').forEach(e=>e.textContent=t(sandbox&&e.dataset.text==='readonlyNote'?'sandboxFooter':e.dataset.text));$$('[data-lang]').forEach(e=>{e.classList.toggle('active',e.dataset.lang===lang);e.setAttribute('aria-pressed',e.dataset.lang===lang);});
  $('#workspace-mode').textContent=`JASON 2.0 / ${t(sandbox?'sandboxVersion':'liveVersion')}`;
  $('#sandbox-banner').hidden=!sandbox;$('#sandbox-banner').textContent=t('sandboxNote');
- $('#nav').innerHTML=['products','keys','checks'].map(v=>`<button class="nav-button ${view===v?'active':''}" data-view="${v}" ${view===v?'aria-current="page"':''}><span class="nav-icon">${icons[v]}</span>${esc(t(v))}<span class="nav-count">${v==='products'?state.products.length:v==='keys'?M.keyEntries(state.logistics).length:M.issues(state).length}</span></button>`).join('');
+ $('#nav').innerHTML=['products','keys','checks'].map(v=>`<button class="nav-button ${view===v?'active':''}" data-view="${v}" ${view===v?'aria-current="page"':''}><span class="nav-icon">${icons[v]}</span>${esc(t(v))}<span class="nav-count">${v==='products'?state.products.length:v==='keys'?M.keyEntries(state.logistics).length:dataIssues().length}</span></button>`).join('');
  $$('[data-view]').forEach(b=>b.onclick=()=>changeView(b.dataset.view));
  $('#data-button').innerHTML=`<span class="nav-icon">↔</span>${esc(t(sandbox?'sandboxData':'data'))}`;
  $('#crumb').textContent=t(view);$('#page-title').textContent=t(view);$('#page-description').textContent=t(view==='products'?'subtitle':view==='keys'?'keyOverviewHint':'checksHint');
@@ -120,12 +122,13 @@ function renderContent(){
  let rows,unit;
  if(view==='products'){rows=filteredProducts();unit=t('countProducts');}
  else if(view==='keys'){rows=M.keyEntries(state.logistics).filter(r=>{const used=state.products.filter(p=>p.brand===r.brand&&M.key(p.key)===r.key).length;return (!filters.brand||r.brand===filters.brand)&&M.fold(r.brand+' '+r.key).includes(M.fold(filters.search))&&(!filters.scope||filters.scope==='used'&&used>0||filters.scope==='unused'&&used===0||filters.scope==='incomplete'&&completion(r.data)<100);}).sort((a,b)=>a.brand.localeCompare(b.brand)||a.key.localeCompare(b.key,undefined,{numeric:true}));unit=t('countKeys');}
- else{rows=M.issues(state).filter(r=>{const p=r.kind==='product'?state.products[r.index]:null;return (!filters.brand||(p?.brand||r.brand)===filters.brand)&&M.fold([p?.name,p?.csName,p?.id,p?.brand,r.brand,r.key,t(r.code),t(r.field)].join(' ')).includes(M.fold(filters.search));});unit=t('countIssues');}
+ else{rows=dataIssues().filter(r=>{const p=r.kind==='product'?state.products[r.index]:null;return (!filters.brand||(p?.brand||r.brand)===filters.brand)&&M.fold([p?.name,p?.csName,p?.id,p?.brand,r.brand,r.key,t(r.code),t(r.field)].join(' ')).includes(M.fold(filters.search));});unit=t('countIssues');}
  const pages=Math.max(1,Math.ceil(rows.length/pageSize));page=Math.min(page,pages);const items=rows.slice((page-1)*pageSize,page*pageSize);
  if(!items.length){$('#content').innerHTML=`<div class="empty-state"><div class="empty-symbol">${view==='checks'?'✓':'◇'}</div><h2>${esc(t(view==='products'&&!state.products.length?'noProducts':view==='checks'&&!rows.length&&!filters.search&&!filters.brand?'noIssues':'empty'))}</h2><p>${esc(t(view==='products'&&!state.products.length?'noProductsHint':'emptyHint'))}</p>${view==='products'&&!state.products.length?button('empty-import','loadProducts','primary'):''}</div>`;if($('#empty-import'))$('#empty-import').onclick=()=>importFile('products');}
  else if(view==='products')renderProductTable(items);
  else if(view==='keys')renderKeyTable(items);
  else renderChecksTable(items);
+ if(view==='checks'&&!photoIds)$('#content').insertAdjacentHTML('afterbegin',`<p class="notice amber" role="status">${esc(t('photoCheckUnavailable'))}</p>`);
  $('#pagination').innerHTML=`<span>${rows.length?(page-1)*pageSize+1:0}–${Math.min(page*pageSize,rows.length)} <span class="muted">/ ${rows.length} ${esc(unit)}</span></span><div class="pagination-actions"><label><select id="page-size" aria-label="${esc(t('countProducts'))}">${[30,60,120].map(n=>option(n,n,pageSize)).join('')}</select></label><button id="prev" ${page===1?'disabled':''}>${t('previous')}</button><span>${page} / ${pages}</span><button id="next" ${page===pages?'disabled':''}>${t('next')}</button></div>`;
  $('#prev').onclick=()=>{page--;renderContent();};$('#next').onclick=()=>{page++;renderContent();};$('#page-size').onchange=e=>{pageSize=Number(e.target.value);page=1;renderContent();};
  renderBulk();
@@ -151,7 +154,7 @@ function renderKeyTable(items){
 }
 function renderChecksTable(items){
  $('#content').innerHTML=`<div class="table-scroll"><table><thead><tr><th>${t('product')} / ${t('key')}</th><th>${t('brand')}</th><th>${t('issue')}</th><th>${t('actions')}</th></tr></thead><tbody>${items.map((r,i)=>{const p=r.kind==='product'?state.products[r.index]:null;return `<tr><td><strong>${esc(p?(lang==='cs'?p.csName||p.name:p.name):r.key)}</strong><small class="cell-sub mono">${esc(p?.id||'')}</small></td><td>${esc(p?.brand||r.brand)}</td><td><span class="issue-dot ${r.code==='keyUnused'?'info':''}"></span>${esc(t(r.code))}${r.field?' · '+esc(t(r.field==='id'?'ean':r.field)):''}</td><td><button data-issue="${i}" class="row-edit">${t('open')}</button></td></tr>`;}).join('')}</tbody></table></div>`;
- $$('[data-issue]').forEach(b=>b.onclick=()=>{const r=items[Number(b.dataset.issue)];if(r.kind==='product')openProduct(r.index);else openKey(r.brand,r.key);});
+ $$('[data-issue]').forEach(b=>b.onclick=()=>{const r=items[Number(b.dataset.issue)];if(r.kind==='product')openProduct(r.index,r.code==='photoMissing'?'photo':'details');else openKey(r.brand,r.key);});
 }
 function renderBulk(){const e=$('#bulk-bar');e.hidden=!selected.size||view!=='products';if(e.hidden)return;e.innerHTML=`<span><strong>${selected.size}</strong> ${t('selected')}</span>${button('bulk-edit','bulk')}${button('bulk-select-all','selectAll')}${button('bulk-clear','selectNone')}`;$('#bulk-edit').onclick=openBulk;$('#bulk-select-all').onclick=()=>{filteredProducts().forEach(r=>selected.add(r.index));renderContent();};$('#bulk-clear').onclick=()=>{selected.clear();renderContent();};}
 function field(name,label,value,type='text',extra='',hint=''){return `<label class="field"><span>${esc(t(label))}</span><input name="${esc(name)}" id="field-${esc(name)}" type="${type}" value="${esc(value??'')}" ${extra}>${hint?`<small>${esc(hint)}</small>`:''}</label>`;}

@@ -23,6 +23,7 @@ class ThumbnailTests(unittest.TestCase):
                 self.assertEqual(image.getpixel((0, 0)), (255, 255, 255))
             self.assertLess(preview.stat().st_size, 10000)
             self.assertEqual(original.read_bytes(), before)
+            self.assertEqual((folder / "thumbnails/photo-index.js").read_text(), 'window.JASON_PHOTO_IDS=["0012345678901"];\n')
             self.assertEqual(generate(root), (1, 0))
             Image.new("RGB", (1600, 400), "blue").save(original)
             self.assertEqual(generate(root), (1, 1))
@@ -31,6 +32,7 @@ class ThumbnailTests(unittest.TestCase):
             original.unlink()
             self.assertEqual(generate(root), (0, 0))
             self.assertFalse(preview.exists())
+            self.assertEqual((folder / "thumbnails/photo-index.js").read_text(), 'window.JASON_PHOTO_IDS=[];\n')
             self.assertEqual(custom.read_bytes(), b"keep")
 
 

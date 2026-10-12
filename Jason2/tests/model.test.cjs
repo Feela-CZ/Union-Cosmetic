@@ -37,6 +37,17 @@ test('placeholder keys excluded without deleting original data',()=>{const data=
 test('historical duplicate EAN does not block unrelated edits but new duplicates are rejected',()=>{const rows=[product,{...product,name:'Historical duplicate'}];assert.equal(M.saveProduct(product,{price:2},rows,0,logistics).price,2);assert.throws(()=>M.saveProduct(product,{id:product.id},rows,null,logistics),/EAN_DUPLICATE/);});
 
 const duplicateIssues=products=>M.issues({products,logistics}).filter(r=>r.code==='eanDuplicate');
+test('missing photos are findings only for active products with a verified photo index',()=>{
+ const products=[product,{...product,id:'absent',new:true},{...product,id:'retired',discontinued:true}];
+ const state={products,logistics,photos:{}},before=M.clone(state);
+ const findings=M.issues(state,new Set([product.id])).filter(r=>r.code==='photoMissing');
+ assert.deepEqual(findings,[{kind:'product',index:1,code:'photoMissing',field:'photo'}]);
+ assert.deepEqual(M.issues(state).filter(r=>r.code==='photoMissing'),[]);
+ assert.deepEqual(state,before);
+ assert.deepEqual(M.issues({...state,photos:{absent:'data:image/jpeg;base64,local'}},new Set([product.id])).filter(r=>r.code==='photoMissing'),[]);
+ assert.ok(M.issues({products:[{...product,id:'retired',discontinued:false}],logistics},new Set()).some(r=>r.code==='photoMissing'));
+ assert.deepEqual(M.issues({products:[{...product,id:Number(product.id)}],logistics},new Set([product.id])).filter(r=>r.code==='photoMissing'),[]);
+});
 test('new flag is independent of active/discontinued status in every combination',()=>{
  const rows=[{...product,id:'active',new:false},{...product,id:'active-new',new:true},{...product,id:'old',discontinued:true,new:false},{...product,id:'old-new',discontinued:true,new:true}];
  const ids=f=>M.filterProducts(rows,f).map(r=>r.p.id);

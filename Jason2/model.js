@@ -72,7 +72,7 @@ function filterProducts(products,f={}){
  });
 }
 function eanValid(value){ const s=String(value);if(!/^\d{13}$/.test(s))return false;return (10-[...s.slice(0,12)].reduce((a,v,i)=>a+Number(v)*(i%2?3:1),0)%10)%10===Number(s[12]); }
-function issues(state){
+function issues(state,photoIds=null){
  const out=[],ids=new Map();
  // A discontinued version may share its EAN with its active replacement.
  // Count only active records and report each conflicting record once.
@@ -85,6 +85,7 @@ function issues(state){
   if(p.price==null||p.price===''||!Number.isFinite(Number(p.price))||Number(p.price)<0)add('priceInvalid','price');
   const k=key(p.key),l=k?state.logistics[p.brand]?.[k]:null;
   if(!k)add('keyMissing','key');else if(!l)add('keyUnknown','key');
+  if(photoIds&&!state.photos?.[p.id]&&!photoIds.has(String(p.id??'')))add('photoMissing','photo');
  });
  for(const {brand,key:k,data} of keyEntries(state.logistics)){
   const add=code=>out.push({kind:'key',brand,key:k,code});

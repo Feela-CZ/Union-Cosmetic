@@ -7,12 +7,13 @@ const fixture={brand:'Lilien',type:'Liquid Soap',id:'8596048008129',hs:'00123456
 const logistics={Lilien:{'500A':{ITEM:{length:'5 cm',width:'5 cm',height:'15 cm',weight:'0.5 kg'},CARTON:{length:'30 cm',width:'20 cm',height:'20 cm',weight:'6 kg',nr_of_items:12},LAYER:{nr_of_items:240,nr_of_cartons:20},PALLET:{length:'120 cm',width:'80 cm',height:'150 cm',weight:'500 kg',nr_of_cartons:160,nr_of_items:1920,nr_of_layers:8},extra:{keep:'supplier'}}}};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function wait(fn){for(let i=0;i<150;i++){if(await fn())return;await sleep(10);}throw Error('Wait condition timed out');}
-async function setup(shared=false,initialRemote=null,withPhotoObserver=false){
+async function setup(shared=false,initialRemote=null,withPhotoObserver=false,knownPhotoIds=[fixture.id]){
  const errors=[],html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
  const dom=new JSDOM(html,{url:shared?'https://feela-cz.github.io/Union-Cosmetic/Jason2/':'https://local.test/Jason2/',runScripts:'outside-only',pretendToBeVisual:true}),w=dom.window;
  w.indexedDB=new IDBFactory();w.HTMLElement.prototype.scrollIntoView=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};w.HTMLAnchorElement.prototype.click=function(){};w.URL.createObjectURL=()=>'blob:test';w.URL.revokeObjectURL=()=>{};
  w.fetch=async()=>({ok:false,status:404,text:async()=>'',json:async()=>{throw Error('404');}});
  w.console.error=e=>errors.push(e.message||String(e));
+ if(knownPhotoIds!==null)w.JASON_PHOTO_IDS=knownPhotoIds;
  const photoObservers=[];
  if(withPhotoObserver)w.IntersectionObserver=class{
   constructor(callback,options){this.callback=callback;this.options=options;this.targets=new Set();photoObservers.push(this);}
@@ -35,6 +36,24 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false){
 (async()=>{
  let passed=0;const c=await setup(),{w,$,$$,click,input,change,saved,upload,submit,errors}=c;
  async function test(name,fn){await fn();passed++;console.log('PASS',name);}
+ await test('missing photo finding opens the photo tab and clears after saving a local photo',async()=>{
+  const n=await setup(),missing={...fixture,id:'0012345678901',csName:'Missing photo'};
+  await n.upload('products',[missing,{...missing,id:'retired',discontinued:true}]);
+  n.click('[data-view=checks]');
+  const rows=n.$$('tbody tr').filter(r=>r.textContent.includes('Chybí fotografie'));
+  assert.equal(rows.length,1);assert.ok(rows[0].textContent.includes('Missing photo'));
+  rows[0].querySelector('button').click();assert.equal(n.$('#tab-photo').getAttribute('aria-selected'),'true');
+  n.w.JasonStorage.jpeg=async()=>'data:image/jpeg;base64,/9j/2Q==';
+  Object.defineProperty(n.$('#photo-input'),'files',{configurable:true,value:[{name:'new.jpg',type:'image/jpeg'}]});
+  n.$('#photo-input').dispatchEvent(new n.w.Event('change'));await wait(()=>n.$('#photo-preview').src.startsWith('data:'));
+  n.submit('#product-form');await wait(()=>!n.$('#editor').open);
+  assert.ok(!n.$('#content').textContent.includes('Chybí fotografie'));assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
+ await test('unavailable photo index is shown explicitly without missing-photo false positives',async()=>{
+  const n=await setup(false,null,false,null);await n.upload('products',[fixture]);n.click('[data-view=checks]');
+  assert.ok(n.$('#content').textContent.includes('Seznam fotografií se nepodařilo načíst'));
+  assert.ok(!n.$$('#content tbody tr').some(r=>r.textContent.includes('Chybí fotografie')));n.dom.window.close();
+ });
  await test('row photos load only on visibility, reuse URLs and open the original without edits',async()=>{
   const n=await setup(false,null,true),products=Array.from({length:64},(_,i)=>({...fixture,id:String(1000000000000+i),csName:'Product '+i}));
   await n.upload('products',products);const before=await n.saved();
@@ -147,7 +166,7 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false){
   n.click('[data-edit="0"]');n.click('#tab-packaging');assert.equal(n.$('#product-key-include-products').checked,false);n.click('#product-key-include-products');n.click('#product-key-export');await wait(()=>wb);assert.ok(wb.getWorksheet('Lilien Products').getCell('A1').value==='PRODUCTS');await wait(()=>!n.$('#product-key-export').disabled);
   n.click('#product-key-open');assert.equal(n.$('#key-preview-include-products').checked,false);n.click('#key-preview-include-products');wb=null;n.click('#key-preview-export');await wait(()=>wb);assert.ok(wb.getWorksheet('Lilien Products').getCell('A1').value==='PRODUCTS');n.click('#key-preview-close');n.click('#editor-close');await wait(()=>!n.$('#editor').open);assert.equal(n.$('#confirm-dialog').open,false);assert.deepEqual(await n.saved(),before);n.dom.window.close();
  });
- await test('data checks detect arithmetic inconsistency and open affected key',async()=>{click('[data-view=checks]');assert.ok($('#content').textContent.includes('nesouhlasí'));click('[data-issue]');assert.ok($('#editor').open);click('#editor-close');});
+ await test('data checks detect arithmetic inconsistency and open affected key',async()=>{click('[data-view=checks]');assert.ok($('#content').textContent.includes('nesouhlasí'));$$('tbody tr').find(r=>r.textContent.includes('nesouhlasí')).querySelector('[data-issue]').click();assert.ok($('#editor').open);click('#editor-close');});
  await test('invalid JSON import leaves state unchanged',async()=>{const before=await saved();await upload('products',{bad:true},false);await wait(()=>$('#toast').textContent.includes('formát'));assert.deepEqual((await saved()).products,before.products);click('#editor-close');errors.length=0;});
  await test('unsaved form close prompts and cancellation retains work',async()=>{click('[data-view=products]');change('#filter-status','all');click('[data-edit="0"]');input('#field-name','UNSAVED');click('#editor-close');await wait(()=>$('#confirm-dialog').open);click('#confirm-no');assert.ok($('#editor').open);click('#editor-close');click('#confirm-yes');await wait(()=>!$('#editor').open);assert.equal((await saved()).products[0].name,'TEST Soap');});
  await test('language switches core UI, product types and forms',async()=>{click('[data-lang=en]');await wait(()=>$('h1').textContent==='Products');click('#create');assert.equal($('#tab-packaging').textContent,'Packaging & logistics');click('#editor-close');});

@@ -49,6 +49,7 @@ def generate(root):
         if Path(name).name == name and name.endswith(".jpg"):
             (output / name).unlink(missing_ok=True)
     manifest_path.write_text(json.dumps({"version": 1, "size": SIZE, "quality": QUALITY, "sources": current}, indent=2) + "\n")
+    (output / "photo-index.js").write_text("window.JASON_PHOTO_IDS=" + json.dumps([Path(name).stem for name in sorted(current)]) + ";\n")
     return len(current), changed
 
 

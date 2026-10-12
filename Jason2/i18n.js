@@ -45,3 +45,6 @@ Object.assign(window.JasonText.en,{keyData:'Logistics key data',openKeyDetail:'O
 
 Object.assign(window.JasonText.cs,{palletItems:'Kusů na paletě',palletWeight:'Hmotnost palety (kg)',estimatedHeight:'Orientační výška palety (cm)',estimatedHeightHint:'Výška europalety 14,4 cm + výška kartonu × počet vrstev. Nezahrnuje proložky ani přesahy obalu.',keyOverviewHint:'Kusy a hmotnost z logistického klíče. Orientační výška: výška kartonu × počet vrstev + europaleta 14,4 cm.'});
 Object.assign(window.JasonText.en,{palletItems:'Items per pallet',palletWeight:'Pallet weight (kg)',estimatedHeight:'Estimated pallet height (cm)',estimatedHeightHint:'Euro pallet height 14.4 cm + carton height × number of layers. Excludes interlayer sheets and packaging overhang.',keyOverviewHint:'Items and weight from the logistics key. Estimated height: carton height × number of layers + Euro pallet 14.4 cm.'});
+
+Object.assign(window.JasonText.cs,{photoMissing:'Chybí fotografie',photoCheckUnavailable:'Seznam fotografií se nepodařilo načíst. Obnovte stránku, aby bylo možné ověřit chybějící fotografie.'});
+Object.assign(window.JasonText.en,{photoMissing:'Photo missing',photoCheckUnavailable:'The photo index could not be loaded. Reload the page to check for missing photos.'});
