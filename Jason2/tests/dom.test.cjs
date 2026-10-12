@@ -36,6 +36,21 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
 (async()=>{
  let passed=0;const c=await setup(),{w,$,$$,click,input,change,saved,upload,submit,errors}=c;
  async function test(name,fn){await fn();passed++;console.log('PASS',name);}
+ await test('name sorting ignores extra whitespace and punctuation in both languages and exports the same order',async()=>{
+  const n=await setup(),products=[
+   {...fixture,id:'1',name:'Lilien  liquid soap Hygiene Plus',csName:'Lilien - intimní sprchový gel'},
+   {...fixture,id:'2',name:'Lilien Body lotion Aloe Vera',csName:'Lilien balzám na rty - Brusinka'},
+   {...fixture,id:'3',name:'  Lilien Boys Shampoo & Bath  ',csName:'  Lilien   balzám na rty - Klasik  '}
+  ];await n.upload('products',products);const before=await n.saved();
+  const ids=()=>n.$$('tbody tr [data-select]').map(e=>products[Number(e.dataset.select)].id);
+  assert.deepEqual(ids(),['2','3','1']);
+  n.click('[data-lang=en]');assert.deepEqual(ids(),['2','3','1']);
+  n.click('[data-sort=name]');assert.deepEqual(ids(),['1','3','2']);
+  let wb;n.w.JasonExport.download=async x=>{wb=x;};n.click('#export');n.submit('#export-form');await wait(()=>wb);
+  const ws=wb.getWorksheet('Products');assert.deepEqual([4,5,6].map(row=>ws.getCell('C'+row).value),['1','3','2']);
+  await wait(()=>!n.$('#export-form [type=submit]').disabled);n.click('#editor-close');
+  assert.deepEqual((await n.saved()).products,before.products);assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
  await test('missing photo finding opens the photo tab and clears after saving a local photo',async()=>{
   const n=await setup(),missing={...fixture,id:'0012345678901',csName:'Missing photo'};
   await n.upload('products',[missing,{...missing,id:'retired',discontinued:true}]);
