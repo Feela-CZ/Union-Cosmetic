@@ -47,15 +47,30 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
    assert.equal(n.$('#tab-'+tab).getAttribute('aria-controls'),'section-'+tab);
    assert.equal(n.$('#section-'+tab).getAttribute('aria-labelledby'),'tab-'+tab);
   }
+  assert.deepEqual(n.$$('[data-label-slot]:not([hidden])').map(e=>e.dataset.labelSlot),['front','back']);
+  assert.equal(n.$('[data-label-slot=back] .label-state').textContent,'N/A');
+  assert.equal(n.$('[data-label-slot=front] .label-state').textContent,'TBD');
+  assert.equal(n.$('[data-label-slot=back] .label-card-actions').hidden,true);
+  for(const tab of ['inci','labelLanguages']){
+   assert.equal((n.$('#section-'+tab).textContent.match(/TBD/g)||[]).length,1);
+   assert.ok(!n.$('#section-'+tab).textContent.includes('Under construction'));
+  }
+  assert.equal(n.$('#section-inci h3').textContent,'INCI');
+  assert.equal(n.$('#section-labelLanguages h3').textContent,'Jazyky etikety');
+  assert.equal(n.$('#section-labelLanguages').textContent.trim(),'Jazyky etiketyTBD');
+  assert.deepEqual(n.$$('[data-label-slot] h4').map(e=>e.textContent),['Přední','Zadní']);
   n.click('[data-label-layout=split]');assert.deepEqual(n.$$('[data-label-slot]:not([hidden])').map(e=>e.dataset.labelSlot),['front','back']);
+  assert.equal(n.$('[data-label-slot=back] .label-state').textContent,'TBD');
+  assert.equal(n.$('[data-label-slot=back] .label-card-actions').hidden,false);
   assert.equal(n.$('[data-label-layout=split]').getAttribute('aria-pressed'),'true');
-  n.click('[data-label-layout=single]');assert.deepEqual(n.$$('[data-label-slot]:not([hidden])').map(e=>e.dataset.labelSlot),['single']);
+  n.click('[data-label-layout=single]');assert.deepEqual(n.$$('[data-label-slot]:not([hidden])').map(e=>e.dataset.labelSlot),['front','back']);
+  assert.equal(n.$('[data-label-slot=back] .label-state').textContent,'N/A');
   n.$('#tab-labels').dispatchEvent(new n.w.KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true}));
   assert.equal(n.$('#tab-labelLanguages').getAttribute('aria-selected'),'true');
   n.click('#editor-close');assert.equal(n.$('#confirm-dialog').open,false);assert.equal(n.$('#editor').open,false);
   assert.deepEqual(await n.saved(),before);
   n.click('[data-lang=en]');n.click('[data-edit="0"]');assert.equal(n.$('#tab-labelLanguages').textContent,'Label languages');
-  n.click('#tab-labels');n.click('[data-label-layout=split]');assert.ok(n.$('[data-label-slot=front]').textContent.includes('Front label'));
+  n.click('#tab-labels');n.click('[data-label-layout=split]');assert.equal(n.$('[data-label-slot=front] h4').textContent,'Front');
   n.click('#editor-close');assert.deepEqual(n.errors,[]);n.dom.window.close();
  });
  await test('saving an existing product through preview tabs preserves future metadata and never stores TBD',async()=>{

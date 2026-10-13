@@ -202,11 +202,10 @@ function openKeyPreview(entry){
 }
 // Preview-only sections. No new product fields or attachments are persisted yet.
 function productInfoSections(){
- const pending='<span class="info-status">TBD</span>';
- const labelCard=(slot,title,hidden=false)=>`<article class="label-card" data-label-slot="${slot}" ${hidden?'hidden':''}><div class="label-card-heading"><h4>${t(title)}</h4>${pending}</div><div class="label-placeholder"><span class="label-file-mark" aria-hidden="true">Aa</span><strong>${t('underConstruction')}</strong><span>TBD</span></div><div class="label-card-actions"><button type="button" disabled>${t('viewLabel')}</button><button type="button" disabled>${t('downloadLabel')}</button></div></article>`;
- return `<section id="section-inci" class="tab-section" role="tabpanel" aria-labelledby="tab-inci"><div class="section-intro"><h3>${t('inci')}</h3>${pending}</div><div class="inci-placeholder"><span class="info-field-label">${t('ingredients')}</span><p>TBD</p><span class="info-construction">${t('underConstruction')}</span></div><div class="info-actions"><button type="button" disabled>${t('copyInci')}</button></div></section>
- <section id="section-labelLanguages" class="tab-section" role="tabpanel" aria-labelledby="tab-labelLanguages"><div class="section-intro"><h3>${t('labelLanguages')}</h3>${pending}</div><div class="languages-placeholder"><span class="info-field-label">${t('availableLabelLanguages')}</span><div class="language-placeholder-list"><span class="language-placeholder-chip">TBD</span></div><span class="info-construction">${t('underConstruction')}</span></div></section>
- <section id="section-labels" class="tab-section" role="tabpanel" aria-labelledby="tab-labels"><div class="section-intro"><h3>${t('labels')}</h3>${pending}</div><div class="label-layout-picker" role="group" aria-label="${esc(t('labelLayout'))}"><button type="button" data-label-layout="single" aria-pressed="true">${t('singleLabel')}</button><button type="button" data-label-layout="split" aria-pressed="false">${t('frontBackLabels')}</button></div><div class="label-grid" id="product-label-grid" aria-live="polite">${labelCard('single','singleLabel')}${labelCard('front','frontLabel',true)}${labelCard('back','backLabel',true)}</div></section>`;
+ const labelCard=(slot,title,applicable=true)=>`<article class="label-card${applicable?'':' not-applicable'}" data-label-slot="${slot}"><div class="label-card-heading"><h4>${t(title)}</h4></div><div class="label-placeholder"><strong class="label-state">${applicable?'TBD':'N/A'}</strong></div><div class="label-card-actions" ${applicable?'':'hidden'}><button type="button" disabled>${t('viewLabel')}</button><button type="button" disabled>${t('downloadLabel')}</button></div></article>`;
+ return `<section id="section-inci" class="tab-section" role="tabpanel" aria-labelledby="tab-inci"><div class="section-intro"><h3>${t('inci')}</h3></div><div class="inci-placeholder"><p>TBD</p></div><div class="info-actions"><button type="button" disabled>${t('copyInci')}</button></div></section>
+ <section id="section-labelLanguages" class="tab-section" role="tabpanel" aria-labelledby="tab-labelLanguages"><div class="section-intro"><h3>${t('labelLanguages')}</h3></div><div class="languages-placeholder"><p>TBD</p></div></section>
+ <section id="section-labels" class="tab-section" role="tabpanel" aria-labelledby="tab-labels"><div class="section-intro"><h3>${t('labels')}</h3></div><div class="label-layout-picker" role="group" aria-label="${esc(t('labelLayout'))}"><button type="button" data-label-layout="single" aria-pressed="true">${t('singleLabel')}</button><button type="button" data-label-layout="split" aria-pressed="false">${t('frontBackLabels')}</button></div><div class="label-grid split" id="product-label-grid" aria-live="polite">${labelCard('front','frontLabel')}${labelCard('back','backLabel',false)}</div></section>`;
 }
 function openProduct(index=null,tab='details',duplicate=false){
  if(refreshing)return;
@@ -228,8 +227,10 @@ function openProduct(index=null,tab='details',duplicate=false){
  $$('[data-label-layout]').forEach(b=>b.onclick=()=>{
   const split=b.dataset.labelLayout==='split';
   $$('[data-label-layout]').forEach(v=>v.setAttribute('aria-pressed',String(v===b)));
-  $('#product-label-grid').classList.toggle('split',split);
-  $$('[data-label-slot]').forEach(card=>{card.hidden=split?card.dataset.labelSlot==='single':card.dataset.labelSlot!=='single';});
+  const back=$('[data-label-slot="back"]');
+  back.classList.toggle('not-applicable',!split);
+  back.querySelector('.label-state').textContent=split?'TBD':'N/A';
+  back.querySelector('.label-card-actions').hidden=!split;
  });
  function keysForBrand(overwrite=false){const b=elements.brand.value,k=elements.key.value||p.key;const keys=M.keyEntries(state.logistics).filter(r=>r.brand===b).map(r=>r.key);$('#product-key').innerHTML=option('','—',k)+keys.map(v=>option(v,v,k)).join('')+(M.key(k)&&!keys.includes(String(k))?option(k,`${k} · ${t('keyUnknown')}`,k):'');if(overwrite){elements.key.value='';}updatePackaging();}
  function updatePackaging(){const l=state.logistics[elements.brand.value]?.[M.key(elements.key.value)];$('#key-summary').textContent=l?`${elements.brand.value} / ${elements.key.value} · ${state.products.filter(x=>x.brand===elements.brand.value&&M.key(x.key)===elements.key.value).length} ${t('countProducts')}`:t('keyMissing');$('#product-key-data').innerHTML=l?logisticsOverview(l):`<p class="muted">${t('keyMissing')}</p>`;$('#product-key-open').disabled=!l;$('#product-key-export').disabled=!l;}

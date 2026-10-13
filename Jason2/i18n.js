@@ -53,16 +53,14 @@ Object.assign(window.JasonText.cs,{'volume.number':'Objem / množství – hodno
 Object.assign(window.JasonText.en,{'volume.number':'Volume / quantity – value','volume.unit':'Volume / quantity – unit'});
 
 Object.assign(window.JasonText.cs,{
- inci:'INCI',ingredients:'Složení INCI',copyInci:'Kopírovat INCI',
- labelLanguages:'Jazyky etikety',availableLabelLanguages:'Dostupné jazyky na etiketě',
+ inci:'INCI',copyInci:'Kopírovat INCI',labelLanguages:'Jazyky etikety',
  labels:'Etikety',labelLayout:'Rozložení etiket',singleLabel:'Jedna etiketa',
- frontBackLabels:'Přední + zadní',frontLabel:'Přední etiketa',backLabel:'Zadní etiketa',
- viewLabel:'Zvětšit',downloadLabel:'Stáhnout',underConstruction:'Under construction'
+ frontBackLabels:'Přední + zadní',frontLabel:'Přední',backLabel:'Zadní',
+ viewLabel:'Zvětšit',downloadLabel:'Stáhnout'
 });
 Object.assign(window.JasonText.en,{
- inci:'INCI',ingredients:'INCI ingredients',copyInci:'Copy INCI',
- labelLanguages:'Label languages',availableLabelLanguages:'Available languages on the label',
+ inci:'INCI',copyInci:'Copy INCI',labelLanguages:'Label languages',
  labels:'Labels',labelLayout:'Label layout',singleLabel:'Single label',
- frontBackLabels:'Front + back',frontLabel:'Front label',backLabel:'Back label',
- viewLabel:'Enlarge',downloadLabel:'Download',underConstruction:'Under construction'
+ frontBackLabels:'Front + back',frontLabel:'Front',backLabel:'Back',
+ viewLabel:'Enlarge',downloadLabel:'Download'
 });
