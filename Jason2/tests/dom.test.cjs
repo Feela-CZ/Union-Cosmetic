@@ -36,7 +36,7 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
 (async()=>{
  let passed=0;const c=await setup(),{w,$,$$,click,input,change,saved,upload,submit,errors}=c;
  async function test(name,fn){await fn();passed++;console.log('PASS',name);}
- await test('product information preview has accessible tabs and both label layouts without dirtying data',async()=>{
+ await test('product information preview has accessible tabs and persistent label slots without a layout selector',async()=>{
   const n=await setup();await n.upload('products',[fixture]);const before=await n.saved();
   n.click('[data-edit="0"]');
   assert.deepEqual(n.$$('[data-tab]').map(b=>b.dataset.tab),['details','packaging','inci','labelLanguages','labels','photo','flags']);
@@ -59,23 +59,18 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
   assert.equal(n.$('#section-labelLanguages h3').textContent,'Jazyky etikety');
   assert.equal(n.$('#section-labelLanguages').textContent.trim(),'Jazyky etiketyTBD');
   assert.deepEqual(n.$$('[data-label-slot] h4').map(e=>e.textContent),['Přední','Zadní']);
-  n.click('[data-label-layout=split]');assert.deepEqual(n.$$('[data-label-slot]:not([hidden])').map(e=>e.dataset.labelSlot),['front','back']);
-  assert.equal(n.$('[data-label-slot=back] .label-state').textContent,'TBD');
-  assert.equal(n.$('[data-label-slot=back] .label-card-actions').hidden,false);
-  assert.equal(n.$('[data-label-layout=split]').getAttribute('aria-pressed'),'true');
-  n.click('[data-label-layout=single]');assert.deepEqual(n.$$('[data-label-slot]:not([hidden])').map(e=>e.dataset.labelSlot),['front','back']);
-  assert.equal(n.$('[data-label-slot=back] .label-state').textContent,'N/A');
+  assert.equal(n.$('[data-label-layout]'),null);
   n.$('#tab-labels').dispatchEvent(new n.w.KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true}));
   assert.equal(n.$('#tab-labelLanguages').getAttribute('aria-selected'),'true');
   n.click('#editor-close');assert.equal(n.$('#confirm-dialog').open,false);assert.equal(n.$('#editor').open,false);
   assert.deepEqual(await n.saved(),before);
   n.click('[data-lang=en]');n.click('[data-edit="0"]');assert.equal(n.$('#tab-labelLanguages').textContent,'Label languages');
-  n.click('#tab-labels');n.click('[data-label-layout=split]');assert.equal(n.$('[data-label-slot=front] h4').textContent,'Front');
+  n.click('#tab-labels');assert.equal(n.$('[data-label-slot=front] h4').textContent,'Front');
   n.click('#editor-close');assert.deepEqual(n.errors,[]);n.dom.window.close();
  });
  await test('saving an existing product through preview tabs preserves future metadata and never stores TBD',async()=>{
   const n=await setup(),p={...fixture,inci:'Existing formula',labelLanguages:['cs','en'],labels:{front:{path:'custom.pdf',revision:2}},extra:{future:true}};
-  await n.upload('products',[p]);n.click('[data-edit="0"]');n.click('#tab-labels');n.click('[data-label-layout=split]');n.click('#tab-inci');
+  await n.upload('products',[p]);n.click('[data-edit="0"]');n.click('#tab-labels');n.click('#tab-inci');
   n.input('#field-price','2.45');n.submit('#product-form');await wait(()=>!n.$('#editor').open);
   const result=(await n.saved()).products[0];assert.deepEqual(result.labels,p.labels);assert.deepEqual(result.labelLanguages,p.labelLanguages);assert.equal(result.inci,p.inci);assert.deepEqual(result.extra,p.extra);assert.equal(result.price,2.45);
   assert.ok(!JSON.stringify(result).includes('TBD'));assert.ok(!Object.hasOwn(result,'labelLayout'));

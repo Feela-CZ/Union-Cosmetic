@@ -205,7 +205,7 @@ function productInfoSections(){
  const labelCard=(slot,title,applicable=true)=>`<article class="label-card${applicable?'':' not-applicable'}" data-label-slot="${slot}"><div class="label-card-heading"><h4>${t(title)}</h4></div><div class="label-placeholder"><strong class="label-state">${applicable?'TBD':'N/A'}</strong></div><div class="label-card-actions" ${applicable?'':'hidden'}><button type="button" disabled>${t('viewLabel')}</button><button type="button" disabled>${t('downloadLabel')}</button></div></article>`;
  return `<section id="section-inci" class="tab-section" role="tabpanel" aria-labelledby="tab-inci"><div class="section-intro"><h3>${t('inci')}</h3></div><div class="inci-placeholder"><p>TBD</p></div><div class="info-actions"><button type="button" disabled>${t('copyInci')}</button></div></section>
  <section id="section-labelLanguages" class="tab-section" role="tabpanel" aria-labelledby="tab-labelLanguages"><div class="section-intro"><h3>${t('labelLanguages')}</h3></div><div class="languages-placeholder"><p>TBD</p></div></section>
- <section id="section-labels" class="tab-section" role="tabpanel" aria-labelledby="tab-labels"><div class="section-intro"><h3>${t('labels')}</h3></div><div class="label-layout-picker" role="group" aria-label="${esc(t('labelLayout'))}"><button type="button" data-label-layout="single" aria-pressed="true">${t('singleLabel')}</button><button type="button" data-label-layout="split" aria-pressed="false">${t('frontBackLabels')}</button></div><div class="label-grid split" id="product-label-grid" aria-live="polite">${labelCard('front','frontLabel')}${labelCard('back','backLabel',false)}</div></section>`;
+ <section id="section-labels" class="tab-section" role="tabpanel" aria-labelledby="tab-labels"><div class="section-intro"><h3>${t('labels')}</h3></div><div class="label-grid split" id="product-label-grid" aria-live="polite">${labelCard('front','frontLabel')}${labelCard('back','backLabel',false)}</div></section>`;
 }
 function openProduct(index=null,tab='details',duplicate=false){
  if(refreshing)return;
@@ -224,14 +224,6 @@ function openProduct(index=null,tab='details',duplicate=false){
  const form=$('#product-form'),elements=form.elements;
  const showTab=v=>{$$('[data-tab]').forEach(b=>{b.setAttribute('aria-selected',b.dataset.tab===v);b.tabIndex=b.dataset.tab===v?0:-1;});$$('.tab-section').forEach(s=>{s.hidden=s.id!==`section-${v}`;});};
  $$('[data-tab]').forEach((b,i,list)=>{b.onclick=()=>showTab(b.dataset.tab);b.onkeydown=e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const n=e.key==='Home'?0:e.key==='End'?list.length-1:(i+(e.key==='ArrowRight'?1:-1)+list.length)%list.length;showTab(list[n].dataset.tab);list[n].focus();}};});showTab(tab);
- $$('[data-label-layout]').forEach(b=>b.onclick=()=>{
-  const split=b.dataset.labelLayout==='split';
-  $$('[data-label-layout]').forEach(v=>v.setAttribute('aria-pressed',String(v===b)));
-  const back=$('[data-label-slot="back"]');
-  back.classList.toggle('not-applicable',!split);
-  back.querySelector('.label-state').textContent=split?'TBD':'N/A';
-  back.querySelector('.label-card-actions').hidden=!split;
- });
  function keysForBrand(overwrite=false){const b=elements.brand.value,k=elements.key.value||p.key;const keys=M.keyEntries(state.logistics).filter(r=>r.brand===b).map(r=>r.key);$('#product-key').innerHTML=option('','—',k)+keys.map(v=>option(v,v,k)).join('')+(M.key(k)&&!keys.includes(String(k))?option(k,`${k} · ${t('keyUnknown')}`,k):'');if(overwrite){elements.key.value='';}updatePackaging();}
  function updatePackaging(){const l=state.logistics[elements.brand.value]?.[M.key(elements.key.value)];$('#key-summary').textContent=l?`${elements.brand.value} / ${elements.key.value} · ${state.products.filter(x=>x.brand===elements.brand.value&&M.key(x.key)===elements.key.value).length} ${t('countProducts')}`:t('keyMissing');$('#product-key-data').innerHTML=l?logisticsOverview(l):`<p class="muted">${t('keyMissing')}</p>`;$('#product-key-open').disabled=!l;$('#product-key-export').disabled=!l;}
  keysForBrand();elements.brand.onchange=()=>keysForBrand(true);elements.key.onchange=()=>updatePackaging();

@@ -54,13 +54,13 @@ Object.assign(window.JasonText.en,{'volume.number':'Volume / quantity – value'
 
 Object.assign(window.JasonText.cs,{
  inci:'INCI',copyInci:'Kopírovat INCI',labelLanguages:'Jazyky etikety',
- labels:'Etikety',labelLayout:'Rozložení etiket',singleLabel:'Jedna etiketa',
- frontBackLabels:'Přední + zadní',frontLabel:'Přední',backLabel:'Zadní',
+ labels:'Etikety',
+ frontLabel:'Přední',backLabel:'Zadní',
  viewLabel:'Zvětšit',downloadLabel:'Stáhnout'
 });
 Object.assign(window.JasonText.en,{
  inci:'INCI',copyInci:'Copy INCI',labelLanguages:'Label languages',
- labels:'Labels',labelLayout:'Label layout',singleLabel:'Single label',
- frontBackLabels:'Front + back',frontLabel:'Front',backLabel:'Back',
+ labels:'Labels',
+ frontLabel:'Front',backLabel:'Back',
  viewLabel:'Enlarge',downloadLabel:'Download'
 });
