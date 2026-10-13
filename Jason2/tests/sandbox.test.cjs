@@ -105,6 +105,29 @@ async function setup(real=false,cached=null){
   assert.equal((await r.saved()).products[0].inci,expected.products[0].inci);
   assert.deepEqual(network,[]);r.dom.window.close();
  });
+ await test('label INCI updates existing candles and undo while preserving custom INCI and other edits',async()=>{
+  const fresh=await setup(true),expected=await fresh.saved(),corrections=clone(fresh.w.JASON_SANDBOX_SEED.inciCorrections);fresh.dom.window.close();
+  assert.equal(corrections.length,4);
+  const fields=['inci','inciStatus','inciSource'],old=clone(expected);old.sandboxInciRevision='20261013-verified-inci';
+  for(const c of corrections){const p=old.products.find(p=>p.id===c.id);for(const k of fields){if(Object.hasOwn(c.before,k))p[k]=clone(c.before[k]);else delete p[k];}}
+  const flower=old.products.find(p=>p.id==='8596048008273');flower.name='Local name';flower.price=77;flower.custom={keep:true};
+  old.products.find(p=>p.id==='8596048008266').inci='My custom formula';
+  const recovery=clone(old);recovery.products.find(p=>p.id==='8596048008273').price=66;
+  const r=await setup(true,{state:old,recovery});await wait(async()=>(await r.saved()).sandboxInciRevision===expected.sandboxInciRevision);
+  for(const s of [await r.saved(),clone(await r.w.JasonStorage.get('recovery'))]){
+   assert.equal(s.products.find(p=>p.id==='8596048008266').inci,'My custom formula');
+   for(const id of ['8596048008259','8596048008273','8596048012195']){
+    const p=s.products.find(p=>p.id===id),e=expected.products.find(p=>p.id===id);for(const k of fields)assert.deepEqual(p[k],e[k]);
+   }
+   const f=s.products.find(p=>p.id==='8596048008273');assert.equal(f.name,'Local name');assert.deepEqual(f.custom,{keep:true});
+   assert.ok(f.inci.includes('Geranium Maculatum Herb Oil'));assert.ok(!f.inci.includes('Oenothera Biennis Oil'));
+   assert.deepEqual(s.logistics,old.logistics);assert.deepEqual(s.photos,old.photos);
+  }
+  const expectedFlower=expected.products.find(p=>p.id==='8596048008273');assert.equal(expectedFlower.inci.split(', ').filter(v=>v==='Geraniol*').length,0);
+  r.click('#undo');await wait(async()=>(await r.saved()).products.find(p=>p.id==='8596048008273').price===66);
+  assert.equal((await r.saved()).products.find(p=>p.id==='8596048008273').inci,expectedFlower.inci);
+  assert.deepEqual(network,[]);r.dom.window.close();
+ });
  await test('real sandbox seed has 317 products, 78 keys and styled Excel export',async()=>{
   const r=await setup(true);assert.equal((await r.saved()).products.length,317);assert.equal(r.w.JasonModel.keyEntries((await r.saved()).logistics).length,78);let workbook;r.w.JasonExport.download=async wb=>{workbook=wb;};r.click('#export');r.submit('#export-form');await wait(()=>workbook);assert.equal(workbook.getWorksheet('Products').getCell('A1').fill.fgColor.argb,'FF214A84');assert.deepEqual(network,[]);r.dom.window.close();
  });

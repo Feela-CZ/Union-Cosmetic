@@ -5448,11 +5448,13 @@
     "key": "60g A",
     "carton_ean": 8596048010306,
     "csName": "NATAVA Masážní svíčka - Síla ovoce",
-    "inci": "Hydrogenated Soybean Oil, Theobroma Cacao Seed Butter, Butyrospermum Parkii Butter, Cocos Nucifera Oil, Persea Gratissima Oil, Prunus Armeniaca Kernel Oil, Limonene*, Citral*, Citrus Reticulata Peel Oil, Linalool, Linalyl Acetate, Citrus Limon Peel Oil, Cymbopogon Flexuosus Herb Oil, Hippophae Rhamnoides Fruit Extract, Juniperus Communis Wood Oil, Pinus Species Twig Leaf Oil, Geraniol*, Citrus Aurantium Leaf Oil, Cymbopogon Martini Oil, Pelargonium Graveolens Oil, Citrus Aurantium Dulcis Peel Oil, Citronellol*, Rosmarinus Officinalis Leaf Extract. * Allergens naturally occurring in essential oils.",
+    "inci": "Hydrogenated Soybean Oil, Theobroma Cacao Seed Butter, Butyrospermum Parkii Butter, Cocos Nucifera Oil, Persea Gratissima Oil, Prunus Armeniaca Kernel Oil, Limonene*, Citral*, Citrus Reticulata Peel Oil, Linalool, Linalyl Acetate, Citrus Limon Peel Oil, Cymbopogon Flexuosus Herb Oil, Hippophae Rhamnoides Fruit Extract, Juniperus Communis Wood Oil, Pinus Species Twig Leaf Oil, Geraniol*, Citrus Aurantium Leaf Oil, Cymbopogon Martini Oil, Pelargonium Graveolens Oil, Citrus Aurantium Dulcis Peel Oil, Citronellol*, Rosmarinus Officinalis Leaf Extract.\n\n* Allergens naturally occurred in essential oils.",
     "inciStatus": "verified",
     "inciSource": {
-      "url": "https://www.unioncosmetic.cz/natava-massage-candle---fruit-power",
-      "checkedAt": "2026-10-13T12:19:36Z"
+      "type": "product-label",
+      "file": "7919.jpg",
+      "libraryFileId": "libfile_6f10a1ed9aa8819188d2268279bd7c5f",
+      "checkedAt": "2026-10-13T12:42:15Z"
     }
   },
   {
@@ -5473,11 +5475,13 @@
     "key": "60g A",
     "carton_ean": 8596048010313,
     "csName": "NATAVA Masážní svíčka - Květinová zahrada",
-    "inci": "Hydrogenated Soybean Oil, Theobroma Cacao Seed Butter, Butyrospermum Parkii Butter, Olea Europaea Fruit Oil, Triticum Vulgare Germ Oil, Cocos Nucifera Oil, Lavandula Angustifolia Oil, Geraniol*, Linalool*, Pelargonium Graveolens Oil, Citronellol*, Cananga Odorata Flower Oil, Oenothera Biennis Oil, Rosa Canina Fruit Oil, Citral*, Benzyl Benzoate, Limonene*, Benzyl Salicylate, Coumarin*, Benzyl Alcohol, Eugenol. * Allergens naturally occurring in essential oils.",
+    "inci": "Hydrogenated Soybean Oil, Theobroma Cacao Seed Butter, Butyrospermum Parkii Butter, Olea Europaea Fruit Oil, Triticum Vulgare Germ Oil, Cocos Nucifera Oil, Lavandula Angustifolia Oil, Linalool*, Pelargonium Graveolens Oil, Citronellol*, Cananga Odorata Flower Oil, Geranium Maculatum Herb Oil, Rosa Canina Fruit Oil, Citral*, Benzyl Benzoate, Limonene*, Benzyl Salicylate, Coumarin*, Benzyl Alcohol, Eugenol.\n\n* Allergens naturally occurred in essential oils.",
     "inciStatus": "verified",
     "inciSource": {
-      "url": "https://www.unioncosmetic.cz/natava-massage-candle---flower-garden",
-      "checkedAt": "2026-10-13T12:19:36Z"
+      "type": "product-label",
+      "file": "7917.jpg",
+      "libraryFileId": "libfile_dd848a705b948191be3cdda55cd21223",
+      "checkedAt": "2026-10-13T12:42:15Z"
     }
   },
   {
@@ -5498,11 +5502,13 @@
     "key": "60g A",
     "carton_ean": 8596048010320,
     "csName": "NATAVA Masážní svíčka - Vůně orientu",
-    "inci": "Hydrogenated Soybean Oil, Theobroma Cacao Seed Butter, Butyrospermum Parkii Butter, Macadamia Integrifolia Seed Oil, Prunus Amygdalus Dulcis Oil, Argania Spinosa Kernel Oil, Melia Azadirachta Seed Oil, Pogostemon Cablin Leaf Oil, Dipropylene Glycol, Eugenol*, Linalyl Acetate, Limonene*, Citrus Aurantium Bergamia Peel Oil Expressed, Citrus Limon Peel Oil, Linalool*, Cupressus Sempervirens Oil, Citrus Aurantium Dulcis Peel Oil, Eugenia Caryophyllus Leaf Oil, Ethylene Brassylate, Tetramethyl Acetyloctahydronaphthalenes, Benzyl Alcohol*, Benzyl Benzoate, Hibiscus Abelmoschus Seed Extract, Citral*, Farnesol*. * Allergens naturally occurring in essential oils.",
+    "inci": "Hydrogenated Soybean Oil, Theobroma Cacao Seed Butter, Butyrospermum Parkii Butter, Macadamia Integrifolia Seed Oil, Prunus Amygdalus Dulcis Oil, Argania Spinosa Kernel Oil, Melia Azadirachta Seed Oil, Pogostemon Cablin Leaf Oil, Dipropylene Glycol, Eugenol*, Linalyl Acetate, Limonene*, Citrus Aurantium Bergamia Peel Oil Expressed, Citrus Limon Peel Oil, Linalool*, Cupressus Sempervirens Oil, Citrus Aurantium Dulcis Peel Oil, Eugenia Caryophyllus Leaf Oil, Ethylene Brassylate, Tetramethyl Acetyloctahydronaphthalenes, Benzyl Alcohol*, Benzyl Benzoate, Hibiscus Abelmoschus Seed Extract, Citral*, Farnesol*.\n\n* Allergens naturally occurred in essential oils.",
     "inciStatus": "verified",
     "inciSource": {
-      "url": "https://www.unioncosmetic.cz/natava-massage-candle---orient-scent",
-      "checkedAt": "2026-10-13T12:19:36Z"
+      "type": "product-label",
+      "file": "7920.jpg",
+      "libraryFileId": "libfile_1fa23278bdec81919c3f260806d1abbc",
+      "checkedAt": "2026-10-13T12:42:15Z"
     }
   },
   {
@@ -5523,7 +5529,14 @@
     "key": null,
     "carton_ean": null,
     "csName": "NATAVA Masážní svíčka - Bylinné dřevo s CBD",
-    "inciStatus": "pending"
+    "inciStatus": "verified",
+    "inci": "Hydrogenated Soybean Oil, Theobroma Cacao Seed Butter, Butyrospermum Parkii Butter, Cocos Nucifera Oil, Cannabis Sativa Seed Oil, Citrus Reticulata Peel Oil, Cananga Odorata Oil/Extract, Limonene, Mentha Piperita Oil, Pogostemon Cablin Leaf Oil, Beta-Caryophyllene, Cannabidiol, Menthol, Pinene, Benzyl Benzoate, Linalool, Geranyl Acetate, Farnesol, Benzyl Salicylate, Terpinolene, Geraniol, Alpha-Terpinene, Methyl-N-methylanthranilate from Natural Source, Terpineol, Eugenol, Citral.\n\n* Allergens naturally occurred in essential oils.",
+    "inciSource": {
+      "type": "product-label",
+      "file": "7918.jpg",
+      "libraryFileId": "libfile_2e155b02bde081919b135f11c4cc482a",
+      "checkedAt": "2026-10-13T12:42:15Z"
+    }
   },
   {
     "brand": "Natava",

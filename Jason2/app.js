@@ -408,11 +408,15 @@ async function upgradeSandboxInci(){
  const identity=p=>JSON.stringify([p.id,p.volume?.number,p.volume?.unit]);
  const groups=new Map();
  for(const p of seed.products){const k=identity(p);groups.set(k,[...(groups.get(k)||[]),p]);}
+ const fields=['inci','inciStatus','inciSource'];
  const repair=snapshot=>{
   for(const p of snapshot.products){
    const matches=groups.get(identity(p))||[],source=matches.length===1?matches[0]:matches.find(s=>s.name===p.name);
-   if(!source||['inci','inciStatus','inciSource'].some(k=>Object.hasOwn(p,k)))continue;
-   for(const k of ['inci','inciStatus','inciSource'])if(Object.hasOwn(source,k))p[k]=M.clone(source[k]);
+   if(!source)continue;
+   // Replace only an exact previously supplied INCI; keep every local edit.
+   const correction=(seed.inciCorrections||[]).find(c=>identity(c)===identity(p)&&fields.every(k=>Object.hasOwn(p,k)===Object.hasOwn(c.before,k)&&JSON.stringify(p[k])===JSON.stringify(c.before[k])));
+   if(!correction&&fields.some(k=>Object.hasOwn(p,k)))continue;
+   for(const k of fields){if(Object.hasOwn(source,k))p[k]=M.clone(source[k]);else if(correction)delete p[k];}
   }
   snapshot.sandboxInciRevision=seed.inciRevision;
  };
