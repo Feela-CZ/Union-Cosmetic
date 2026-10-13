@@ -51,3 +51,16 @@ Object.assign(window.JasonText.en,{photoMissing:'Photo missing',photoCheckUnavai
 
 Object.assign(window.JasonText.cs,{'volume.number':'Objem / množství – hodnota','volume.unit':'Objem / množství – jednotka'});
 Object.assign(window.JasonText.en,{'volume.number':'Volume / quantity – value','volume.unit':'Volume / quantity – unit'});
+
+Object.assign(window.JasonText.cs,{
+ inci:'INCI',copyInci:'Kopírovat INCI',inciCopied:'INCI zkopírováno',labelLanguages:'Jazyky etikety',
+ labels:'Etikety',
+ frontLabel:'Přední',backLabel:'Zadní',
+ viewLabel:'Zvětšit',downloadLabel:'Stáhnout'
+});
+Object.assign(window.JasonText.en,{
+ inci:'INCI',copyInci:'Copy INCI',inciCopied:'INCI copied',labelLanguages:'Label languages',
+ labels:'Labels',
+ frontLabel:'Front',backLabel:'Back',
+ viewLabel:'Enlarge',downloadLabel:'Download'
+});

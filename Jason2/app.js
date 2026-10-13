@@ -200,6 +200,14 @@ function openKeyPreview(entry){
  $('#key-preview-body').innerHTML=`${logisticsOverview(entry.data)}<label class="checkbox-label"><input type="checkbox" id="key-preview-include-products">${t('includeProductList')}</label><p class="muted">${t('includeProductListHint')}</p><div class="key-preview-actions">${button('key-preview-export','exportNow','primary')}</div>`;
  $('#key-preview-export').onclick=e=>downloadKey(entry,e.currentTarget,$('#key-preview-include-products').checked);d.showModal();
 }
+// Labels and languages remain placeholders until their data is supplied.
+function productInfoSections(p){
+ const inci=p.inciStatus==='not-applicable'?'N/A':typeof p.inci==='string'&&p.inci.trim()?p.inci:'TBD',available=inci!=='TBD'&&inci!=='N/A';
+ const labelCard=(slot,title,applicable=true)=>`<article class="label-card${applicable?'':' not-applicable'}" data-label-slot="${slot}"><div class="label-card-heading"><h4>${t(title)}</h4></div><div class="label-placeholder"><strong class="label-state">${applicable?'TBD':'N/A'}</strong></div><div class="label-card-actions" ${applicable?'':'hidden'}><button type="button" disabled>${t('viewLabel')}</button><button type="button" disabled>${t('downloadLabel')}</button></div></article>`;
+ return `<section id="section-inci" class="tab-section" role="tabpanel" aria-labelledby="tab-inci"><div class="section-intro"><h3>${t('inci')}</h3></div><div class="inci-placeholder${available?' has-inci':''}"><p>${esc(inci)}</p></div><div class="info-actions"><button id="copy-inci" type="button" ${available?'':'disabled'}>${t('copyInci')}</button></div></section>
+ <section id="section-labelLanguages" class="tab-section" role="tabpanel" aria-labelledby="tab-labelLanguages"><div class="section-intro"><h3>${t('labelLanguages')}</h3></div><div class="languages-placeholder"><p>TBD</p></div></section>
+ <section id="section-labels" class="tab-section" role="tabpanel" aria-labelledby="tab-labels"><div class="section-intro"><h3>${t('labels')}</h3></div><div class="label-grid split" id="product-label-grid" aria-live="polite">${labelCard('front','frontLabel')}${labelCard('back','backLabel',false)}</div></section>`;
+}
 function openProduct(index=null,tab='details',duplicate=false){
  if(refreshing)return;
  const original=index!==null?M.clone(state.products[index]):null;
@@ -207,14 +215,15 @@ function openProduct(index=null,tab='details',duplicate=false){
  if(duplicate)p.id='';
  let selectedPhoto=duplicate&&original?state.photos[original.id]||null:null,photoExists=false;
  const title=duplicate?t('duplicate'):original?(lang==='cs'?p.csName||p.name:p.name)||t('edit'):t('addProduct');
- openEditor(title,original&&!duplicate?`${p.brand} / ${p.id}`:t('product'),`<form id="product-form" novalidate><div class="editor-tabs" role="tablist">${['details','packaging','flags','photo'].map(v=>`<button type="button" role="tab" id="tab-${v}" aria-controls="section-${v}" data-tab="${v}" aria-selected="${v===tab}">${t(v)}</button>`).join('')}</div>
+ openEditor(title,original&&!duplicate?`${p.brand} / ${p.id}`:t('product'),`<form id="product-form" novalidate><div class="editor-tabs" role="tablist" aria-label="${esc(t('product'))}">${['details','packaging','inci','labelLanguages','labels','photo','flags'].map(v=>`<button type="button" role="tab" id="tab-${v}" aria-controls="section-${v}" data-tab="${v}" aria-selected="${v===tab}">${t(v)}</button>`).join('')}</div>
  <div class="form-content"><div id="form-error" class="notice error-notice" role="alert" hidden></div>
  <section id="section-details" class="tab-section" role="tabpanel" aria-labelledby="tab-details"><div class="section-intro"><h3>${t('details')}</h3></div><div class="form-grid">${field('brand','brand',p.brand,'text','list="brands" required')}${field('type','type',p.type,'text','list="types"')}${field('id','ean',p.id,'text','required inputmode="numeric"',t('required'))}${field('hs','hs',p.hs,'text','inputmode="numeric"')}${field('name','name',p.name)}${field('csName','csName',p.csName)}<label class="field"><span>${t('volume')}</span><div class="input-group"><input name="volume-number" type="text" inputmode="decimal" value="${esc(p.volume?.number??'')}"><input name="volume-unit" list="units" value="${esc(p.volume?.unit??'')}" aria-label="${lang==='cs'?'Jednotka':'Unit'}"></div></label>${field('price','price',p.price,'number','min="0" step="any"')}</div>${datalist('brands',brands())}${datalist('types',[...new Set([...types(),...state.products.map(p=>p.type)])].filter(Boolean))}${datalist('units',['ml','g','pc','l','kg'])}<p class="notice" id="draft-warning" hidden>${t('draftWarning')}</p></section>
  <section id="section-packaging" class="tab-section" role="tabpanel" aria-labelledby="tab-packaging"><div class="section-intro"><h3>${t('packaging')}</h3></div><div class="form-grid"><label class="field"><span>${t('key')}</span><select name="key" id="product-key"></select></label>${field('carton_ean','carton_ean',p.carton_ean)}</div><p class="muted" id="key-summary"></p><section class="product-logistics"><div class="section-intro"><h3>${t('keyData')}</h3><div class="key-detail-actions">${button('product-key-open','openKeyDetail')}${button('product-key-export','exportNow')}</div></div><label class="checkbox-label"><input type="checkbox" id="product-key-include-products">${t('includeProductList')}</label><div id="product-key-data"></div></section></section>
  <section id="section-flags" class="tab-section" role="tabpanel" aria-labelledby="tab-flags"><h3>${t('flags')}</h3>${['new','discontinued'].map(v=>`<div class="flag-card"><label class="checkbox-label"><input type="checkbox" name="${v}" ${p[v]===true?'checked':''}>${t(v)}</label>${field(v+'_date',v+'_date',p[v+'_date'],'date')}</div>`).join('')}<div class="form-grid">${field('flags','customFlags',(p.flags||[]).join(', '),'text','',t('flagsHint'))}</div></section>
  <section id="section-photo" class="tab-section" role="tabpanel" aria-labelledby="tab-photo"><h3>${t('photo')}</h3><div class="photo-layout"><button type="button" class="photo-drop" id="photo-drop"><img id="photo-preview" alt="${esc(t('photo'))}" hidden><span id="photo-placeholder">+<small>${t('choosePhoto')}</small></span></button><div><p>${t(sandbox?'sandboxPhotoHint':'photoHint')}</p><input type="file" accept="image/jpeg,image/png,image/webp" id="photo-input" hidden>${button('photo-choose','choosePhoto')}${button('photo-download','downloadPhoto')}${button('photo-view','viewPhoto')}<p class="muted">${state.pendingPhotos.includes(p.id)?t('photoPending'):''}</p></div></div></section>
- </div>${formFooter()}</form>`);
+ ${productInfoSections(p)}</div>${formFooter()}</form>`);
  const form=$('#product-form'),elements=form.elements;
+ $('#copy-inci').onclick=async()=>{try{await navigator.clipboard.writeText(p.inci);toast(t('inciCopied'));}catch(e){error(e);}};
  const showTab=v=>{$$('[data-tab]').forEach(b=>{b.setAttribute('aria-selected',b.dataset.tab===v);b.tabIndex=b.dataset.tab===v?0:-1;});$$('.tab-section').forEach(s=>{s.hidden=s.id!==`section-${v}`;});};
  $$('[data-tab]').forEach((b,i,list)=>{b.onclick=()=>showTab(b.dataset.tab);b.onkeydown=e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const n=e.key==='Home'?0:e.key==='End'?list.length-1:(i+(e.key==='ArrowRight'?1:-1)+list.length)%list.length;showTab(list[n].dataset.tab);list[n].focus();}};});showTab(tab);
  function keysForBrand(overwrite=false){const b=elements.brand.value,k=elements.key.value||p.key;const keys=M.keyEntries(state.logistics).filter(r=>r.brand===b).map(r=>r.key);$('#product-key').innerHTML=option('','—',k)+keys.map(v=>option(v,v,k)).join('')+(M.key(k)&&!keys.includes(String(k))?option(k,`${k} · ${t('keyUnknown')}`,k):'');if(overwrite){elements.key.value='';}updatePackaging();}
@@ -377,7 +386,7 @@ function sandboxSeed(){
  const seed=window.JASON_SANDBOX_SEED;
  if(!seed)throw Error('SANDBOX_SEED_MISSING');
  M.validateProducts(seed.products);M.validateLogistics(seed.logistics);
- return isolate({...M.clone(state),products:M.clone(seed.products),logistics:M.clone(seed.logistics),photos:{},updated:seed.snapshotAt,sandboxNameRevision:seed.nameRevision});
+ return isolate({...M.clone(state),products:M.clone(seed.products),logistics:M.clone(seed.logistics),photos:{},updated:seed.snapshotAt,sandboxNameRevision:seed.nameRevision,sandboxInciRevision:seed.inciRevision});
 }
 async function upgradeSandboxNames(){
  const seed=window.JASON_SANDBOX_SEED;
@@ -392,6 +401,25 @@ async function upgradeSandboxNames(){
  if(history.length)await S.put('recovery',M.clone(history.at(-1)));
  await persist();
 }
+async function upgradeSandboxInci(){
+ const seed=window.JASON_SANDBOX_SEED;
+ if(!sandbox||!seed?.inciRevision||state.sandboxInciRevision===seed.inciRevision)return;
+ // Keep ID types: a retired and a replacement product can share the same EAN.
+ const identity=p=>JSON.stringify([p.id,p.volume?.number,p.volume?.unit]);
+ const groups=new Map();
+ for(const p of seed.products){const k=identity(p);groups.set(k,[...(groups.get(k)||[]),p]);}
+ const repair=snapshot=>{
+  for(const p of snapshot.products){
+   const matches=groups.get(identity(p))||[],source=matches.length===1?matches[0]:matches.find(s=>s.name===p.name);
+   if(!source||['inci','inciStatus','inciSource'].some(k=>Object.hasOwn(p,k)))continue;
+   for(const k of ['inci','inciStatus','inciSource'])if(Object.hasOwn(source,k))p[k]=M.clone(source[k]);
+  }
+  snapshot.sandboxInciRevision=seed.inciRevision;
+ };
+ repair(state);history.forEach(repair);
+ if(history.length)await S.put('recovery',M.clone(history.at(-1)));
+ await persist();
+}
 async function resetSandbox(){
  if(!sandbox||busy||!await confirm('sandboxResetTitle',t('sandboxResetHint'),'sandboxReset'))return;
  try{const next=sandboxSeed();await S.put('recovery',null);state=next;history=[];future=[];selected.clear();await persist();formClose();render();toast(t('loaded'));}catch(e){error(e);}
@@ -401,7 +429,7 @@ async function boot(){
  try{const saved=await S.get('state');if(saved?.state){M.validateProducts(saved.state.products);M.validateLogistics(saved.state.logistics);state=isolate({...state,...saved.state});hasSavedState=true;lang=saved.lang==='en'?'en':'cs';const recovery=await S.get('recovery');if(recovery)history=[recovery];}}
  catch(e){storageError=true;toast(t('localError'),true);}
  if(sandbox&&!hasSavedState){try{state=sandboxSeed();await persist();}catch(e){error(e);}}
- if(sandbox&&hasSavedState){try{await upgradeSandboxNames();}catch(e){storageError=true;toast(t('localError'),true);}}
+ if(sandbox&&hasSavedState){try{await upgradeSandboxNames();await upgradeSandboxInci();}catch(e){storageError=true;toast(t('localError'),true);}}
  if(JASON_CONFIG.sharedOnly){state.api=JASON_CONFIG.apiBase;state.imageBase=JASON_CONFIG.imageBase;}
  view=['products','keys','checks'].includes(location.hash.slice(1))?location.hash.slice(1):'products';render();
  if(sandbox)return;

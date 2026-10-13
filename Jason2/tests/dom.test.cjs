@@ -36,6 +36,60 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
 (async()=>{
  let passed=0;const c=await setup(),{w,$,$$,click,input,change,saved,upload,submit,errors}=c;
  async function test(name,fn){await fn();passed++;console.log('PASS',name);}
+ await test('product information preview has accessible tabs and persistent label slots without a layout selector',async()=>{
+  const n=await setup();await n.upload('products',[fixture]);const before=await n.saved();
+  n.click('[data-edit="0"]');
+  assert.deepEqual(n.$$('[data-tab]').map(b=>b.dataset.tab),['details','packaging','inci','labelLanguages','labels','photo','flags']);
+  for(const tab of ['inci','labelLanguages','labels']){
+   n.click('#tab-'+tab);assert.equal(n.$('#section-'+tab).hidden,false);
+   assert.equal(n.$$('.tab-section:not([hidden])').length,1);
+   assert.ok(n.$('#section-'+tab).textContent.includes('TBD'));
+   assert.equal(n.$('#tab-'+tab).getAttribute('aria-controls'),'section-'+tab);
+   assert.equal(n.$('#section-'+tab).getAttribute('aria-labelledby'),'tab-'+tab);
+  }
+  assert.deepEqual(n.$$('[data-label-slot]:not([hidden])').map(e=>e.dataset.labelSlot),['front','back']);
+  assert.equal(n.$('[data-label-slot=back] .label-state').textContent,'N/A');
+  assert.equal(n.$('[data-label-slot=front] .label-state').textContent,'TBD');
+  assert.equal(n.$('[data-label-slot=back] .label-card-actions').hidden,true);
+  for(const tab of ['inci','labelLanguages']){
+   assert.equal((n.$('#section-'+tab).textContent.match(/TBD/g)||[]).length,1);
+   assert.ok(!n.$('#section-'+tab).textContent.includes('Under construction'));
+  }
+  assert.equal(n.$('#section-inci h3').textContent,'INCI');
+  assert.equal(n.$('#section-labelLanguages h3').textContent,'Jazyky etikety');
+  assert.equal(n.$('#section-labelLanguages').textContent.trim(),'Jazyky etiketyTBD');
+  assert.deepEqual(n.$$('[data-label-slot] h4').map(e=>e.textContent),['Přední','Zadní']);
+  assert.equal(n.$('[data-label-layout]'),null);
+  n.$('#tab-labels').dispatchEvent(new n.w.KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true}));
+  assert.equal(n.$('#tab-labelLanguages').getAttribute('aria-selected'),'true');
+  n.click('#editor-close');assert.equal(n.$('#confirm-dialog').open,false);assert.equal(n.$('#editor').open,false);
+  assert.deepEqual(await n.saved(),before);
+  n.click('[data-lang=en]');n.click('[data-edit="0"]');assert.equal(n.$('#tab-labelLanguages').textContent,'Label languages');
+  n.click('#tab-labels');assert.equal(n.$('[data-label-slot=front] h4').textContent,'Front');
+  n.click('#editor-close');assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
+ await test('INCI renders as text and copying never changes product data or submits the form',async()=>{
+  const n=await setup(),inci='Aqua, <test>, Parfum.\nLinalool*';await n.upload('products',[{...fixture,inci,inciStatus:'verified'}]);
+  let copied;Object.defineProperty(n.w.navigator,'clipboard',{value:{writeText:async text=>{copied=text;}}});
+  const before=await n.saved();n.click('[data-edit="0"]');n.click('#tab-inci');
+  assert.equal(n.$('#section-inci p').textContent,inci);assert.equal(n.$('#section-inci test'),null);
+  assert.equal(n.$('#copy-inci').disabled,false);n.click('#copy-inci');await wait(()=>copied===inci);
+  assert.equal(n.$('#editor').open,true);assert.deepEqual(await n.saved(),before);
+  n.click('#editor-close');assert.equal(n.$('#confirm-dialog').open,false);
+  for(const [product,label] of [[{...fixture,inciStatus:'not-applicable'},'N/A'],[{...fixture,inciStatus:'pending'},'TBD']]){
+   await n.upload('products',[product]);n.click('[data-edit="0"]');n.click('#tab-inci');
+   assert.equal(n.$('#section-inci p').textContent,label);assert.equal(n.$('#copy-inci').disabled,true);n.click('#editor-close');
+  }
+  assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
+ await test('saving an existing product through preview tabs preserves future metadata and never stores TBD',async()=>{
+  const n=await setup(),p={...fixture,inci:'Existing formula',labelLanguages:['cs','en'],labels:{front:{path:'custom.pdf',revision:2}},extra:{future:true}};
+  await n.upload('products',[p]);n.click('[data-edit="0"]');n.click('#tab-labels');n.click('#tab-inci');
+  n.input('#field-price','2.45');n.submit('#product-form');await wait(()=>!n.$('#editor').open);
+  const result=(await n.saved()).products[0];assert.deepEqual(result.labels,p.labels);assert.deepEqual(result.labelLanguages,p.labelLanguages);assert.equal(result.inci,p.inci);assert.deepEqual(result.extra,p.extra);assert.equal(result.price,2.45);
+  assert.ok(!JSON.stringify(result).includes('TBD'));assert.ok(!Object.hasOwn(result,'labelLayout'));
+  assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
  await test('clean product names sort alphabetically in both languages and export in the same order',async()=>{
   const n=await setup(),products=[
    {...fixture,id:'1',name:'Lilien liquid soap Hygiene Plus',csName:'Lilien intimní sprchový gel'},

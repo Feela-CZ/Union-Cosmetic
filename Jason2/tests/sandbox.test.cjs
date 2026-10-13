@@ -84,6 +84,27 @@ async function setup(real=false,cached=null){
   const again=await setup(true,{state:current});assert.deepEqual(await again.saved(),current);
   again.dom.window.close();assert.deepEqual(network,[]);assert.deepEqual(await liveState(),{sentinel:'LIVE DATA'});
  });
+ await test('cached sandbox imports INCI into state and undo without replacing local edits or custom INCI',async()=>{
+  const fresh=await setup(true),expected=await fresh.saved(),revision=expected.sandboxInciRevision;fresh.dom.window.close();
+  const old=clone(expected);delete old.sandboxInciRevision;
+  for(const p of old.products)for(const k of ['inci','inciStatus','inciSource'])delete p[k];
+  const custom=old.products.find(p=>String(p.id)==='8596048008488');custom.inci='Local custom INCI';custom.price=77;
+  const changed=old.products.find(p=>String(p.id)==='8596048006965');changed.name='Local product name';changed.price=88;changed.custom={keep:true};
+  old.logistics.Lilien['500A'].ITEM.weight=42;old.photos={local:'data:image/jpeg;base64,local'};
+  const recovery=clone(old);recovery.products.find(p=>String(p.id)==='8596048006965').price=66;
+  const r=await setup(true,{state:old,recovery});await wait(async()=>(await r.saved()).sandboxInciRevision===revision);
+  const current=await r.saved(),restore=clone(await r.w.JasonStorage.get('recovery'));
+  for(const s of [current,restore]){
+   assert.equal(s.products.find(p=>String(p.id)==='8596048008488').inci,'Local custom INCI');
+   const imported=s.products.find(p=>String(p.id)==='8596048006965');assert.equal(imported.inci,expected.products[0].inci);assert.equal(imported.name,'Local product name');assert.deepEqual(imported.custom,{keep:true});
+   assert.deepEqual(s.logistics,old.logistics);assert.deepEqual(s.photos,old.photos);
+   assert.equal(s.products[17].inciStatus,'pending');assert.equal(s.products[20].inciStatus,'verified');
+  }
+  assert.equal(current.products.find(p=>String(p.id)==='8596048006965').price,88);
+  r.click('#undo');await wait(async()=>(await r.saved()).products.find(p=>String(p.id)==='8596048006965').price===66);
+  assert.equal((await r.saved()).products[0].inci,expected.products[0].inci);
+  assert.deepEqual(network,[]);r.dom.window.close();
+ });
  await test('real sandbox seed has 317 products, 78 keys and styled Excel export',async()=>{
   const r=await setup(true);assert.equal((await r.saved()).products.length,317);assert.equal(r.w.JasonModel.keyEntries((await r.saved()).logistics).length,78);let workbook;r.w.JasonExport.download=async wb=>{workbook=wb;};r.click('#export');r.submit('#export-form');await wait(()=>workbook);assert.equal(workbook.getWorksheet('Products').getCell('A1').fill.fgColor.argb,'FF214A84');assert.deepEqual(network,[]);r.dom.window.close();
  });
