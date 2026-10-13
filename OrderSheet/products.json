@@ -3533,12 +3533,7 @@
     "key": 500,
     "carton_ean": 8596048012355,
     "csName": "Twister wc gel - Fresh Forest",
-    "inci": "EUH208 Contains the reaction mixture: 5-chloro-2 methylisothiazol-3(2H)-one and 2-methylisothiazol-3(2H)-one (3:1). May cause an allergic reaction. Composition according to Regulation (EC) No. 648/2004, as amended: <5 % anionic surfactants, CI 74180, CI 19140, Methylisothiazolinone, Methylchloroisothiazolinone, Eugenol, Coumarin, Geraniol, Linalool, Limonene, Camphor, Linalyl Acetate, Menthol, Tetramethyl acetyloctahydronaphthalenes.",
-    "inciStatus": "verified",
-    "inciSource": {
-      "url": "https://www.unioncosmetic.cz/twister-wc-gel---fresh-forest-500-ml--3",
-      "checkedAt": "2026-10-13T12:19:36Z"
-    }
+    "inciStatus": "pending"
   },
   {
     "brand": "Twister",
@@ -3556,12 +3551,7 @@
     "key": 500,
     "carton_ean": 8595196901542,
     "csName": "Twister wc gel - Ocean Breeze",
-    "inci": "EUH 208 Contains 4-tert-butylcyclohexyl acetate, alpha-hexycinnamaldehyde, linalool, linalyl acetate, (R)-p mentha-1,8-diene, reaction mixture: 5-chloro-2-methylisothiazole 3(2H)-one and 2-methylisothiazole-3(2H)-one (3:1).",
-    "inciStatus": "verified",
-    "inciSource": {
-      "url": "https://www.unioncosmetic.cz/twister-wc-gel---ocean-breeze-500-ml--3",
-      "checkedAt": "2026-10-13T12:19:36Z"
-    }
+    "inciStatus": "pending"
   },
   {
     "brand": "Twister",
@@ -5475,13 +5465,13 @@
     "key": "60g A",
     "carton_ean": 8596048010313,
     "csName": "NATAVA Masážní svíčka - Květinová zahrada",
-    "inci": "Hydrogenated Soybean Oil, Theobroma Cacao Seed Butter, Butyrospermum Parkii Butter, Olea Europaea Fruit Oil, Triticum Vulgare Germ Oil, Cocos Nucifera Oil, Lavandula Angustifolia Oil, Linalool*, Pelargonium Graveolens Oil, Citronellol*, Cananga Odorata Flower Oil, Geranium Maculatum Herb Oil, Rosa Canina Fruit Oil, Citral*, Benzyl Benzoate, Limonene*, Benzyl Salicylate, Coumarin*, Benzyl Alcohol, Eugenol.\n\n* Allergens naturally occurred in essential oils.",
+    "inci": "Hydrogenated Soybean Oil, Theobroma Cacao Seed Butter, Butyrospermum Parkii Butter, Olea Europaea Fruit Oil, Triticum Vulgare Germ Oil, Cocos Nucifera Oil, Lavandula Angustifolia Oil, Geraniol*, Linalool*, Pelargonium Graveolens Oil, Citronellol*, Cananga Odorata Flower Oil, Oenothera Biennis Oil, Rosa Canina Fruit Oil, Citral*, Benzyl Benzoate, Limonene*, Benzyl Salicylate, Coumarin*, Benzyl Alcohol, Eugenol.\n\n* Allergens naturally occurred in essential oils.",
     "inciStatus": "verified",
     "inciSource": {
       "type": "product-label",
       "file": "7917.jpg",
       "libraryFileId": "libfile_dd848a705b948191be3cdda55cd21223",
-      "checkedAt": "2026-10-13T12:42:15Z"
+      "checkedAt": "2026-10-13T12:58:01Z"
     }
   },
   {

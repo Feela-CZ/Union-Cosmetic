@@ -107,7 +107,7 @@ async function setup(real=false,cached=null){
  });
  await test('label INCI updates existing candles and undo while preserving custom INCI and other edits',async()=>{
   const fresh=await setup(true),expected=await fresh.saved(),corrections=clone(fresh.w.JASON_SANDBOX_SEED.inciCorrections);fresh.dom.window.close();
-  assert.equal(corrections.length,4);
+  assert.equal(corrections.length,7);
   const fields=['inci','inciStatus','inciSource'],old=clone(expected);old.sandboxInciRevision='20261013-verified-inci';
   for(const c of corrections){const p=old.products.find(p=>p.id===c.id);for(const k of fields){if(Object.hasOwn(c.before,k))p[k]=clone(c.before[k]);else delete p[k];}}
   const flower=old.products.find(p=>p.id==='8596048008273');flower.name='Local name';flower.price=77;flower.custom={keep:true};
@@ -120,12 +120,35 @@ async function setup(real=false,cached=null){
     const p=s.products.find(p=>p.id===id),e=expected.products.find(p=>p.id===id);for(const k of fields)assert.deepEqual(p[k],e[k]);
    }
    const f=s.products.find(p=>p.id==='8596048008273');assert.equal(f.name,'Local name');assert.deepEqual(f.custom,{keep:true});
-   assert.ok(f.inci.includes('Geranium Maculatum Herb Oil'));assert.ok(!f.inci.includes('Oenothera Biennis Oil'));
+   assert.ok(f.inci.includes('Oenothera Biennis Oil'));assert.ok(!f.inci.includes('Geranium Maculatum Herb Oil'));
    assert.deepEqual(s.logistics,old.logistics);assert.deepEqual(s.photos,old.photos);
   }
-  const expectedFlower=expected.products.find(p=>p.id==='8596048008273');assert.equal(expectedFlower.inci.split(', ').filter(v=>v==='Geraniol*').length,0);
+  const expectedFlower=expected.products.find(p=>p.id==='8596048008273');assert.equal(expectedFlower.inci.split(', ').filter(v=>v==='Geraniol*').length,1);
   r.click('#undo');await wait(async()=>(await r.saved()).products.find(p=>p.id==='8596048008273').price===66);
   assert.equal((await r.saved()).products.find(p=>p.id==='8596048008273').inci,expectedFlower.inci);
+  assert.deepEqual(network,[]);r.dom.window.close();
+ });
+ await test('flower correction repairs a copy with the erroneous transcription without replacing custom INCI',async()=>{
+  const fresh=await setup(true),expected=await fresh.saved(),corrections=clone(fresh.w.JASON_SANDBOX_SEED.inciCorrections);fresh.dom.window.close();
+  const erroneous=corrections.find(c=>c.id==='8596048008273'&&c.before.inci.includes('Geranium Maculatum Herb Oil'));assert.ok(erroneous);
+  const old=clone(expected);old.sandboxInciRevision='20261013-candle-labels';
+  const p=old.products.find(p=>p.id===erroneous.id);Object.assign(p,clone(erroneous.before));p.price=87;p.custom={keep:true};
+  const r=await setup(true,{state:old,recovery:old});await wait(async()=>(await r.saved()).sandboxInciRevision===expected.sandboxInciRevision);
+  for(const s of [await r.saved(),clone(await r.w.JasonStorage.get('recovery'))]){
+   const p=s.products.find(p=>p.id===erroneous.id);assert.equal(p.inci,expected.products.find(p=>p.id===erroneous.id).inci);assert.equal(p.price,87);assert.deepEqual(p.custom,{keep:true});
+   assert.ok(p.inci.includes('Lavandula Angustifolia Oil, Geraniol*, Linalool*'));assert.ok(p.inci.includes('Oenothera Biennis Oil'));
+  }
+  r.dom.window.close();const custom=clone(old);custom.products.find(p=>p.id===erroneous.id).inci='Custom local formula';
+  const c=await setup(true,{state:custom});await wait(async()=>(await c.saved()).sandboxInciRevision===expected.sandboxInciRevision);
+  assert.equal((await c.saved()).products.find(p=>p.id===erroneous.id).inci,'Custom local formula');assert.deepEqual(network,[]);c.dom.window.close();
+ });
+ await test('safety warnings are removed from INCI in cached state and undo',async()=>{
+  const fresh=await setup(true),expected=await fresh.saved(),corrections=clone(fresh.w.JASON_SANDBOX_SEED.inciCorrections);fresh.dom.window.close();
+  const old=clone(expected);old.sandboxInciRevision='20261013-candle-labels';
+  const ids=['8596048012331','8596048012348'];
+  for(const id of ids){const p=old.products.find(p=>String(p.id)===id),c=corrections.find(c=>String(c.id)===id);assert.ok(c.before.inci.startsWith('EUH'));Object.assign(p,c.before);p.price=31;}
+  const r=await setup(true,{state:old,recovery:old});await wait(async()=>(await r.saved()).sandboxInciRevision===expected.sandboxInciRevision);
+  for(const s of [await r.saved(),clone(await r.w.JasonStorage.get('recovery'))])for(const id of ids){const p=s.products.find(p=>String(p.id)===id);assert.equal(p.inciStatus,'pending');assert.equal(Object.hasOwn(p,'inci'),false);assert.equal(Object.hasOwn(p,'inciSource'),false);assert.equal(p.price,31);}
   assert.deepEqual(network,[]);r.dom.window.close();
  });
  await test('real sandbox seed has 317 products, 78 keys and styled Excel export',async()=>{
