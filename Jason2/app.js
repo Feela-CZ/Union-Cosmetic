@@ -6,7 +6,7 @@ const sandbox=JASON_CONFIG.sandbox===true;
 function isolate(next){next.products=M.cleanProducts(next.products);if(next.baseline?.products){try{next.baseline.products=sig(M.cleanProducts(JSON.parse(next.baseline.products)));}catch{}}if(sandbox){next.connected=false;next.api='';next.imageBase=JASON_CONFIG.imageBase;next.baseline={};next.pendingPhotos=[];}return next;}
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const icons={products:'▦',keys:'◇',checks:'✓',data:'↔',undo:'↶',redo:'↷',export:'↓',plus:'+'};
-let lang='cs',view='products',page=1,pageSize=30,sort={field:'name',asc:true},selected=new Set(),history=[],future=[],busy=false,editorDirty=false,editorSave=null,toastTimer,syncing=false,storageError=false;
+let lang='cs',view='products',page=1,pageSize=30,sort={field:'name',asc:true},selected=new Set(),history=[],future=[],busy=false,editorDirty=false,editorSave=null,editorReturn=null,toastTimer,syncing=false,storageError=false;
 let state={products:[],logistics:M.clone(window.JASON_SEED_LOGISTICS||{}),photos:{},pendingPhotos:[],connected:false,api:JASON_CONFIG.apiBase,imageBase:JASON_CONFIG.imageBase,baseline:{},updated:null};
 let filters={search:'',brand:'',type:'',key:'',status:'active',new:'',flag:'',scope:''};
 let photoVersion=Date.now(),photoObserver=null;
@@ -73,15 +73,15 @@ async function confirm(title,message,yes='confirm',danger=false){
  const d=$('#confirm-dialog');$('#confirm-title').textContent=t(title);$('#confirm-message').textContent=message;$('#confirm-no').textContent=t('cancel');$('#confirm-yes').textContent=t(yes);$('#confirm-yes').className=danger?'danger':'primary';d.showModal();
  return new Promise(resolve=>{const finish=v=>{d.close();d.oncancel=null;resolve(v);};$('#confirm-yes').onclick=()=>finish(true);$('#confirm-no').onclick=()=>finish(false);d.oncancel=e=>{e.preventDefault();finish(false);};});
 }
-async function closeEditor(){if(busy)return;if(editorDirty&&!await confirm('discard',t('discardHint'),'discardYes'))return;$('#editor').close();editorDirty=false;editorSave=null;}
+async function closeEditor(){if(busy)return;if(editorDirty&&!await confirm('discard',t('discardHint'),'discardYes'))return;formClose();}
 function openEditor(title,caption,html,small=false){
- const d=$('#editor');d.classList.toggle('small',small);$('#editor-title').textContent=title;$('#editor-caption').textContent=caption;$('#editor-body').innerHTML=html;editorDirty=false;editorSave=null;
- $('#editor-body').oninput=e=>{if(e.target.closest('form')&&e.target.id!=='include-products')editorDirty=true;};$('#editor-body').onchange=e=>{if(e.target.closest('form')&&e.target.id!=='include-products')editorDirty=true;};
+ const d=$('#editor');d.classList.toggle('small',small);$('#editor-title').textContent=title;$('#editor-caption').textContent=caption;$('#editor-body').innerHTML=html;editorDirty=false;editorSave=null;editorReturn=null;
+ $('#editor-body').oninput=e=>{if(e.target.closest('form')&&!['include-products','include-empty'].includes(e.target.id))editorDirty=true;};$('#editor-body').onchange=e=>{if(e.target.closest('form')&&!['include-products','include-empty'].includes(e.target.id))editorDirty=true;};
  if(!d.open)d.showModal();
  d.scrollTop=0;
 }
 async function runForm(action){if(busy)return;busy=true;$$('#editor button[type="submit"]').forEach(b=>{b.disabled=true;b.dataset.original=b.textContent;b.textContent=t('saving');});try{await action();}catch(e){error(e);}finally{busy=false;$$('#editor button[type="submit"]').forEach(b=>{b.disabled=false;b.textContent=b.dataset.original||t('save');});}}
-function formClose(){editorDirty=false;editorSave=null;$('#editor').close();}
+function formClose(result,returnToOrigin=true){const back=editorReturn;editorDirty=false;editorSave=null;editorReturn=null;$('#editor').close();if(returnToOrigin&&back)back(result);}
 function render(){
  document.documentElement.lang=lang;document.title=`Jason 2.0 · ${t(sandbox?'sandboxVersion':'liveVersion')} · ${t(view)}`;
  $$('[data-text]').forEach(e=>e.textContent=t(sandbox&&e.dataset.text==='readonlyNote'?'sandboxFooter':e.dataset.text));$$('[data-lang]').forEach(e=>{e.classList.toggle('active',e.dataset.lang===lang);e.setAttribute('aria-pressed',e.dataset.lang===lang);});
@@ -191,9 +191,16 @@ function observeProductPhotos(){
 function logisticsOverview(data){
  return `<div class="logistics-overview">${Object.entries(M.sections).map(([section,fields])=>`<section><h4>${t(section)}</h4><dl>${fields.map(f=>{const raw=data[section]?.[f],value=M.count(raw);return `<div><dt>${esc(t(f))}</dt><dd>${raw==null||raw===''?'—':esc(value===''?String(raw):value.toLocaleString(lang==='cs'?'cs-CZ':'en-GB',{maximumFractionDigits:6}))}</dd></div>`;}).join('')}</dl></section>`).join('')}</div>`;
 }
-async function downloadKey(entry,button,includeProducts=false){
- if(button.disabled)return;button.disabled=true;
- try{await exportLogistics([entry],includeProducts);}catch(e){error(e);}finally{button.disabled=false;}
+function openKeyExport(entry){
+ const d=$('#single-key-export-dialog');$('#single-key-export-title').textContent=t('exportNow');$('#single-key-export-question').textContent=t('includeProductsQuestion');
+ $('#single-key-export-no').textContent=t('no');$('#single-key-export-yes').textContent=t('yes');
+ let downloading=false;
+ const close=()=>{if(!downloading)d.close();};$('#single-key-export-close').onclick=close;d.oncancel=e=>{e.preventDefault();close();};
+ for(const [id,include] of [['single-key-export-no',false],['single-key-export-yes',true]])$('#'+id).onclick=async()=>{
+  if(downloading)return;downloading=true;$$('#single-key-export-dialog button').forEach(b=>b.disabled=true);
+  try{await exportLogistics([entry],include);d.close();}catch(e){error(e);}finally{downloading=false;$$('#single-key-export-dialog button').forEach(b=>b.disabled=false);}
+ };
+ d.showModal();
 }
 // Labels and languages remain placeholders until their data is supplied.
 function productInfoSections(p){
@@ -225,7 +232,19 @@ function openProduct(index=null,tab='details',duplicate=false){
  function updatePackaging(){const l=state.logistics[elements.brand.value]?.[M.key(elements.key.value)];$('#key-summary').textContent=l?`${elements.brand.value} / ${elements.key.value} · ${state.products.filter(x=>x.brand===elements.brand.value&&M.key(x.key)===elements.key.value).length} ${t('countProducts')}`:t('keyMissing');$('#product-key-data').innerHTML=l?logisticsOverview(l):`<p class="muted">${t('keyMissing')}</p>`;$('#product-key-open').disabled=!l;$('#product-key-export').disabled=!l;}
  keysForBrand();elements.brand.onchange=()=>keysForBrand(true);elements.key.onchange=()=>updatePackaging();
  function currentKeyEntry(){const brand=elements.brand.value,key=M.key(elements.key.value);return {brand,key,data:M.clone(state.logistics[brand][key])};}
- $('#product-key-open').onclick=async()=>{const entry=currentKeyEntry();await closeEditor();if($('#editor').open)return;changeView('keys');filters.brand=entry.brand;filters.search=entry.key;renderToolbar();renderContent();openKey(entry.brand,entry.key);};$('#product-key-export').onclick=e=>downloadKey(currentKeyEntry(),e.currentTarget);
+ $('#product-key-open').onclick=()=>{
+  if(busy)return;const entry=currentKeyEntry(),d=$('#editor'),body=$('#editor-body');
+  const origin={view,page,filters:{...filters},selected:new Set(selected),title:$('#editor-title').textContent,caption:$('#editor-caption').textContent,small:d.classList.contains('small'),scroll:d.scrollTop,dirty:editorDirty,save:editorSave};
+  const draft=document.createDocumentFragment();while(body.firstChild)draft.append(body.firstChild);
+  d.close();editorDirty=false;editorSave=null;changeView('keys');filters.brand=entry.brand;filters.search=entry.key;renderToolbar();renderContent();
+  const back=result=>{
+   view=origin.view;page=origin.page;filters=origin.filters;selected=origin.selected;location.hash=view;render();
+   $('#editor-title').textContent=origin.title;$('#editor-caption').textContent=origin.caption;body.replaceChildren(draft);d.classList.toggle('small',origin.small);editorDirty=origin.dirty;editorSave=origin.save;editorReturn=null;
+   if(result?.brand===entry.brand&&result?.oldKey===entry.key&&result.key!==entry.key){elements.key.insertAdjacentHTML('beforeend',option(result.key,result.key,result.key));elements.key.value=result.key;}
+   keysForBrand();d.showModal();d.scrollTop=origin.scroll;$('#product-key-open').focus();
+  };
+  back.dirty=origin.dirty;openKey(entry.brand,entry.key,null,back);
+ };$('#product-key-export').onclick=()=>openKeyExport(currentKeyEntry());
  for(const v of ['new','discontinued'])elements[v].onchange=()=>{elements[v+'_date'].value=elements[v].checked?(elements[v+'_date'].value||today()):'';};
  const warn=()=>{$('#draft-warning').hidden=!!elements.brand.value&&!!elements.name.value&&!!elements.csName.value&&M.eanValid(elements.id.value);};['id','brand','name','csName'].forEach(f=>elements[f].addEventListener('input',warn));warn();
  function preview(src){const img=$('#photo-preview');photoExists=false;img.hidden=true;$('#photo-placeholder').hidden=false;$('#photo-download').disabled=true;$('#photo-view').disabled=true;if(src){img.onload=()=>{photoExists=true;img.hidden=false;$('#photo-placeholder').hidden=true;$('#photo-download').disabled=false;$('#photo-view').disabled=false;};img.onerror=()=>{photoExists=false;img.hidden=true;$('#photo-placeholder').hidden=false;};img.src=src;}else img.removeAttribute('src');}
@@ -262,18 +281,18 @@ function openBulk(){
  const next=M.clone(state);for(const i of chosen){const p=next.products[i];if(op==='setNew'){p.new=true;p.new_date=p.new_date||today();}if(op==='clearNew'){p.new=false;p.new_date='';}if(op==='setDisc'){p.discontinued=true;p.discontinued_date=p.discontinued_date||today();}if(op==='clearDisc'){p.discontinued=false;p.discontinued_date='';}if(op==='addFlag')p.flags=[...new Set([...(p.flags||[]),f])];if(op==='removeFlag')p.flags=(p.flags||[]).filter(x=>x!==f);}
  await commit(next);formClose();});form.onsubmit=e=>{e.preventDefault();void editorSave();};attachCancel();
 }
-function openKey(brand='',oldKey=null,template=null){
+function openKey(brand='',oldKey=null,template=null,returnToProduct=null){
  if(refreshing)return;
  let original=oldKey?M.clone(state.logistics[brand]?.[oldKey]||M.emptyLogistics()):M.clone(template||M.emptyLogistics()),working=M.clone(original);
  const used=oldKey?state.products.filter(p=>p.brand===brand&&M.key(p.key)===oldKey).length:0;
- openEditor(oldKey?`${brand} / ${oldKey}`:t('addKey'),t('keys'),`<form id="key-form" novalidate><div class="form-content"><div class="notice ${used?'amber':''}">${used?`${t('sharedWarning')} ${t('affected')}: ${used}.`:t('keyHelp')}</div><div id="form-error" class="notice error-notice" hidden></div><div class="form-grid key-identity">${field('brand','brand',brand||filters.brand,'text',`required list="brands" ${oldKey?'readonly':''}`)}${field('key','keyName',oldKey||'','text','required',t('keyRename'))}${oldKey?'':`<label class="field"><span>${t('copyFrom')}</span><select id="copy-key">${option('',t('blankKey'),'')}${M.keyEntries(state.logistics).map((r,i)=>option(i,`${r.brand} / ${r.key}`,'')).join('')}</select></label>`}</div>${datalist('brands',brands())}<p class="muted">${t('dimensionHint')}</p><div class="logistics-grid" id="logistics-fields"></div>${oldKey?`<div class="key-secondary-actions">${button('key-copy','duplicate')}${button('key-delete','delete','danger-quiet')}</div>`:''}</div>${formFooter('save',used?`${used} ${t('countProducts')}`:'')}</form>`);
- const form=$('#key-form');
+ openEditor(oldKey?`${brand} / ${oldKey}`:t('addKey'),t('keys'),`<form id="key-form" novalidate><div class="form-content">${returnToProduct?`<div class="editor-return">${button('key-back','backToProduct')}</div>`:''}<div class="notice ${used?'amber':''}">${used?`${t('sharedWarning')} ${t('affected')}: ${used}.`:t('keyHelp')}</div><div id="form-error" class="notice error-notice" hidden></div><div class="form-grid key-identity">${field('brand','brand',brand||filters.brand,'text',`required list="brands" ${oldKey?'readonly':''}`)}${field('key','keyName',oldKey||'','text','required',t('keyRename'))}${oldKey?'':`<label class="field"><span>${t('copyFrom')}</span><select id="copy-key">${option('',t('blankKey'),'')}${M.keyEntries(state.logistics).map((r,i)=>option(i,`${r.brand} / ${r.key}`,'')).join('')}</select></label>`}</div>${datalist('brands',brands())}<p class="muted">${t('dimensionHint')}</p><div class="logistics-grid" id="logistics-fields"></div>${oldKey?`<div class="key-secondary-actions">${button('key-copy','duplicate')}${button('key-delete','delete','danger-quiet')}</div>`:''}</div>${formFooter('save',used?`${used} ${t('countProducts')}`:'')}</form>`);
+ const form=$('#key-form');editorReturn=returnToProduct;if(returnToProduct)$('#key-back').onclick=closeEditor;
  function renderFields(){
   $('#logistics-fields').innerHTML=Object.entries(M.sections).map(([s,fs])=>{const fields=[...new Set([...fs,...Object.keys(working[s]||{})])].filter(f=>f!=='carton_ean');return `<fieldset><legend>${t(s)}</legend>${fields.map((f,i)=>field(`${s}:${f}`,f,working[s]?.[f],'text',`data-section="${s}" data-field="${esc(f)}" inputmode="decimal"`)).join('')}</fieldset>`;}).join('');
  }
  renderFields();if($('#copy-key'))$('#copy-key').onchange=e=>{working=e.target.value===''?M.emptyLogistics():M.clone(M.keyEntries(state.logistics)[Number(e.target.value)].data);renderFields();};
  if(oldKey){$('#key-delete').disabled=used>0;$('#key-delete').title=used?t('keyInUse'):'';$('#key-delete').onclick=async()=>{if(await confirm('deleteKey',t('deleteKeyHint'),'delete',true)){const next=M.clone(state);delete next.logistics[brand][oldKey];await commit(next);formClose();}};
- $('#key-copy').onclick=()=>{formClose();openKey(brand,null,original);editorDirty=true;};}
+ $('#key-copy').onclick=()=>{formClose(undefined,false);openKey(brand,null,original,returnToProduct);editorDirty=true;};}
  editorSave=()=>runForm(async()=>{
   const notice=$('#form-error');notice.hidden=true;
   try{
@@ -287,7 +306,7 @@ function openKey(brand='',oldKey=null,template=null){
    });
    if(oldKey&&k===oldKey&&b===brand&&sig(data)===sig(original)){formClose();return;}
    if(used&&(sig(data)!==sig(original)||k!==oldKey)&&!await confirm('confirmShared',`${b} / ${k}\n${t('affected')}: ${used}\n\n${t('confirmSharedHint')}`,'save'))return;
-   let next=M.clone(state);if(oldKey&&k!==oldKey)next=M.renameKey(next,b,oldKey,k);next=M.applyLogistics(next,b,k,data);await commit(next);formClose();
+   let next=M.clone(state);if(oldKey&&k!==oldKey)next=M.renameKey(next,b,oldKey,k);next=M.applyLogistics(next,b,k,data);await commit(next);formClose({brand:b,oldKey,key:k});
   }catch(e){notice.textContent=t(e.message);notice.hidden=false;notice.scrollIntoView({block:'nearest'});}
  });form.onsubmit=e=>{e.preventDefault();void editorSave();};attachCancel();
 }
@@ -331,14 +350,11 @@ $('#import-file').onchange=async e=>{
 };
 function openExport(){
  openEditor(t('exportTitle'),'JASON / EXCEL',`<form id="export-form"><div class="form-content"><p>${t('exportHint')}</p><div class="editor-tabs"><button type="button" id="export-tab-products">${t('exportProducts')}</button><button type="button" id="export-tab-keys">${t('exportKeys')}</button></div><div id="export-options"></div></div>${formFooter('exportNow')}</form>`,true);
- let mode=view==='keys'?'keys':'products',includeProducts=false;
+ let mode=view==='keys'?'keys':'products',includeProducts=false,includeEmpty=false;
  function options(){
-  const footer=$('#export-form .form-footer');footer.classList.toggle('has-export-option',mode==='keys');
-  let downloadGroup=$('#export-download-controls');if(!downloadGroup){const submit=$('#export-form [type=submit]');downloadGroup=document.createElement('div');downloadGroup.id='export-download-controls';downloadGroup.className='export-download-controls';submit.before(downloadGroup);downloadGroup.append(submit);}
-  $('#include-products-option')?.remove();if(mode==='keys'){downloadGroup.insertAdjacentHTML('afterbegin',`<label id="include-products-option" class="checkbox-label"><input type="checkbox" id="include-products" ${includeProducts?'checked':''}>${t('includeProductList')}</label>`);$('#include-products').onchange=e=>{includeProducts=e.target.checked;};}
   $('#export-tab-products').setAttribute('aria-selected',mode==='products');$('#export-tab-keys').setAttribute('aria-selected',mode==='keys');
   if(mode==='products')$('#export-options').innerHTML=`<p class="notice">${productExportRows().length} ${t('countProducts')} · ${t(selected.size?'exportSelectedScope':'exportFilteredScope')}</p>`;
-  else{$('#export-options').innerHTML=`<label class="field"><span>${t('brand')}</span><select id="export-brand">${option('',t('allBrands'),filters.brand)}${brands().map(v=>option(v,v,filters.brand)).join('')}</select></label><label class="checkbox-label"><input type="checkbox" id="include-empty">${t('includeEmpty')}</label><div class="export-controls">${button('keys-all','selectAll')}${button('keys-none','selectNone')}</div><div id="export-key-list" class="checkbox-list"></div>`;fillExportKeys();$('#export-brand').onchange=fillExportKeys;$('#include-empty').onchange=fillExportKeys;$('#keys-all').onclick=()=>$$('[data-export-key]').forEach(c=>c.checked=true);$('#keys-none').onclick=()=>$$('[data-export-key]').forEach(c=>c.checked=false);}
+  else{$('#export-options').innerHTML=`<label class="field"><span>${t('brand')}</span><select id="export-brand">${option('',t('allBrands'),filters.brand)}${brands().map(v=>option(v,v,filters.brand)).join('')}</select></label><div class="export-options-row"><label class="checkbox-label"><input type="checkbox" id="include-empty" ${includeEmpty?'checked':''}>${t('includeEmpty')}</label><label class="checkbox-label"><input type="checkbox" id="include-products" ${includeProducts?'checked':''}>${t('includeProductList')}</label></div><div class="export-controls">${button('keys-all','selectAll')}${button('keys-none','selectNone')}</div><div id="export-key-list" class="checkbox-list"></div>`;fillExportKeys();$('#include-products').onchange=e=>{includeProducts=e.target.checked;};$('#export-brand').onchange=fillExportKeys;$('#include-empty').onchange=e=>{includeEmpty=e.target.checked;fillExportKeys();};$('#keys-all').onclick=()=>$$('[data-export-key]').forEach(c=>c.checked=true);$('#keys-none').onclick=()=>$$('[data-export-key]').forEach(c=>c.checked=false);}
  }
  function fillExportKeys(){const b=$('#export-brand').value,include=$('#include-empty').checked;$('#export-key-list').innerHTML=M.keyEntries(state.logistics).map((r,i)=>({r,i})).filter(({r})=>(!b||r.brand===b)&&(include||completion(r.data)>0)).map(({r,i})=>`<label class="checkbox-label"><input type="checkbox" data-export-key="${i}" checked>${esc(r.brand)} / <strong>${esc(r.key)}</strong><small>${completion(r.data)}%</small></label>`).join('')||`<p class="muted">${t('nothing')}</p>`;}
  $('#export-tab-products').onclick=()=>{mode='products';options();};$('#export-tab-keys').onclick=()=>{mode='keys';options();};options();
@@ -357,9 +373,9 @@ async function exportLogistics(entries,includeProducts=false){
  await JasonExport.download(wb,`logistics-${today()}.xlsx`);
 }
 $('#editor-close').onclick=closeEditor;$('#editor').oncancel=e=>{e.preventDefault();void closeEditor();};$('#photo-close').onclick=()=>$('#photo-dialog').close();$('#data-button').onclick=openData;$('#export').onclick=openExport;$('#create').onclick=()=>view==='keys'?openKey():openProduct();$('#undo').onclick=()=>undo();$('#redo').onclick=()=>undo(true);$('#retry').onclick=()=>syncRemote();$$('[data-lang]').forEach(b=>b.onclick=async()=>{if($('#editor').open)await closeEditor();if($('#editor').open)return;lang=b.dataset.lang;await persist();render();});
-window.addEventListener('beforeunload',e=>{if(syncing||storageError||editorDirty||hasPending()){e.preventDefault();e.returnValue='';}});
+window.addEventListener('beforeunload',e=>{if(syncing||storageError||editorDirty||editorReturn?.dirty||hasPending()){e.preventDefault();e.returnValue='';}});
 document.addEventListener('keydown',e=>{
- const mod=e.ctrlKey||e.metaKey;if(!mod||$('#confirm-dialog').open)return;
+ const mod=e.ctrlKey||e.metaKey;if($('#single-key-export-dialog').open){if(mod&&['s','z'].includes(e.key.toLowerCase()))e.preventDefault();return;}if(!mod||$('#confirm-dialog').open)return;
  if(e.key.toLowerCase()==='s'){e.preventDefault();if(editorSave)void editorSave();else if(!$('#editor').open)backup();}
  if(e.key.toLowerCase()==='z'&&!e.target.closest('input,textarea,[contenteditable]')){e.preventDefault();if(!$('#editor').open)void undo(e.shiftKey);}
 });

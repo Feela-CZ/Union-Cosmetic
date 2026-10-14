@@ -196,28 +196,46 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
   p=(await n.saved()).products[0];assert.deepEqual(clone(n.w.JasonModel.packaging(p,(await n.saved()).logistics)),{pack:24,boxes_per_layer:10,boxes_per_pallet:80});assert.equal(p.pack,undefined);assert.equal(p.carton_ean,fixture.carton_ean);assert.deepEqual(p.custom,fixture.custom);let workbook;n.w.JasonExport.download=async wb=>{workbook=wb;};n.click('#export');n.submit('#export-form');await wait(()=>workbook);assert.equal(workbook.getWorksheet('Products').getCell('J4').value,24);assert.equal(workbook.getWorksheet('Products').getCell('K4').value,10);assert.equal(workbook.getWorksheet('Products').getCell('L4').value,80);
   assert.deepEqual(n.errors,[]);n.dom.window.close();
  });
- await test('product logistics exports only the key and opens its editor with discard protection',async()=>{
+ await test('product key export asks for the product list without losing or saving a product draft',async()=>{
   const n=await setup(),keys=clone(logistics);keys.Lilien['500A'].ITEM.weight='0 kg';keys.Natava={'500A':clone(keys.Lilien['500A'])};keys.Natava['500A'].CARTON.nr_of_items=24;
   await n.upload('products',[fixture]);await n.upload('logistics',keys);const before=await n.saved();
   n.click('[data-edit="0"]');n.input('#field-name','UNSAVED PRODUCT');n.click('#tab-packaging');
   assert.equal(n.$('#product-key-include-products'),null);assert.equal(n.$('#key-preview-dialog'),null);
   assert.equal(n.$$('#product-key-data section').length,4);assert.equal(n.$$('#product-key-data dd').length,18);assert.ok(n.$$('#product-key-data dd').some(el=>el.textContent==='0'));
-  let wb;n.w.JasonExport.download=async book=>{wb=book;};n.click('#product-key-export');await wait(()=>wb);assert.deepEqual(Array.from(wb.worksheets,s=>s.name),['Lilien Data']);assert.equal(wb.getWorksheet('Lilien Data').columnCount,3);assert.equal(wb.getWorksheet('Lilien Data').getCell('C2').value,'500A');assert.equal(wb.getWorksheet('Lilien Data').getCell('C6').value,0);await wait(()=>!n.$('#product-key-export').disabled);
-  n.click('#product-key-open');await wait(()=>n.$('#confirm-dialog').open);n.click('#confirm-no');await sleep(20);
-  assert.equal(n.$('#page-title').textContent,'Produkty');assert.equal(n.$('#field-name').value,'UNSAVED PRODUCT');assert.equal(n.$('#key-form'),null);assert.deepEqual(await n.saved(),before);
+  let wb;n.w.JasonExport.download=async book=>{wb=book;};n.click('#product-key-export');assert.equal(n.$('#single-key-export-dialog').open,true);assert.equal(wb,undefined);
+  n.w.document.dispatchEvent(new n.w.KeyboardEvent('keydown',{key:'s',ctrlKey:true,bubbles:true,cancelable:true}));await sleep(20);assert.deepEqual(await n.saved(),before);
+  n.click('#single-key-export-close');assert.equal(wb,undefined);assert.equal(n.$('#field-name').value,'UNSAVED PRODUCT');
+  n.click('#product-key-export');n.click('#single-key-export-no');await wait(()=>wb);await wait(()=>!n.$('#single-key-export-dialog').open);
+  assert.deepEqual(Array.from(wb.worksheets,s=>s.name),['Lilien Data']);assert.equal(wb.getWorksheet('Lilien Data').columnCount,3);assert.equal(wb.getWorksheet('Lilien Data').getCell('C2').value,'500A');assert.equal(wb.getWorksheet('Lilien Data').getCell('C6').value,0);
+  wb=null;n.click('#product-key-export');n.click('#single-key-export-yes');await wait(()=>wb);await wait(()=>!n.$('#single-key-export-dialog').open);assert.deepEqual(Array.from(wb.worksheets,s=>s.name),['Lilien Data','Lilien Products']);assert.equal(wb.getWorksheet('Lilien Products').getCell('C3').value,fixture.id);
   n.change('#product-key','');assert.ok(n.$('#product-key-open').disabled);assert.ok(n.$('#product-key-export').disabled);assert.equal(n.$$('#product-key-data dd').length,0);
   n.input('#field-brand','Natava');n.change('#field-brand','Natava');n.change('#product-key','500A');assert.ok(n.$('#product-key-data').textContent.includes('24'));
-  wb=null;n.click('#product-key-export');await wait(()=>wb);assert.deepEqual(Array.from(wb.worksheets,s=>s.name),['Natava Data']);assert.equal(wb.getWorksheet('Natava Data').getCell('C11').value,24);await wait(()=>!n.$('#product-key-export').disabled);
-  n.click('#product-key-open');await wait(()=>n.$('#confirm-dialog').open);n.click('#confirm-yes');await wait(()=>n.$('#key-form'));
-  assert.equal(n.$('#page-title').textContent,'Logistické klíče');assert.equal(n.w.location.hash,'#keys');assert.equal(n.$('#filter-brand').value,'Natava');assert.equal(n.$('#editor-title').textContent,'Natava / 500A');assert.equal(n.$('#key-form [name=brand]').value,'Natava');assert.equal(n.$('#key-form [name=key]').value,'500A');assert.equal(n.$('[name="CARTON:nr_of_items"]').value,'24');assert.deepEqual(await n.saved(),before);
-  n.click('#editor-close');assert.equal(n.$('#confirm-dialog').open,false);assert.deepEqual(n.errors,[]);n.dom.window.close();
+  wb=null;n.click('#product-key-export');n.click('#single-key-export-no');await wait(()=>wb);await wait(()=>!n.$('#single-key-export-dialog').open);assert.deepEqual(Array.from(wb.worksheets,s=>s.name),['Natava Data']);assert.equal(wb.getWorksheet('Natava Data').getCell('C11').value,24);
+  assert.equal(n.$('#field-name').value,'UNSAVED PRODUCT');assert.deepEqual(await n.saved(),before);assert.deepEqual(n.errors,[]);n.dom.window.close();
  });
- await test('clean product navigates to the exact key and saves edits through the shared-key confirmation',async()=>{
+ await test('key return restores the product draft, original tab, filters and selection and protects unsaved key edits',async()=>{
   const n=await setup();await n.upload('products',[fixture]);await n.upload('logistics',logistics);const before=await n.saved();
-  n.click('[data-lang=en]');await wait(()=>n.$('#page-title').textContent==='Products');n.click('[data-edit="0"]');n.click('#tab-packaging');assert.equal(n.$('#product-key-open').textContent,'Edit logistics key');n.click('#product-key-open');await wait(()=>n.$('#key-form'));
-  assert.equal(n.$('#confirm-dialog').open,false);assert.equal(n.$('#page-title').textContent,'Logistics keys');assert.equal(n.$('#key-form [name=key]').value,'500A');
-  n.input('[name="ITEM:weight"]','0.7 kg');n.submit('#key-form');await wait(()=>n.$('#confirm-dialog').open);n.click('#confirm-yes');await wait(()=>!n.$('#editor').open);
-  const after=await n.saved();assert.equal(after.logistics.Lilien['500A'].ITEM.weight,'0.7 kg');assert.deepEqual(after.products,before.products);assert.deepEqual(after.logistics.Lilien['500A'].extra,before.logistics.Lilien['500A'].extra);assert.deepEqual(n.errors,[]);n.dom.window.close();
+  n.input('#search','TEST');n.change('#filter-brand','Lilien');n.click('[data-select="0"]');n.click('[data-edit="0"]');n.input('#field-price','2.45');n.click('#tab-packaging');n.click('#product-key-open');await wait(()=>n.$('#key-form'));
+  assert.equal(n.$('#confirm-dialog').open,false);assert.equal(n.$('#page-title').textContent,'Logistické klíče');assert.equal(n.$('#key-form [name=key]').value,'500A');assert.equal(n.$('#key-back').textContent,'← Zpět k produktu');
+  const unload=new n.w.Event('beforeunload',{cancelable:true});n.w.dispatchEvent(unload);assert.equal(unload.defaultPrevented,true);
+  n.input('[name="ITEM:weight"]','0.7 kg');n.click('#key-back');await wait(()=>n.$('#confirm-dialog').open);n.click('#confirm-no');await sleep(20);assert.ok(n.$('#key-form'));assert.equal(n.$('[name="ITEM:weight"]').value,'0.7 kg');
+  n.click('#key-back');await wait(()=>n.$('#confirm-dialog').open);n.click('#confirm-yes');await wait(()=>n.$('#product-form'));
+  assert.equal(n.$('#page-title').textContent,'Produkty');assert.equal(n.$('#tab-packaging').getAttribute('aria-selected'),'true');assert.equal(n.$('#field-price').value,'2.45');assert.equal(n.$('#search').value,'TEST');assert.equal(n.$('#filter-brand').value,'Lilien');assert.equal(n.$('[data-select="0"]').checked,true);assert.deepEqual(await n.saved(),before);
+  n.submit('#product-form');await wait(()=>!n.$('#editor').open);assert.equal((await n.saved()).products[0].price,2.45);assert.deepEqual((await n.saved()).logistics,before.logistics);assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
+ await test('saving and renaming a key returns to the original product with updated logistics and preserves its draft',async()=>{
+  const n=await setup();await n.upload('products',[fixture]);await n.upload('logistics',logistics);const before=await n.saved();
+  n.click('[data-lang=en]');await wait(()=>n.$('#page-title').textContent==='Products');n.click('[data-edit="0"]');n.input('#field-name','Draft name');n.click('#tab-packaging');n.click('#product-key-open');await wait(()=>n.$('#key-form'));
+  assert.equal(n.$('#key-back').textContent,'← Back to product');n.input('[name="ITEM:weight"]','0.7 kg');n.input('#key-form [name=key]','RENAMED');n.submit('#key-form');await wait(()=>n.$('#confirm-dialog').open);n.click('#confirm-yes');await wait(()=>n.$('#product-form'));
+  const after=await n.saved();assert.equal(after.logistics.Lilien.RENAMED.ITEM.weight,'0.7 kg');assert.equal(after.products[0].name,fixture.name);assert.equal(after.products[0].key,'RENAMED');assert.deepEqual(after.logistics.Lilien.RENAMED.extra,before.logistics.Lilien['500A'].extra);
+  assert.equal(n.$('#page-title').textContent,'Products');assert.equal(n.$('#field-name').value,'Draft name');assert.equal(n.$('#product-key').value,'RENAMED');assert.ok(n.$('#product-key-data').textContent.includes('0.7'));
+  n.submit('#product-form');await wait(()=>!n.$('#editor').open);assert.equal((await n.saved()).products[0].name,'Draft name');assert.equal((await n.saved()).products[0].key,'RENAMED');assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
+ await test('cancel and unchanged save return to product while standalone key editors have no return button',async()=>{
+  const n=await setup();await n.upload('products',[fixture]);await n.upload('logistics',logistics);const before=await n.saved();
+  n.click('[data-edit="0"]');n.click('#tab-packaging');n.click('#product-key-open');await wait(()=>n.$('#key-form'));n.click('#editor-close');await wait(()=>n.$('#product-form'));assert.equal(n.$('#tab-packaging').getAttribute('aria-selected'),'true');
+  n.click('#product-key-open');await wait(()=>n.$('#key-form'));n.submit('#key-form');await wait(()=>n.$('#product-form'));n.click('#editor-close');
+  n.click('[data-view=keys]');n.click('[data-key-edit]');assert.equal(n.$('#key-back'),null);n.click('#editor-close');assert.deepEqual(await n.saved(),before);assert.deepEqual(n.errors,[]);n.dom.window.close();
  });
  await test('new flag keeps its status badge and filters independently, including exports',async()=>{
   const n=await setup();
@@ -256,7 +274,7 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
  await test('optional logistics product list respects selected keys and checkbox survives tab switches',async()=>{
   const n=await setup(),keys=clone(logistics);keys.Lilien['500B']=clone(keys.Lilien['500A']);keys.Natava={'500A':clone(keys.Lilien['500A'])};
   await n.upload('products',[fixture,{...fixture,key:'500B',id:'0000000000002',name:'Unselected'},{...fixture,brand:'Natava',id:'0000000000003',name:'Other brand'}]);await n.upload('logistics',keys);const before=await n.saved();
-  let wb;n.w.JasonExport.download=async book=>{wb=book;};n.click('[data-view=keys]');n.click('#export');assert.equal(n.$('#include-products').checked,false);assert.ok(n.$('#include-products').closest('#export-download-controls'));assert.ok(n.$('#export-download-controls [type=submit]'));n.click('#include-products');n.click('#export-tab-products');assert.equal(n.$('#include-products'),null);n.click('#export-tab-keys');assert.equal(n.$('#include-products').checked,true);n.change('#export-brand','Lilien');
+  let wb;n.w.JasonExport.download=async book=>{wb=book;};n.click('[data-view=keys]');n.click('#export');assert.equal(n.$('#include-products').checked,false);assert.equal(n.$('#include-products').closest('.export-options-row'),n.$('#include-empty').closest('.export-options-row'));assert.equal(n.$('#export-form .form-footer input'),null);n.click('#include-empty');n.click('#include-products');n.click('#export-tab-products');assert.equal(n.$('#include-products'),null);n.click('#export-tab-keys');assert.equal(n.$('#include-products').checked,true);assert.equal(n.$('#include-empty').checked,true);n.change('#export-brand','Lilien');
   n.click('#keys-none');n.click('[data-export-key="0"]');n.submit('#export-form');await wait(()=>wb);const ws=wb.getWorksheet('Lilien Products');assert.equal(ws.getCell('A2').value,'LOGISTICS KEY');assert.equal(ws.getCell('B3').value,fixture.name);assert.equal(ws.getCell('C3').value,fixture.id);assert.equal(ws.columnCount,4);assert.equal(ws.views[0].xSplit||0,0);assert.equal(wb.worksheets.length,2);
   assert.deepEqual(await n.saved(),before);assert.deepEqual(n.errors,[]);n.dom.window.close();
  });

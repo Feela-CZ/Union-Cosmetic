@@ -64,3 +64,6 @@ Object.assign(window.JasonText.en,{
  frontLabel:'Front',backLabel:'Back',
  viewLabel:'Enlarge',downloadLabel:'Download'
 });
+
+Object.assign(window.JasonText.cs,{backToProduct:"← Zpět k produktu",includeProductsQuestion:"Zahrnout seznam výrobků?"});
+Object.assign(window.JasonText.en,{backToProduct:"← Back to product",includeProductsQuestion:"Include the product list?"});
