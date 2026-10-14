@@ -74,6 +74,7 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
   const before=await n.saved();n.click('[data-edit="0"]');n.click('#tab-inci');
   assert.equal(n.$('#section-inci p').textContent,inci);assert.equal(n.$('#section-inci test'),null);
   assert.equal(n.$('#copy-inci').disabled,false);n.click('#copy-inci');await wait(()=>copied===inci);
+  assert.equal(n.$('#toast').parentElement,n.$('#editor'));assert.equal(n.$('#toast').hidden,false);
   assert.equal(n.$('#editor').open,true);assert.deepEqual(await n.saved(),before);
   n.click('#editor-close');assert.equal(n.$('#confirm-dialog').open,false);
   for(const [product,label] of [[{...fixture,inciStatus:'not-applicable'},'N/A'],[{...fixture,inciStatus:'pending'},'TBD']]){
@@ -81,6 +82,21 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
    assert.equal(n.$('#section-inci p').textContent,label);assert.equal(n.$('#copy-inci').disabled,true);n.click('#editor-close');
   }
   assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
+ await test('modal clipboard notifications reopen in the top layer and dismiss after their timeout',async()=>{
+  const n=await setup();await n.upload('products',[{...fixture,inci:'Aqua, Parfum'}]);
+  const e=n.$('#toast');let shown=0,open=false,dismiss,delay;
+  e.showPopover=()=>{assert.equal(e.hidden,false);assert.equal(e.parentElement,n.$('#editor'));open=true;shown++;};
+  e.hidePopover=()=>{open=false;};
+  const timer=n.w.setTimeout.bind(n.w);n.w.setTimeout=(fn,ms,...args)=>{if(ms===3500||ms===9000){dismiss=fn;delay=ms;return 99999;}return timer(fn,ms,...args);};
+  let fail=false;Object.defineProperty(n.w.navigator,'clipboard',{value:{writeText:async()=>{if(fail)throw Error('Clipboard denied');}}});
+  n.click('[data-edit="0"]');n.click('#tab-inci');const before=await n.saved();
+  n.click('#copy-inci');await wait(()=>shown===1);assert.equal(e.getAttribute('popover'),'manual');assert.equal(open,true);assert.equal(delay,3500);
+  n.click('#copy-inci');await wait(()=>shown===2);assert.equal(open,true);
+  dismiss();assert.equal(open,false);assert.equal(e.hidden,true);assert.equal(n.$('#editor').open,true);
+  fail=true;n.click('#copy-inci');await wait(()=>shown===3);assert.equal(e.className,'error');assert.equal(delay,9000);assert.equal(open,true);
+  dismiss();assert.equal(e.hidden,true);assert.deepEqual(await n.saved(),before);assert.deepEqual(n.errors,['Clipboard denied']);
+  n.dom.window.close();
  });
  await test('saving an existing product through preview tabs preserves future metadata and never stores TBD',async()=>{
   const n=await setup(),p={...fixture,inci:'Existing formula',labelLanguages:['cs','en'],labels:{front:{path:'custom.pdf',revision:2}},extra:{future:true}};

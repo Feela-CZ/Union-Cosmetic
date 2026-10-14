@@ -27,7 +27,17 @@ const hasPending=()=>!sandbox&&(dirty('products')||dirty('logistics')||state.pen
 const option=(value,label,sel)=>`<option value="${esc(value)}" ${String(value)===String(sel)?'selected':''}>${esc(label)}</option>`;
 const button=(id,label,cls='')=>`<button type="button" id="${id}" class="${cls}">${esc(t(label))}</button>`;
 function selectHTML(id,label,items,value,empty){return `<label class="filter"><span>${esc(t(label))}</span><select id="${id}">${option('',t(empty),value)}${items.map(x=>option(typeof x==='object'?x.value:x,typeof x==='object'?x.label:x,value)).join('')}</select></label>`;}
-function toast(text,error=false){const e=$('#toast');e.textContent=text;e.className=error?'error':'';e.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{e.hidden=true;},error?9000:3500);}
+function toast(text,error=false){
+ const e=$('#toast');clearTimeout(toastTimer);
+ const hide=()=>{if(typeof e.hidePopover==='function')e.hidePopover();e.hidden=true;};
+ hide();
+ // Keep announcements inside the active modal's accessible subtree. A manual
+ // popover lifts them above its backdrop and escapes the dialog's scroll area.
+ const dialogs=$$('dialog[open]');(dialogs.at(-1)||document.body).append(e);
+ e.textContent=text;e.className=error?'error':'';e.hidden=false;
+ if(typeof e.showPopover==='function')e.showPopover();
+ toastTimer=setTimeout(hide,error?9000:3500);
+}
 function error(e){const msg=e?.message||String(e);toast(`${t('failed')}: ${t(msg)}`,true);console.error(e);}
 async function persist(){isolate(state);try{await S.put('state',{state,lang});storageError=false;}catch(e){storageError=true;toast(t('localError'),true);}renderStatus();}
 function renderStatus(){
