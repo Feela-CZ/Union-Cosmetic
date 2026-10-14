@@ -105,6 +105,24 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
   await wait(()=>!n.$('#export-form [type=submit]').disabled);n.click('#editor-close');
   assert.deepEqual((await n.saved()).products,before.products);assert.deepEqual(n.errors,[]);n.dom.window.close();
  });
+ await test('first hosted visit shows the published catalog before a slow API and blocks edits until verification',async()=>{
+  let resolveProducts,resolveLogistics,puts=0;const apiProducts=new Promise(r=>resolveProducts=r),apiLogistics=new Promise(r=>resolveLogistics=r),actual={...fixture,name:'Current API product'};
+  const n=await setup(true,async(url,args={})=>{
+   if(args.method==='PUT'){puts++;throw Error('Unexpected write');}
+   const pathname=new URL(url,'https://feela-cz.github.io/Union-Cosmetic/Jason2/').pathname;
+   if(pathname.endsWith('/products.json'))return {ok:true,json:async()=>[clone(fixture)]};
+   if(pathname.endsWith('/logistics.json'))return {ok:true,json:async()=>clone(logistics)};
+   if(pathname.endsWith('/api/products'))return apiProducts;
+   if(pathname.endsWith('/api/logistics'))return apiLogistics;
+   throw Error('Unexpected request '+url);
+  });
+  await wait(()=>n.$$('tbody tr').length===1);assert.equal(n.$('#create').disabled,true);assert.equal(n.$('#save-status').textContent,'Načítám společná data…');assert.equal(puts,0);
+  n.click('[data-edit="0"]');assert.equal(n.$('#editor').open,false);n.click('[data-more="0"]');assert.equal(n.$('#editor').open,false);
+  n.click('[data-select="0"]');n.click('#bulk-edit');assert.equal(n.$('#editor').open,false);
+  resolveProducts({ok:true,json:async()=>[clone(actual)]});resolveLogistics({ok:true,json:async()=>clone(logistics)});
+  await wait(()=>!n.$('#create').disabled);const state=await n.saved();assert.equal(state.products[0].name,actual.name);assert.equal(state.connected,true);assert.equal(puts,0);
+  n.click('[data-edit="0"]');assert.equal(n.$('#field-name').value,actual.name);n.click('#editor-close');assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
  await test('missing product fields show translated findings and open the relevant tabs without changing data',async()=>{
   const n=await setup();await n.upload('logistics',logistics);
   const p={...fixture,hs:' ',carton_ean:null,volume:{number:null,unit:null},price:' ',new:true,new_date:''};

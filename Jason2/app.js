@@ -22,6 +22,7 @@ const flags=()=>[...new Set(state.products.flatMap(p=>p.flags||[]))].sort();
 const sig=v=>JSON.stringify(v,(_,x)=>x&&typeof x==='object'&&!Array.isArray(x)?Object.fromEntries(Object.keys(x).sort().map(k=>[k,x[k]])):x);
 const dirty=n=>state.connected&&sig(state[n])!==state.baseline[n];
 let refreshing=false,lastRefresh=0,refreshFailed=false;
+const canEdit=()=>!refreshing&&!(JASON_CONFIG.sharedOnly&&JASON_CONFIG.autoConnect&&!state.connected);
 const hasPending=()=>!sandbox&&(dirty('products')||dirty('logistics')||state.pendingPhotos.length>0);
 const option=(value,label,sel)=>`<option value="${esc(value)}" ${String(value)===String(sel)?'selected':''}>${esc(label)}</option>`;
 const button=(id,label,cls='')=>`<button type="button" id="${id}" class="${cls}">${esc(t(label))}</button>`;
@@ -217,7 +218,7 @@ function productInfoSections(p){
  <section id="section-labels" class="tab-section" role="tabpanel" aria-labelledby="tab-labels"><div class="section-intro"><h3>${t('labels')}</h3></div><div class="label-grid split" id="product-label-grid" aria-live="polite">${labelCard('front','frontLabel')}${labelCard('back','backLabel',false)}</div></section>`;
 }
 function openProduct(index=null,tab='details',duplicate=false){
- if(refreshing)return;
+ if(!canEdit())return;
  const original=index!==null?M.clone(state.products[index]):null;
  const p=original?M.clone(original):{brand:filters.brand||'',type:'',id:'',hs:'',name:'',csName:'',volume:{number:'',unit:'ml'},price:'',key:null,new:false,new_date:'',discontinued:false,discontinued_date:'',carton_ean:null};
  if(duplicate)p.id='';
@@ -279,16 +280,16 @@ function openProduct(index=null,tab='details',duplicate=false){
  });
  form.onsubmit=e=>{e.preventDefault();void editorSave();};attachCancel();
 }
-function productActions(index){const p=state.products[index];openEditor(lang==='cs'?p.csName||p.name:p.name,`${p.brand} / ${p.id}`,`<div class="action-menu">${button('action-edit','edit')}${button('action-copy','duplicate')}${button('action-delete','delete','danger-quiet')}</div>`,true);$('#action-edit').onclick=()=>openProduct(index);$('#action-copy').onclick=()=>openProduct(index,'details',true);$('#action-delete').onclick=async()=>{if(await confirm('deleteProduct',`${p.name||p.csName} (${p.id})\n\n${t('deleteProductHint')}`,'confirmDelete',true)){const next=M.clone(state);next.products.splice(index,1);await commit(next);formClose();}};}
+function productActions(index){if(!canEdit())return;const p=state.products[index];openEditor(lang==='cs'?p.csName||p.name:p.name,`${p.brand} / ${p.id}`,`<div class="action-menu">${button('action-edit','edit')}${button('action-copy','duplicate')}${button('action-delete','delete','danger-quiet')}</div>`,true);$('#action-edit').onclick=()=>openProduct(index);$('#action-copy').onclick=()=>openProduct(index,'details',true);$('#action-delete').onclick=async()=>{if(await confirm('deleteProduct',`${p.name||p.csName} (${p.id})\n\n${t('deleteProductHint')}`,'confirmDelete',true)){const next=M.clone(state);next.products.splice(index,1);await commit(next);formClose();}};}
 function openBulk(){
- const chosen=[...selected];openEditor(t('bulk'),`${chosen.length} ${t('selected')}`,`<form id="bulk-form"><div class="form-content"><p>${t('bulkHint')}</p><label class="field"><span>${t('operation')}</span><select name="operation">${['setNew','clearNew','setDisc','clearDisc','addFlag','removeFlag'].map(v=>option(v,t(v),'')).join('')}</select></label>${field('flag','flag','','text','list="flag-list"')}${datalist('flag-list',flags())}<div id="form-error" class="notice error-notice" hidden></div></div>${formFooter('apply')}</form>`,true);
+ if(!canEdit())return;const chosen=[...selected];openEditor(t('bulk'),`${chosen.length} ${t('selected')}`,`<form id="bulk-form"><div class="form-content"><p>${t('bulkHint')}</p><label class="field"><span>${t('operation')}</span><select name="operation">${['setNew','clearNew','setDisc','clearDisc','addFlag','removeFlag'].map(v=>option(v,t(v),'')).join('')}</select></label>${field('flag','flag','','text','list="flag-list"')}${datalist('flag-list',flags())}<div id="form-error" class="notice error-notice" hidden></div></div>${formFooter('apply')}</form>`,true);
  const form=$('#bulk-form');form.elements.flag.closest('label').hidden=true;form.elements.operation.onchange=()=>form.elements.flag.closest('label').hidden=!['addFlag','removeFlag'].includes(form.elements.operation.value);
  editorSave=()=>runForm(async()=>{const op=form.elements.operation.value,f=form.elements.flag.value.trim();if(['addFlag','removeFlag'].includes(op)&&(!f||f.includes(','))){$('#form-error').textContent=t('checkFirst');$('#form-error').hidden=false;return;}
  const next=M.clone(state);for(const i of chosen){const p=next.products[i];if(op==='setNew'){p.new=true;p.new_date=p.new_date||today();}if(op==='clearNew'){p.new=false;p.new_date='';}if(op==='setDisc'){p.discontinued=true;p.discontinued_date=p.discontinued_date||today();}if(op==='clearDisc'){p.discontinued=false;p.discontinued_date='';}if(op==='addFlag')p.flags=[...new Set([...(p.flags||[]),f])];if(op==='removeFlag')p.flags=(p.flags||[]).filter(x=>x!==f);}
  await commit(next);formClose();});form.onsubmit=e=>{e.preventDefault();void editorSave();};attachCancel();
 }
 function openKey(brand='',oldKey=null,template=null,returnToProduct=null){
- if(refreshing)return;
+ if(!canEdit())return;
  let original=oldKey?M.clone(state.logistics[brand]?.[oldKey]||M.emptyLogistics()):M.clone(template||M.emptyLogistics()),working=M.clone(original);
  const used=oldKey?state.products.filter(p=>p.brand===brand&&M.key(p.key)===oldKey).length:0;
  openEditor(oldKey?`${brand} / ${oldKey}`:t('addKey'),t('keys'),`<form id="key-form" novalidate><div class="form-content">${returnToProduct?`<div class="editor-return">${button('key-back','backToProduct')}</div>`:''}<div class="notice ${used?'amber':''}">${used?`${t('sharedWarning')} ${t('affected')}: ${used}.`:t('keyHelp')}</div><div id="form-error" class="notice error-notice" hidden></div><div class="form-grid key-identity">${field('brand','brand',brand||filters.brand,'text',`required list="brands" ${oldKey?'readonly':''}`)}${field('key','keyName',oldKey||'','text','required',t('keyRename'))}${oldKey?'':`<label class="field"><span>${t('copyFrom')}</span><select id="copy-key">${option('',t('blankKey'),'')}${M.keyEntries(state.logistics).map((r,i)=>option(i,`${r.brand} / ${r.key}`,'')).join('')}</select></label>`}</div>${datalist('brands',brands())}<p class="muted">${t('dimensionHint')}</p><div class="logistics-grid" id="logistics-fields"></div>${oldKey?`<div class="key-secondary-actions">${button('key-copy','duplicate')}${button('key-delete','delete','danger-quiet')}</div>`:''}</div>${formFooter('save',used?`${used} ${t('countProducts')}`:'')}</form>`);
@@ -388,6 +389,17 @@ document.addEventListener('keydown',e=>{
  if(e.key.toLowerCase()==='z'&&!e.target.closest('input,textarea,[contenteditable]')){e.preventDefault();if(!$('#editor').open)void undo(e.shiftKey);}
 });
 window.addEventListener('hashchange',()=>{const v=location.hash.slice(1);if(['products','keys','checks'].includes(v)&&v!==view)changeView(v);});
+// First visit: display the existing published catalog while the API verifies it.
+// Preview data cannot be edited or sent back before the authoritative read completes.
+async function previewShared(){
+ try{
+  const responses=await Promise.all([fetch(JASON_CONFIG.legacyProducts,{cache:'no-cache'}),fetch(JASON_CONFIG.logisticsFile,{cache:'no-cache'})]);
+  if(responses.some(r=>!r.ok))return;
+  const [p,l]=await Promise.all(responses.map(r=>r.json())),products=M.validateProducts(p);M.validateLogistics(l);
+  if(!refreshing||state.connected||state.products.length)return;
+  state={...state,products,logistics:l};render();
+ }catch{} // The API remains the authority if the quick preview is unavailable.
+}
 async function refreshShared(automatic=false){
  if(sandbox)return;
  if(refreshing||syncing||busy||automatic&&($('#editor').open||editorDirty||hasPending()))return;
@@ -459,7 +471,7 @@ async function boot(){
  if(JASON_CONFIG.sharedOnly){state.api=JASON_CONFIG.apiBase;state.imageBase=JASON_CONFIG.imageBase;}
  view=['products','keys','checks'].includes(location.hash.slice(1))?location.hash.slice(1):'products';render();
  if(sandbox)return;
- if(JASON_CONFIG.autoConnect||state.connected){if(!hasPending())await refreshShared(true);}
+ if(JASON_CONFIG.autoConnect||state.connected){if(!hasPending()){const refresh=refreshShared(true);if(JASON_CONFIG.autoConnect&&!hasSavedState)void previewShared();await refresh;}}
  else if(location.protocol!=='file:'&&['localhost','127.0.0.1'].includes(location.hostname)){
   try{const [pr,lr]=await Promise.all([fetch(JASON_CONFIG.legacyProducts),fetch(JASON_CONFIG.logisticsFile)]);if(pr.ok&&lr.ok){const p=await pr.json(),l=await lr.json();M.validateProducts(p);M.validateLogistics(l);state.products=p;state.logistics=l;await persist();render();}}catch{}
  }
