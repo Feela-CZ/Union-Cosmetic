@@ -158,13 +158,26 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
   button.click();assert.ok(n.$('#photo-dialog').open);assert.ok(!n.$('#editor').open);
   assert.ok(!n.$('#large-photo').src.includes('/thumbnails/'));n.click('#photo-close');
   n.$('[data-select]').dispatchEvent(new n.w.Event('change'));
-  assert.equal(observer.disconnected,true);assert.equal(n.$('[data-photo-src]').dataset.photoSrc,url);
-  assert.equal(n.$('[data-photo-src]').hasAttribute('src'),false);
+  assert.notEqual(observer.disconnected,true);assert.equal(n.$('[data-photo-src]'),image);assert.equal(n.$('[data-photo-src]').dataset.photoSrc,url);
+  assert.equal(n.$('[data-photo-src]').src,url);
   const failed=n.$$('[data-photo-src]')[1],failedUrl=failed.dataset.photoSrc;
   n.photoObservers.at(-1).show(failed.closest('.product-thumb'));failed.dispatchEvent(new n.w.Event('error'));
   assert.equal(failed.hidden,true);assert.equal(failed.closest('button').disabled,true);
   n.change('#page-size','60');assert.ok(!n.$$('[data-photo-src]').some(img=>img.dataset.photoSrc===failedUrl));
   assert.equal(n.$$('[data-row-photo]').length,60);assert.deepEqual(await n.saved(),before);assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
+ await test('All displays every filtered product and preserves selections without rebuilding rows or photo observers',async()=>{
+  const n=await setup(false,null,true),products=Array.from({length:131},(_,i)=>({...fixture,id:String(1000000000000+i),csName:'Product '+i}));
+  await n.upload('products',products);const before=await n.saved();n.click('[data-select="0"]');n.change('#page-size','all');
+  assert.equal(n.$$('#content tbody tr').length,131);assert.equal(n.$('#page-size').value,'all');assert.equal(n.$('#page-size option[value=all]').textContent,'Vše');assert.equal(n.$('#prev').disabled,true);assert.equal(n.$('#next').disabled,true);assert.ok(n.$('#pagination').textContent.includes('1–131'));
+  const observer=n.photoObservers.at(-1),image=n.$('[data-photo-src]'),last=n.$('[data-select="130"]');n.click('[data-select="130"]');
+  assert.equal(n.$('[data-select="130"]'),last);assert.equal(n.$('[data-photo-src]'),image);assert.notEqual(observer.disconnected,true);assert.equal(n.$('#select-page').indeterminate,true);
+  n.change('#page-size','30');assert.equal(n.$$('tbody tr').length,30);n.change('#page-size','all');assert.equal(n.$('[data-select="0"]').checked,true);assert.equal(n.$('[data-select="130"]').checked,true);
+  let wb;n.w.JasonExport.download=async book=>{wb=book;};n.click('#export');n.submit('#export-form');await wait(()=>wb);assert.equal(wb.getWorksheet('Products').rowCount,5);assert.deepEqual([4,5].map(row=>wb.getWorksheet('Products').getCell('C'+row).value),[products[0].id,products[130].id]);await wait(()=>!n.$('#export-form [type=submit]').disabled);n.click('#editor-close');
+  const currentImage=n.$('[data-photo-src]');n.click('#select-page');assert.ok(n.$$('[data-select]').every(c=>c.checked));assert.equal(n.$('#select-page').indeterminate,false);n.click('#bulk-clear');assert.ok(n.$$('[data-select]').every(c=>!c.checked));assert.equal(n.$('[data-photo-src]'),currentImage);
+  n.click('[data-lang=en]');await wait(()=>n.$('#page-size option[value=all]').textContent==='All');assert.equal(n.$$('tbody tr').length,131);
+  n.input('#search','no matches');assert.equal(n.$$('tbody tr').length,0);assert.ok(n.$('#pagination').textContent.includes('0–0'));assert.ok(!n.$('#pagination').textContent.includes('NaN'));n.input('#search','Product 130');assert.equal(n.$$('tbody tr').length,1);assert.equal(n.$('#page-size').value,'all');
+  assert.deepEqual(await n.saved(),before);assert.deepEqual(n.errors,[]);n.dom.window.close();
  });
  await test('row photos prefer local restored photos without remote downloads',async()=>{
   const n=await setup(false,null,true),data='data:image/jpeg;base64,/9j/2Q==';

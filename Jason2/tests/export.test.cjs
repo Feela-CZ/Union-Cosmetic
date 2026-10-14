@@ -75,3 +75,12 @@ test('real logistics export includes all keys across brands and safe unique work
  assert.equal(wb.worksheets.reduce((n,ws)=>n+ws.columnCount-2,0),entries.length);
  assert.equal(new Set(wb.worksheets.map(ws=>ws.name)).size,wb.worksheets.length);assert.ok(wb.worksheets.every(ws=>ws.name.length<=31));
 });
+
+test('Excel library loads only on demand, shares parallel requests and retries a failed load',async()=>{
+ const vm=require('node:vm'),scripts=[],document={currentScript:{src:'https://local.test/Jason2/export.js?v=test'},head:{append:script=>scripts.push(script)},createElement:()=>({remove(){this.removed=true;}})};
+ const context=vm.createContext({document,URL,Promise,setTimeout,clearTimeout});vm.runInContext(fs.readFileSync(path.join(__dirname,'../export.js'),'utf8'),context);
+ const lazy=context.JasonExport;assert.equal(scripts.length,0);
+ const failed=lazy.ready(),parallel=lazy.ready();assert.equal(failed,parallel);assert.equal(scripts.length,1);assert.equal(scripts[0].src,'https://local.test/Jason2/vendor/exceljs.min.js?v=4.3.0-csp1');
+ scripts[0].onerror();await assert.rejects(failed,/EXCEL_LOAD_FAILED/);assert.equal(scripts[0].removed,true);
+ const loaded=lazy.ready();assert.equal(scripts.length,2);context.ExcelJS={Workbook:function(){}};scripts[1].onload();await loaded;await lazy.ready();assert.equal(scripts.length,2);
+});

@@ -1,6 +1,21 @@
 /* Customer-ready XLSX output. Uses the same ExcelJS version as the original Jason. */
 (function(root){
 'use strict';
+// The export library is not needed to browse or edit the catalog.
+const exportScript=root.document?.currentScript?.src;
+let libraryPromise=null;
+function ready(){
+ if(root.ExcelJS?.Workbook)return Promise.resolve();
+ if(libraryPromise)return libraryPromise;
+ libraryPromise=new Promise((resolve,reject)=>{
+  if(!exportScript||!root.document){reject(Error('EXCEL_LOAD_FAILED'));return;}
+  const script=root.document.createElement('script');let timeout;const fail=()=>{root.clearTimeout(timeout);script.remove();reject(Error('EXCEL_LOAD_FAILED'));};script.src=new URL('vendor/exceljs.min.js?v=4.3.0-csp1',exportScript).href;script.async=true;
+  script.onload=()=>{root.clearTimeout(timeout);if(root.ExcelJS?.Workbook)resolve();else fail();};
+  script.onerror=fail;timeout=root.setTimeout(fail,30000);root.document.head.append(script);
+ }).catch(error=>{libraryPromise=null;throw error;});
+ return libraryPromise;
+}
+
 const colors={navy:'FF214A84',blue:'FF3566A6',pale:'FFE8EFF8',ink:'FF243A57',line:'FFB7C8DE',white:'FFFFFFFF',stripe:'FFF5F8FC'};
 const brandColors={lilien:'FF1669A8',natava:'FF607B55',naturalis:'FF38816C',sunnore:'FFAE792B',twister:'FF655AA7'};
 function palette(brand){
@@ -124,5 +139,5 @@ async function download(wb,filename){
  const a=root.document.createElement('a');a.href=url;a.download=filename;root.document.body.appendChild(a);a.click();
  root.setTimeout(()=>{a.remove();root.URL.revokeObjectURL(url);},1000);
 }
-root.JasonExport={products,logistics,download};
+root.JasonExport={products,logistics,download,ready};
 })(typeof window!=='undefined'?window:globalThis);

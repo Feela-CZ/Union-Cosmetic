@@ -67,3 +67,6 @@ Object.assign(window.JasonText.en,{
 
 Object.assign(window.JasonText.cs,{backToProduct:"← Zpět k produktu",includeProductsQuestion:"Zahrnout seznam výrobků?"});
 Object.assign(window.JasonText.en,{backToProduct:"← Back to product",includeProductsQuestion:"Include the product list?"});
+
+Object.assign(window.JasonText.cs,{pageAll:"Vše",EXCEL_LOAD_FAILED:"Export se nepodařilo načíst. Zkuste to znovu."});
+Object.assign(window.JasonText.en,{pageAll:"All",EXCEL_LOAD_FAILED:"Could not load the export library. Please try again."});
