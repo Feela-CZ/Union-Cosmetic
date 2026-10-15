@@ -42,6 +42,18 @@ async function setup(real=false,cached=null){
   c.w.JasonStorage.jpeg=async()=> 'data:image/jpeg;base64,/9j/2Q==';c.click('[data-view=products]');c.click('[data-edit="0"]');c.click('#tab-photo');Object.defineProperty(c.$('#photo-input'),'files',{configurable:true,value:[{name:'local.png',type:'image/png'}]});c.$('#photo-input').dispatchEvent(new c.w.Event('change'));await wait(()=>c.$('#photo-preview').src.startsWith('data:'));c.submit('#product-form');await wait(()=>!c.$('#editor').open);
   assert.equal((await c.saved()).photos[fixture.id],'data:image/jpeg;base64,/9j/2Q==');assert.deepEqual((await c.saved()).pendingPhotos,[]);assert.equal(c.$('#retry').hidden,true);assert.deepEqual(network,[]);assert.deepEqual(await liveState(),{sentinel:'LIVE DATA'});
  });
+ await test('sandbox labels, INCI and languages survive reload and backup without sending files or touching live storage',async()=>{
+  c.click('[data-view=products]');c.click('[data-edit="0"]');c.input('#inci-text','Aqua, Parfum');
+  c.$('[data-label-language=ar]').checked=true;c.$('[data-label-language=ar]').dispatchEvent(new c.w.Event('change',{bubbles:true}));
+  const png='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a3uoAAAAASUVORK5CYII=';
+  const file=new c.w.File([Buffer.from(png,'base64')],'local-label.png',{type:'image/png'});
+  Object.defineProperty(c.$('#label-input-front'),'files',{configurable:true,value:[file]});c.$('#label-input-front').dispatchEvent(new c.w.Event('change',{bubbles:true}));await wait(()=>!c.$('#label-input-front').disabled);
+  c.submit('#product-form');await wait(()=>!c.$('#editor').open);let s=await c.saved(),label=s.products[0].labels.front.path;
+  assert.equal(s.labelFiles[label],'data:image/png;base64,'+png);assert.deepEqual(s.pendingLabels,[]);assert.equal(s.products[0].inci,'Aqua, Parfum');assert.deepEqual(s.products[0].labelLanguages,['ar']);
+  c.dom.window.close();c=await setup();s=await c.saved();assert.equal(s.labelFiles[label],'data:image/png;base64,'+png);c.click('[data-edit="0"]');c.click('#tab-labels');assert.equal(c.$('[data-label-preview=front] img').src,s.labelFiles[label]);c.click('#editor-close');
+  await c.upload('backup',{format:'jason-backup',version:1,products:s.products,logistics:s.logistics,photos:s.photos,labelFiles:s.labelFiles,pendingLabels:[label],connected:true,api:'https://union-cosmetic.filipluchesi.workers.dev'});
+  assert.equal((await c.saved()).labelFiles[label],s.labelFiles[label]);assert.deepEqual((await c.saved()).pendingLabels,[]);assert.deepEqual(network,[]);assert.deepEqual(await liveState(),{sentinel:'LIVE DATA'});
+ });
  await test('sandbox reload keeps edits and focus never refreshes shared data',async()=>{
   c.dom.window.close();c=await setup();assert.equal((await c.saved()).products[0].price,9.99);assert.equal((await c.saved()).products[0].pack,undefined);assert.equal(c.w.JasonModel.packaging((await c.saved()).products[0],(await c.saved()).logistics).pack,6);c.w.dispatchEvent(new c.w.Event('focus'));await sleep(20);assert.deepEqual(network,[]);
  });

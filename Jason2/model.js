@@ -30,6 +30,20 @@ function validateLogistics(value) {
  }
  return value;
 }
+function labelPath(value){
+ const path=typeof value==='string'?value:value?.path;
+ return typeof path==='string'&&/^OrderSheet\/img\/labels\/[a-zA-Z0-9_-]+\.(jpg|png|webp|pdf)$/.test(path)?path:null;
+}
+function labelReferences(products){return new Set(products.flatMap(p=>['front','back'].map(slot=>labelPath(p.labels?.[slot]))).filter(Boolean));}
+function validateLabelFiles(value){
+ if(!value||typeof value!=='object'||Array.isArray(value))throw Error('BACKUP_FORMAT');
+ for(const [path,data] of Object.entries(value)){
+  if(!labelPath(path)||typeof data!=='string'||!/^data:(image\/(jpeg|png|webp)|application\/pdf);base64,[A-Za-z0-9+/]+={0,2}$/.test(data))throw Error('BACKUP_FORMAT');
+  const expected={jpg:'image/jpeg',png:'image/png',webp:'image/webp',pdf:'application/pdf'}[path.split('.').pop()];
+  if(!data.startsWith('data:'+expected+';base64,'))throw Error('BACKUP_FORMAT');
+ }
+ return value;
+}
 function emptyLogistics(){return Object.fromEntries(Object.entries(sections).map(([s,fs])=>[s,Object.fromEntries(fs.map(f=>[f,null]))]));}
 // Display-only estimate in cm; never saved into PALLET.height or product data.
 function estimatedPalletHeight(data){
@@ -99,7 +113,7 @@ function issues(state,photoIds=null){
  }
  return out;
 }
-const api={clone,sections,key,fold,isMissing,count,validateProducts,validateLogistics,emptyLogistics,estimatedPalletHeight,cleanProducts,packaging,saveProduct,keyEntries,applyLogistics,renameKey,filterProducts,eanValid,issues};
+const api={clone,sections,key,fold,isMissing,count,validateProducts,validateLogistics,labelPath,labelReferences,validateLabelFiles,emptyLogistics,estimatedPalletHeight,cleanProducts,packaging,saveProduct,keyEntries,applyLogistics,renameKey,filterProducts,eanValid,issues};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.JasonModel=api;
 })(typeof window!=='undefined'?window:globalThis);
 

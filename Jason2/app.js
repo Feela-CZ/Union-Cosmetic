@@ -3,11 +3,11 @@
 'use strict';
 const M=JasonModel,S=JasonStorage,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const sandbox=JASON_CONFIG.sandbox===true;
-function isolate(next){next.products=M.cleanProducts(next.products);if(next.baseline?.products){try{next.baseline.products=sig(M.cleanProducts(JSON.parse(next.baseline.products)));}catch{}}if(sandbox){next.connected=false;next.api='';next.imageBase=JASON_CONFIG.imageBase;next.baseline={};next.pendingPhotos=[];}return next;}
+function isolate(next){next.products=M.cleanProducts(next.products);const refs=M.labelReferences(next.products);next.labelFiles=Object.fromEntries(Object.entries(next.labelFiles||{}).filter(([path])=>refs.has(path)));next.pendingLabels=(next.pendingLabels||[]).filter(path=>Object.hasOwn(next.labelFiles,path));if(next.baseline?.products){try{next.baseline.products=sig(M.cleanProducts(JSON.parse(next.baseline.products)));}catch{}}if(sandbox){next.connected=false;next.api='';next.imageBase=JASON_CONFIG.imageBase;next.baseline={};next.pendingPhotos=[];next.pendingLabels=[];}return next;}
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const icons={products:'▦',keys:'◇',checks:'✓',data:'↔',undo:'↶',redo:'↷',export:'↓',plus:'+'};
 let lang='cs',view='products',page=1,pageSize=30,sort={field:'name',asc:true},selected=new Set(),history=[],future=[],busy=false,editorDirty=false,editorSave=null,editorReturn=null,toastTimer,syncing=false,storageError=false;
-let state={products:[],logistics:M.clone(window.JASON_SEED_LOGISTICS||{}),photos:{},pendingPhotos:[],connected:false,api:JASON_CONFIG.apiBase,imageBase:JASON_CONFIG.imageBase,baseline:{},updated:null};
+let state={products:[],logistics:M.clone(window.JASON_SEED_LOGISTICS||{}),photos:{},pendingPhotos:[],labelFiles:{},pendingLabels:[],connected:false,api:JASON_CONFIG.apiBase,imageBase:JASON_CONFIG.imageBase,baseline:{},updated:null};
 let filters={search:'',brand:'',type:'',key:'',status:'active',new:'',flag:'',scope:''};
 let photoVersion=Date.now(),photoObserver=null;
 const photoVersions=new Map(),missingThumbnails=new Set();
@@ -23,7 +23,7 @@ const sig=v=>JSON.stringify(v,(_,x)=>x&&typeof x==='object'&&!Array.isArray(x)?O
 const dirty=n=>state.connected&&sig(state[n])!==state.baseline[n];
 let refreshing=false,lastRefresh=0,refreshFailed=false;
 const canEdit=()=>!refreshing&&!(JASON_CONFIG.sharedOnly&&JASON_CONFIG.autoConnect&&!state.connected);
-const hasPending=()=>!sandbox&&(dirty('products')||dirty('logistics')||state.pendingPhotos.length>0);
+const hasPending=()=>!sandbox&&(dirty('products')||dirty('logistics')||state.pendingPhotos.length>0||state.pendingLabels.length>0);
 const option=(value,label,sel)=>`<option value="${esc(value)}" ${String(value)===String(sel)?'selected':''}>${esc(label)}</option>`;
 const button=(id,label,cls='')=>`<button type="button" id="${id}" class="${cls}">${esc(t(label))}</button>`;
 function selectHTML(id,label,items,value,empty){return `<label class="filter"><span>${esc(t(label))}</span><select id="${id}">${option('',t(empty),value)}${items.map(x=>option(typeof x==='object'?x.value:x,typeof x==='object'?x.label:x,value)).join('')}</select></label>`;}
@@ -57,12 +57,27 @@ async function undo(redo=false){if(busy||editorDirty)return;const source=redo?fu
  // Keep the acknowledged remote baseline; history changes data, never connection identity.
  next.connected=state.connected;next.api=state.api;next.imageBase=state.imageBase;next.baseline=state.baseline;
  next.pendingPhotos=Object.keys(next.photos).filter(id=>next.photos[id]!==state.photos[id]||state.pendingPhotos.includes(id));
+ next.pendingLabels=Object.keys(next.labelFiles||{}).filter(path=>next.labelFiles[path]!==state.labelFiles[path]||state.pendingLabels.includes(path));
  state=isolate(next);await persist();selected.clear();render();toast(t(redo?'redo':'undo'));if(state.connected)void syncRemote();}
 async function syncRemote(){
  if(sandbox||syncing||!state.connected)return;
  syncing=true;renderStatus();
  try{
   while(state.connected&&hasPending()){
+   // Publish immutable files before their product references. On failure the
+   // entire change stays durable locally and can be retried after reloading.
+   if(state.pendingLabels.length&&dirty('products')){
+    const remote=await S.request(state.api,'products');
+    if(sig(M.cleanProducts(remote))!==state.baseline.products)throw Error(t('sharedConflict'));
+   }
+   for(const path of [...state.pendingLabels]){
+    const data=state.labelFiles[path];
+    if(data&&M.labelReferences(state.products).has(path)){
+     await S.request(state.api,'upload-image','PUT',{path,content:data.split(',')[1]});
+     if(state.labelFiles[path]!==data)continue;
+    }
+    state.pendingLabels=state.pendingLabels.filter(p=>p!==path);await persist();
+   }
    for(const name of ['logistics','products']){
     if(!dirty(name))continue;
     const snapshot=M.clone(state[name]);
@@ -219,13 +234,15 @@ function openKeyExport(entry){
  };
  d.showModal();
 }
-// Labels and languages remain placeholders until their data is supplied.
+const labelLanguageCodes=['cs','en','sk','de','pl','hu','fr','it','es','ro','bg','uk','ru','ar','vi'];
+function labelSource(asset){const path=M.labelPath(asset);return path?(state.labelFiles[path]||`${state.imageBase.replace(/\/$/,'')}/labels/${path.split('/').pop()}`):'';}
 function productInfoSections(p){
- const inci=p.inciStatus==='not-applicable'?'N/A':typeof p.inci==='string'&&p.inci.trim()?p.inci:'TBD',available=inci!=='TBD'&&inci!=='N/A';
- const labelCard=(slot,title,applicable=true)=>`<article class="label-card${applicable?'':' not-applicable'}" data-label-slot="${slot}"><div class="label-card-heading"><h4>${t(title)}</h4></div><div class="label-placeholder"><strong class="label-state">${applicable?'TBD':'N/A'}</strong></div><div class="label-card-actions" ${applicable?'':'hidden'}><button type="button" disabled>${t('viewLabel')}</button><button type="button" disabled>${t('downloadLabel')}</button></div></article>`;
- return `<section id="section-inci" class="tab-section" role="tabpanel" aria-labelledby="tab-inci"><div class="section-intro"><h3>${t('inci')}</h3></div><div class="inci-placeholder${available?' has-inci':''}"><p>${esc(inci)}</p></div><div class="info-actions"><button id="copy-inci" type="button" ${available?'':'disabled'}>${t('copyInci')}</button></div></section>
- <section id="section-labelLanguages" class="tab-section" role="tabpanel" aria-labelledby="tab-labelLanguages"><div class="section-intro"><h3>${t('labelLanguages')}</h3></div><div class="languages-placeholder"><p>TBD</p></div></section>
- <section id="section-labels" class="tab-section" role="tabpanel" aria-labelledby="tab-labels"><div class="section-intro"><h3>${t('labels')}</h3></div><div class="label-grid split" id="product-label-grid" aria-live="polite">${labelCard('front','frontLabel')}${labelCard('back','backLabel',false)}</div></section>`;
+ const available=typeof p.inci==='string'&&!!p.inci.trim()&&!['not-applicable','pending'].includes(p.inciStatus),status=p.inciStatus==='not-applicable'?'not-applicable':available?'provided':'pending';
+ const languages=Array.isArray(p.labelLanguages)?p.labelLanguages:[],languageNames=new Intl.DisplayNames([lang],{type:'language'});
+ const labelCard=(slot,title)=>`<article class="label-card" data-label-slot="${slot}"><div class="label-card-heading"><h4>${t(title)}</h4></div><div class="label-placeholder" data-label-preview="${slot}" tabindex="0" role="button" aria-label="${esc(t('uploadLabel')+' — '+t(title))}"></div><p class="label-file-name" data-label-name="${slot}"></p><input type="file" id="label-input-${slot}" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" hidden><div class="label-card-actions"><button type="button" data-label-upload="${slot}">${t('uploadLabel')}</button><button type="button" data-label-view="${slot}">${t('viewLabel')}</button><button type="button" data-label-download="${slot}">${t('downloadLabel')}</button><button type="button" class="danger-quiet" data-label-remove="${slot}">${t('removeLabel')}</button></div></article>`;
+ return `<section id="section-inci" class="tab-section" role="tabpanel" aria-labelledby="tab-inci"><div class="section-intro"><h3>${t('inci')}</h3><select id="inci-status" name="inciStatus" aria-label="${esc(t('status'))}">${['provided','pending','not-applicable'].map(v=>option(v,v==='provided'?t('filled'):v==='pending'?'TBD':'N/A',status)).join('')}</select></div><textarea id="inci-text" name="inci" rows="8" aria-label="INCI" placeholder="TBD" ${status==='not-applicable'?'disabled':''}>${esc(p.inci||'')}</textarea><div class="info-actions"><button id="copy-inci" type="button" ${available?'':'disabled'}>${t('copyInci')}</button></div></section>
+ <section id="section-labelLanguages" class="tab-section" role="tabpanel" aria-labelledby="tab-labelLanguages"><div class="section-intro"><h3>${t('labelLanguages')}</h3><span id="label-languages-state" ${languages.length?'hidden':''}>TBD</span></div><div class="label-language-grid">${labelLanguageCodes.map(code=>`<label class="checkbox-label"><input type="checkbox" data-label-language="${code}" ${languages.includes(code)?'checked':''}>${esc(languageNames.of(code))} <small>${code.toUpperCase()}</small></label>`).join('')}</div><label class="field"><span>${t('otherLanguages')}</span><input id="label-other-languages" value="${esc(languages.filter(c=>!labelLanguageCodes.includes(c)).join(', '))}" placeholder="pt, nl, …"></label></section>
+ <section id="section-labels" class="tab-section" role="tabpanel" aria-labelledby="tab-labels"><div class="section-intro"><h3>${t('labels')}</h3></div><div class="label-grid split" id="product-label-grid">${labelCard('front','frontLabel')}${labelCard('back','backLabel')}</div><p class="muted label-file-hint">${t('labelFileHint')}</p></section>`;
 }
 function openProduct(index=null,tab='details',duplicate=false){
  if(!canEdit())return;
@@ -241,16 +258,59 @@ function openProduct(index=null,tab='details',duplicate=false){
  <section id="section-flags" class="tab-section" role="tabpanel" aria-labelledby="tab-flags"><h3>${t('flags')}</h3>${['new','discontinued'].map(v=>`<div class="flag-card"><label class="checkbox-label"><input type="checkbox" name="${v}" ${p[v]===true?'checked':''}>${t(v)}</label>${field(v+'_date',v+'_date',p[v+'_date'],'date')}</div>`).join('')}<div class="form-grid">${field('flags','customFlags',(p.flags||[]).join(', '),'text','',t('flagsHint'))}</div></section>
  <section id="section-photo" class="tab-section" role="tabpanel" aria-labelledby="tab-photo"><h3>${t('photo')}</h3><div class="photo-layout"><button type="button" class="photo-drop" id="photo-drop"><img id="photo-preview" alt="${esc(t('photo'))}" hidden><span id="photo-placeholder">+<small>${t('choosePhoto')}</small></span></button><div><p>${t(sandbox?'sandboxPhotoHint':'photoHint')}</p><input type="file" accept="image/jpeg,image/png,image/webp" id="photo-input" hidden>${button('photo-choose','choosePhoto')}${button('photo-download','downloadPhoto')}${button('photo-view','viewPhoto')}<p class="muted">${state.pendingPhotos.includes(p.id)?t('photoPending'):''}</p></div></div></section>
  ${productInfoSections(p)}</div>${formFooter()}</form>`);
- const form=$('#product-form'),elements=form.elements;
- $('#copy-inci').onclick=async()=>{try{await navigator.clipboard.writeText(p.inci);toast(t('inciCopied'));}catch(e){error(e);}};
+ const form=$('#product-form'),elements=form.elements,selectedLabels={},labelReads=new Set(),labelReadRevisions={front:0,back:0};
+ const originalInfo={inci:$('#inci-text').value,status:$('#inci-status').value,languages:Array.isArray(p.labelLanguages)?M.clone(p.labelLanguages):[]};
+ const readLanguages=()=>[...new Set([...$$('[data-label-language]:checked').map(e=>e.dataset.labelLanguage),...$('#label-other-languages').value.split(',').map(v=>v.trim()).filter(Boolean)])];
+ originalInfo.languagesRendered=readLanguages();
+ const updateInci=()=>{$('#inci-text').disabled=$('#inci-status').value==='not-applicable';$('#inci-text').placeholder=$('#inci-status').value==='not-applicable'?'N/A':'TBD';$('#copy-inci').disabled=$('#inci-status').value!=='provided'||!$('#inci-text').value.trim();};
+ $('#inci-text').addEventListener('input',()=>{$('#inci-status').value=$('#inci-text').value.trim()?'provided':'pending';updateInci();});$('#inci-status').onchange=updateInci;updateInci();
+ $('#copy-inci').onclick=async()=>{try{await navigator.clipboard.writeText($('#inci-text').value);toast(t('inciCopied'));}catch(e){error(e);}};
+ const updateLanguages=()=>{$('#label-languages-state').hidden=readLanguages().length>0;};
+ for(const e of [...$$('[data-label-language]'),$('#label-other-languages')]){e.addEventListener('input',updateLanguages);e.addEventListener('change',updateLanguages);}
+ function currentLabel(slot){return Object.hasOwn(selectedLabels,slot)?selectedLabels[slot]:p.labels?.[slot];}
+ function labelUrl(slot){const asset=currentLabel(slot);return asset?.dataUrl||labelSource(asset);}
+ function renderLabel(slot){
+  const asset=currentLabel(slot),src=labelUrl(slot),card=form.querySelector(`[data-label-slot="${slot}"]`),preview=card.querySelector('[data-label-preview]');
+  const pdf=asset?.mimeType==='application/pdf'||M.labelPath(asset)?.endsWith('.pdf');
+  card.classList.toggle('not-applicable',slot==='back'&&!src);
+  preview.innerHTML=src?(pdf?'<strong class="label-state">PDF</strong>':`<img src="${esc(src)}" alt="${esc(t(slot==='front'?'frontLabel':'backLabel'))}">`):`<strong class="label-state">${slot==='back'?'N/A':'TBD'}</strong>`;
+  card.querySelector('[data-label-name]').textContent=src?(asset?.name||M.labelPath(asset)?.split('/').pop()||''):'';
+  for(const action of ['view','download'])card.querySelector(`[data-label-${action}]`).disabled=!src;
+  card.querySelector('[data-label-view]').textContent=t(pdf?'openLabelPdf':'viewLabel');
+  card.querySelector('[data-label-remove]').disabled=!asset;
+  card.querySelector('[data-label-upload]').textContent=t(src?'replaceLabel':'uploadLabel');
+  const img=preview.querySelector('img');if(img)img.onerror=()=>{preview.innerHTML=`<strong class="label-state">${esc(t('labelUnavailable'))}</strong>`;};
+ }
+ async function selectLabel(slot,file){
+  if(busy)return;
+  const input=form.querySelector('#label-input-'+slot),revision=++labelReadRevisions[slot],load=S.label(file);labelReads.add(load);input.disabled=true;
+  try{const asset=await load;if(!form.isConnected||labelReadRevisions[slot]!==revision)return;selectedLabels[slot]=asset;editorDirty=true;renderLabel(slot);}catch(e){if(form.isConnected&&labelReadRevisions[slot]===revision)error(e);}finally{labelReads.delete(load);if(labelReadRevisions[slot]===revision){input.disabled=false;input.value='';}}
+ }
+ for(const slot of ['front','back']){
+  const card=form.querySelector(`[data-label-slot="${slot}"]`),input=card.querySelector('input[type=file]'),preview=card.querySelector('[data-label-preview]');
+  card.querySelector('[data-label-upload]').onclick=()=>input.click();
+  input.onchange=()=>{if(input.files[0])void selectLabel(slot,input.files[0]);};
+  preview.onclick=()=>input.click();preview.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click();}};
+  preview.ondragover=e=>{e.preventDefault();preview.classList.add('dragover');};preview.ondragleave=()=>preview.classList.remove('dragover');preview.ondrop=e=>{e.preventDefault();preview.classList.remove('dragover');if(e.dataTransfer.files[0])void selectLabel(slot,e.dataTransfer.files[0]);};
+  card.querySelector('[data-label-remove]').onclick=()=>{labelReadRevisions[slot]++;input.disabled=false;input.value='';selectedLabels[slot]=null;editorDirty=true;renderLabel(slot);};
+  card.querySelector('[data-label-view]').onclick=async()=>{
+   try{const src=labelUrl(slot),asset=currentLabel(slot);if(!src)return;
+    if(asset?.mimeType==='application/pdf'||M.labelPath(asset)?.endsWith('.pdf')){
+     if(src.startsWith('data:')){const bytes=Uint8Array.from(atob(src.split(',')[1]),c=>c.charCodeAt(0)),url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));window.open(url,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(url),60000);}else window.open(src,'_blank','noopener');
+    }else{$('#large-photo').src=src;$('#photo-dialog').showModal();}
+   }catch(e){error(e);}
+  };
+  card.querySelector('[data-label-download]').onclick=async()=>{try{const src=labelUrl(slot),asset=currentLabel(slot),filename=asset?.name||M.labelPath(asset)?.split('/').pop()||'label';if(src.startsWith('data:'))downloadData(src,filename);else{const r=await fetch(src);if(!r.ok)throw Error('HTTP '+r.status);downloadBlob(await r.blob(),filename);}}catch(e){error(e);}};
+  renderLabel(slot);
+ }
  const showTab=v=>{$$('[data-tab]').forEach(b=>{b.setAttribute('aria-selected',b.dataset.tab===v);b.tabIndex=b.dataset.tab===v?0:-1;});$$('.tab-section').forEach(s=>{s.hidden=s.id!==`section-${v}`;});};
  $$('[data-tab]').forEach((b,i,list)=>{b.onclick=()=>showTab(b.dataset.tab);b.onkeydown=e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const n=e.key==='Home'?0:e.key==='End'?list.length-1:(i+(e.key==='ArrowRight'?1:-1)+list.length)%list.length;showTab(list[n].dataset.tab);list[n].focus();}};});showTab(tab);
  function keysForBrand(overwrite=false){const b=elements.brand.value,k=elements.key.value||p.key;const keys=M.keyEntries(state.logistics).filter(r=>r.brand===b).map(r=>r.key);$('#product-key').innerHTML=option('','—',k)+keys.map(v=>option(v,v,k)).join('')+(M.key(k)&&!keys.includes(String(k))?option(k,`${k} · ${t('keyUnknown')}`,k):'');if(overwrite){elements.key.value='';}updatePackaging();}
  function updatePackaging(){const l=state.logistics[elements.brand.value]?.[M.key(elements.key.value)];$('#key-summary').textContent=l?`${elements.brand.value} / ${elements.key.value} · ${state.products.filter(x=>x.brand===elements.brand.value&&M.key(x.key)===elements.key.value).length} ${t('countProducts')}`:t('keyMissing');$('#product-key-data').innerHTML=l?logisticsOverview(l):`<p class="muted">${t('keyMissing')}</p>`;$('#product-key-open').disabled=!l;$('#product-key-export').disabled=!l;}
  keysForBrand();elements.brand.onchange=()=>keysForBrand(true);elements.key.onchange=()=>updatePackaging();
  function currentKeyEntry(){const brand=elements.brand.value,key=M.key(elements.key.value);return {brand,key,data:M.clone(state.logistics[brand][key])};}
- $('#product-key-open').onclick=()=>{
-  if(busy)return;const entry=currentKeyEntry(),d=$('#editor'),body=$('#editor-body');
+ $('#product-key-open').onclick=async()=>{
+  if(busy)return;await Promise.allSettled([...labelReads]);if($('#product-form')!==form)return;const entry=currentKeyEntry(),d=$('#editor'),body=$('#editor-body');
   const origin={view,page,filters:{...filters},selected:new Set(selected),title:$('#editor-title').textContent,caption:$('#editor-caption').textContent,small:d.classList.contains('small'),scroll:d.scrollTop,dirty:editorDirty,save:editorSave};
   const draft=document.createDocumentFragment();while(body.firstChild)draft.append(body.firstChild);
   d.close();editorDirty=false;editorSave=null;changeView('keys');filters.brand=entry.brand;filters.search=entry.key;renderToolbar();renderContent();
@@ -272,18 +332,34 @@ function openProduct(index=null,tab='details',duplicate=false){
  function preserve(name,old,value){return String(old??'')===String(value??'')?old:value;}
  editorSave=()=>runForm(async()=>{
   const notice=$('#form-error');notice.hidden=true;
+  await Promise.allSettled([...labelReads]);
   if(!editorDirty&&!selectedPhoto&&original&&!duplicate){formClose();return;}
   try{
    const str=n=>elements[n].value.trim(),num=n=>str(n)===''?'':Number(str(n));
    const price=num('price');if(price!==''&&(!Number.isFinite(price)||price<0))throw Error('numeric');
    const id=str('id');if(!id)throw Error('EAN_REQUIRED');if(!str('brand'))throw Error('KEY_REQUIRED');
    const patch={brand:str('brand'),type:str('type'),id,hs:str('hs'),name:str('name'),csName:str('csName'),volume:{...(p.volume||{}),number:preserve('volume',p.volume?.number,str('volume-number')),unit:str('volume-unit')},price:preserve('price',p.price,num('price')),key:preserve('key',p.key,str('key')||null),carton_ean:preserve('carton_ean',p.carton_ean,str('carton_ean')||null)};
+   if($('#inci-text').value!==originalInfo.inci||$('#inci-status').value!==originalInfo.status){
+    const status=$('#inci-status').value;patch.inci=status==='provided'?$('#inci-text').value:'';patch.inciStatus=status==='provided'&&patch.inci.trim()?'provided':status==='not-applicable'?'not-applicable':'pending';patch.inciSource={type:'manual',updatedAt:new Date().toISOString()};
+   }
+   const languages=readLanguages();if(JSON.stringify(languages)!==JSON.stringify(originalInfo.languagesRendered)){
+    if(languages.some(code=>!/^[a-zA-Z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(code)))throw Error('LABEL_LANGUAGES');patch.labelLanguages=languages;
+   }
+   const files={};if(Object.keys(selectedLabels).length){
+    patch.labels=p.labels&&typeof p.labels==='object'&&!Array.isArray(p.labels)?M.clone(p.labels):{};
+    for(const [slot,asset] of Object.entries(selectedLabels)){
+     if(!asset){patch.labels[slot]=null;continue;}
+     const path=S.labelPath(id,slot,asset.extension);files[path]=asset.dataUrl;
+     patch.labels[slot]={...(p.labels?.[slot]&&typeof p.labels[slot]==='object'?p.labels[slot]:{}),path,name:asset.name,mimeType:asset.mimeType,size:asset.size,uploadedAt:new Date().toISOString()};
+    }
+   }
    for(const v of ['new','discontinued']){const checked=elements[v].checked,flagChanged=(p[v]===true)!==checked;patch[v]=flagChanged?checked:p[v];patch[v+'_date']=flagChanged?(checked?(str(v+'_date')||today()):''):preserve(v+'_date',p[v+'_date'],str(v+'_date'));}
    const flagList=[...new Set(str('flags').split(',').map(s=>s.trim()).filter(Boolean))];if(p.flags!==undefined||flagList.length)patch.flags=flagList;
    const target=duplicate?null:index;const record=M.saveProduct(duplicate?p:original,patch,state.products,target,state.logistics);
    // If an EAN changes (or a product is copied), retain its visible photo at the new filename.
    if(!selectedPhoto&&photoExists&&(duplicate||original&&id!==String(original.id))){const r=await fetch($('#photo-preview').src);if(!r.ok)throw Error('HTTP '+r.status);selectedPhoto=await S.jpeg(new File([await r.blob()],'photo.jpg',{type:'image/jpeg'}));}
    const next=M.clone(state);if(target!==null)next.products[target]=record;else next.products.push(record);
+   Object.assign(next.labelFiles,files);next.pendingLabels=[...new Set([...next.pendingLabels,...Object.keys(files)])];
    if(selectedPhoto){next.photos[id]=selectedPhoto;if(!next.pendingPhotos.includes(id))next.pendingPhotos.push(id);}
    await commit(next);formClose();
   }catch(e){notice.textContent=t(e.message);notice.hidden=false;showTab('details');notice.scrollIntoView({block:'nearest'});}
@@ -330,7 +406,7 @@ function openKey(brand='',oldKey=null,template=null,returnToProduct=null){
 function downloadBlob(blob,name){const url=URL.createObjectURL(blob);downloadData(url,name);setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function downloadData(url,name){const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();}
 function downloadJSON(value,name){downloadBlob(new Blob([JSON.stringify(value,null,2)+'\n'],{type:'application/json;charset=utf-8'}),name);}
-function backup(){downloadJSON({format:'jason-backup',version:1,createdAt:new Date().toISOString(),products:state.products,logistics:state.logistics,photos:state.photos,pendingPhotos:state.pendingPhotos},`jason-backup-${today()}.json`);}
+function backup(){downloadJSON({format:'jason-backup',version:1,createdAt:new Date().toISOString(),products:state.products,logistics:state.logistics,photos:state.photos,pendingPhotos:state.pendingPhotos,labelFiles:state.labelFiles,pendingLabels:state.pendingLabels},`jason-backup-${today()}.json`);}
 function openData(){
  openEditor(t(sandbox?'sandboxData':'dataTitle'),'JASON / DATA',`<div class="form-content data-content"><p>${t(sandbox?'sandboxNote':'dataHint')}</p>${JASON_CONFIG.sharedOnly?'<p class="notice amber">'+t('sharedOnly')+'</p>':''}<section class="data-section"><h3>${t('import')}</h3><div class="button-grid">${button('import-products','importProducts')}${button('import-logistics','importLogistics')}${button('restore-backup','restore')}${button('download-backup','backup','primary')}</div><div class="button-grid">${button('download-products','jsonProducts')}${button('download-logistics','jsonLogistics')}</div></section>${sandbox?'<section class="data-section"><h3>'+t('sandboxResetTitle')+'</h3><p>'+t('sandboxResetHint')+'</p>'+button('reset-sandbox','sandboxReset')+'</section>':`<section class="data-section"><h3>${t('connection')}</h3><p class="muted">${t('connectHint')}</p><div class="form-grid">${field('api','api',state.api,'url')}${field('images','images',state.imageBase,'url')}</div><div class="connection-actions">${button('connect','connect','primary')}${button('disconnect','disconnect')}<span>${t(state.connected?'connected':'local')}</span></div></section>`}</div>`,true);
  $('#import-products').onclick=()=>importFile('products');$('#import-logistics').onclick=()=>importFile('logistics');$('#restore-backup').onclick=()=>importFile('backup');$('#download-backup').onclick=backup;$('#download-products').onclick=()=>downloadJSON(state.products,'products.json');$('#download-logistics').onclick=()=>downloadJSON(state.logistics,'logistics.json');
@@ -342,7 +418,7 @@ function openData(){
 async function connect(api,imageBase,automatic=false){
  if(sandbox||syncing||busy)return;busy=true;renderStatus();try{
   const [p,l]=await Promise.all([S.request(api,'products'),S.request(api,'logistics')]);M.validateProducts(p);M.validateLogistics(l);
-  const next={...M.clone(state),products:p,logistics:l,photos:{},pendingPhotos:[],api,imageBase,connected:true,baseline:{products:sig(p),logistics:sig(l)}};
+  const next={...M.clone(state),products:p,logistics:l,photos:{},pendingPhotos:[],labelFiles:{},pendingLabels:[],api,imageBase,connected:true,baseline:{products:sig(p),logistics:sig(l)}};
   await commit(next,'loaded');formClose();
  }catch(e){if(!automatic)error(e);else toast(t('fileMissing'),true);}finally{busy=false;renderStatus();}
 }
@@ -358,7 +434,8 @@ $('#import-file').onchange=async e=>{
   else{
    if(value.format!=='jason-backup'||value.version!==1)throw Error('BACKUP_FORMAT');M.validateProducts(value.products);M.validateLogistics(value.logistics);
    if(value.photos!=null&&(typeof value.photos!=='object'||Array.isArray(value.photos)||Object.entries(value.photos).some(([id,v])=>!id||typeof v!=='string'||!/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(v))))throw Error('BACKUP_FORMAT');
-   next={...next,products:value.products,logistics:value.logistics,photos:value.photos||{},pendingPhotos:Object.keys(value.photos||{}),connected:JASON_CONFIG.sharedOnly?state.connected:false,baseline:JASON_CONFIG.sharedOnly?state.baseline:{}};
+   M.validateLabelFiles(value.labelFiles||{});
+   next={...next,products:value.products,logistics:value.logistics,photos:value.photos||{},pendingPhotos:Object.keys(value.photos||{}),labelFiles:value.labelFiles||{},pendingLabels:Object.keys(value.labelFiles||{}),connected:JASON_CONFIG.sharedOnly?state.connected:false,baseline:JASON_CONFIG.sharedOnly?state.baseline:{}};
   }
   const extra=next.connected?'\n\n'+(lang==='cs'?'Po potvrzení se změna odešle také do společných dat.':'After confirmation the change will also be sent to shared data.'):'';
   if(!await confirm('importConfirm',file.name+'\n\n'+t('importConfirmHint')+extra,'confirm'))return;
@@ -420,7 +497,7 @@ async function refreshShared(automatic=false){
   const [p,l]=await Promise.all([S.request(api,'products'),S.request(api,'logistics')]);M.validateProducts(p);M.validateLogistics(l);
   const changed=sig(p)!==sig(state.products)||sig(l)!==sig(state.logistics);
   if(changed){history=[];future=[];selected.clear();}
-  state={...state,products:p,logistics:l,api,imageBase:JASON_CONFIG.sharedOnly?JASON_CONFIG.imageBase:state.imageBase,connected:true,baseline:{products:sig(p),logistics:sig(l)},pendingPhotos:[],updated:new Date().toISOString()};
+  state={...state,products:p,logistics:l,api,imageBase:JASON_CONFIG.sharedOnly?JASON_CONFIG.imageBase:state.imageBase,connected:true,baseline:{products:sig(p),logistics:sig(l)},pendingPhotos:[],pendingLabels:[],updated:new Date().toISOString()};
   if(!automatic){photoVersion=Date.now();photoVersions.clear();missingThumbnails.clear();}
   lastRefresh=Date.now();await persist();
  }catch(e){refreshFailed=true;toast(t(state.products.length?'refreshFailed':'sharedNotLoaded'),true);}
@@ -430,7 +507,7 @@ function sandboxSeed(){
  const seed=window.JASON_SANDBOX_SEED;
  if(!seed)throw Error('SANDBOX_SEED_MISSING');
  M.validateProducts(seed.products);M.validateLogistics(seed.logistics);
- return isolate({...M.clone(state),products:M.clone(seed.products),logistics:M.clone(seed.logistics),photos:{},updated:seed.snapshotAt,sandboxNameRevision:seed.nameRevision,sandboxInciRevision:seed.inciRevision});
+ return isolate({...M.clone(state),products:M.clone(seed.products),logistics:M.clone(seed.logistics),photos:{},labelFiles:{},pendingLabels:[],updated:seed.snapshotAt,sandboxNameRevision:seed.nameRevision,sandboxInciRevision:seed.inciRevision});
 }
 async function upgradeSandboxNames(){
  const seed=window.JASON_SANDBOX_SEED;

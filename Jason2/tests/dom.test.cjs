@@ -36,7 +36,7 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
 (async()=>{
  let passed=0;const c=await setup(),{w,$,$$,click,input,change,saved,upload,submit,errors}=c;
  async function test(name,fn){await fn();passed++;console.log('PASS',name);}
- await test('product information preview has accessible tabs and persistent label slots without a layout selector',async()=>{
+ await test('product information editor has accessible tabs and both upload slots without a layout selector',async()=>{
   const n=await setup();await n.upload('products',[fixture]);const before=await n.saved();
   n.click('[data-edit="0"]');
   assert.deepEqual(n.$$('[data-tab]').map(b=>b.dataset.tab),['details','packaging','inci','labelLanguages','labels','photo','flags']);
@@ -50,14 +50,15 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
   assert.deepEqual(n.$$('[data-label-slot]:not([hidden])').map(e=>e.dataset.labelSlot),['front','back']);
   assert.equal(n.$('[data-label-slot=back] .label-state').textContent,'N/A');
   assert.equal(n.$('[data-label-slot=front] .label-state').textContent,'TBD');
-  assert.equal(n.$('[data-label-slot=back] .label-card-actions').hidden,true);
+  assert.equal(n.$('[data-label-upload=back]').disabled,false);
   for(const tab of ['inci','labelLanguages']){
    assert.equal((n.$('#section-'+tab).textContent.match(/TBD/g)||[]).length,1);
    assert.ok(!n.$('#section-'+tab).textContent.includes('Under construction'));
   }
   assert.equal(n.$('#section-inci h3').textContent,'INCI');
   assert.equal(n.$('#section-labelLanguages h3').textContent,'Jazyky etikety');
-  assert.equal(n.$('#section-labelLanguages').textContent.trim(),'Jazyky etiketyTBD');
+  assert.equal(n.$('[data-label-language=cs]').checked,false);
+  assert.equal(n.$('#label-languages-state').hidden,false);
   assert.deepEqual(n.$$('[data-label-slot] h4').map(e=>e.textContent),['Přední','Zadní']);
   assert.equal(n.$('[data-label-layout]'),null);
   n.$('#tab-labels').dispatchEvent(new n.w.KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true}));
@@ -72,14 +73,14 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
   const n=await setup(),inci='Aqua, <test>, Parfum.\nLinalool*';await n.upload('products',[{...fixture,inci,inciStatus:'verified'}]);
   let copied;Object.defineProperty(n.w.navigator,'clipboard',{value:{writeText:async text=>{copied=text;}}});
   const before=await n.saved();n.click('[data-edit="0"]');n.click('#tab-inci');
-  assert.equal(n.$('#section-inci p').textContent,inci);assert.equal(n.$('#section-inci test'),null);
+  assert.equal(n.$('#inci-text').value,inci);assert.equal(n.$('#section-inci test'),null);
   assert.equal(n.$('#copy-inci').disabled,false);n.click('#copy-inci');await wait(()=>copied===inci);
   assert.equal(n.$('#toast').parentElement,n.$('#editor'));assert.equal(n.$('#toast').hidden,false);
   assert.equal(n.$('#editor').open,true);assert.deepEqual(await n.saved(),before);
   n.click('#editor-close');assert.equal(n.$('#confirm-dialog').open,false);
   for(const [product,label] of [[{...fixture,inciStatus:'not-applicable'},'N/A'],[{...fixture,inciStatus:'pending'},'TBD']]){
    await n.upload('products',[product]);n.click('[data-edit="0"]');n.click('#tab-inci');
-   assert.equal(n.$('#section-inci p').textContent,label);assert.equal(n.$('#copy-inci').disabled,true);n.click('#editor-close');
+   assert.equal(n.$('#inci-text').placeholder,label);assert.equal(n.$('#copy-inci').disabled,true);n.click('#editor-close');
   }
   assert.deepEqual(n.errors,[]);n.dom.window.close();
  });
@@ -341,6 +342,76 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
   assert.deepEqual(history.errors,[]);
  });
  history.dom.window.close();
+ const png='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a3uoAAAAASUVORK5CYII=';
+ async function selectLabel(n,slot,name='label.png',data=png){
+  const bytes=Buffer.from(data,'base64'),file=new n.w.File([bytes],name,{type:name.endsWith('.pdf')?'application/pdf':'image/png'});
+  Object.defineProperty(n.$('#label-input-'+slot),'files',{configurable:true,value:[file]});
+  n.$('#label-input-'+slot).dispatchEvent(new n.w.Event('change',{bubbles:true}));
+  await wait(()=>!n.$('#label-input-'+slot).disabled);return file;
+ }
+ await test('existing product saves original front/back bytes, language selection and manually supplied INCI',async()=>{
+  const n=await setup();await n.upload('products',[{...fixture,inci:'Old',inciStatus:'verified',inciSource:{url:'original'},labelLanguages:['en','cs'],labels:{future:{keep:true}},extra:'keep'}]);
+  n.click('[data-edit="0"]');n.input('#inci-text','Aqua, Parfum.\nLinalool*');
+  n.$('[data-label-language=ar]').checked=true;n.$('[data-label-language=ar]').dispatchEvent(new n.w.Event('input',{bubbles:true}));n.input('#label-other-languages','pt, nl');
+  await selectLabel(n,'front','přední.png');await selectLabel(n,'back','back.pdf',Buffer.from('%PDF-1.4\nlabel\n%%EOF').toString('base64'));
+  assert.equal(n.$('[data-label-view=front]').disabled,false);n.click('[data-label-view=front]');assert.ok(n.$('#photo-dialog').open);n.click('#photo-close');
+  n.submit('#product-form');await wait(()=>!n.$('#editor').open);const s=await n.saved(),p=s.products[0];
+  assert.equal(p.inci,'Aqua, Parfum.\nLinalool*');assert.equal(p.inciStatus,'provided');assert.equal(p.inciSource.type,'manual');assert.equal(p.inciSource.url,undefined);
+  assert.deepEqual(p.labelLanguages,['cs','en','ar','pt','nl']);assert.deepEqual(p.labels.future,{keep:true});assert.equal(p.extra,'keep');
+  assert.equal(p.labels.front.name,'přední.png');assert.equal(p.labels.back.mimeType,'application/pdf');
+  assert.equal(s.labelFiles[p.labels.front.path],'data:image/png;base64,'+png);assert.equal(Object.keys(s.labelFiles).length,2);
+  assert.ok(!JSON.stringify(p).includes('base64'));assert.equal(s.pendingLabels.length,2);
+  n.click('[data-edit="0"]');n.click('#tab-labels');assert.ok(n.$('[data-label-preview=front] img').src.startsWith('data:image/png;'));
+  assert.equal(n.$('[data-label-preview=back]').textContent,'PDF');n.click('#editor-close');assert.equal(n.$('#confirm-dialog').open,false);
+  assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
+ await test('new product has every information field and removing a back label restores N/A without deleting the front',async()=>{
+  const n=await setup();n.click('#create');n.input('#field-id','0012345678901');n.input('#field-brand','Lilien');n.input('#field-name','New labelled product');n.input('#inci-text','Aqua');
+  n.$('[data-label-language=cs]').checked=true;n.$('[data-label-language=cs]').dispatchEvent(new n.w.Event('input',{bubbles:true}));
+  await selectLabel(n,'front');await selectLabel(n,'back');n.submit('#product-form');await wait(()=>!n.$('#editor').open);
+  let s=await n.saved();assert.equal(s.products[0].inci,'Aqua');assert.deepEqual(s.products[0].labelLanguages,['cs']);const front=s.products[0].labels.front.path;
+  n.click('[data-edit="0"]');n.click('#tab-labels');n.click('[data-label-remove=back]');assert.equal(n.$('[data-label-preview=back]').textContent,'N/A');n.submit('#product-form');await wait(()=>!n.$('#editor').open);
+  s=await n.saved();assert.equal(s.products[0].labels.front.path,front);assert.equal(s.products[0].labels.back,null);assert.equal(s.pendingLabels.length,1);
+  n.click('#undo');await wait(async()=>!!(await n.saved()).products[0].labels.back);assert.ok((await n.saved()).labelFiles[(await n.saved()).products[0].labels.back.path]);
+  assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
+ await test('label draft and INCI survive the roundtrip to the logistics editor; untouched language order is preserved',async()=>{
+  const n=await setup();await n.upload('products',[{...fixture,labelLanguages:['en','cs'],inci:'Original',inciStatus:'verified',inciSource:{url:'source'}}]);await n.upload('logistics',logistics);
+  n.click('[data-edit="0"]');n.input('#inci-text','Draft INCI');await selectLabel(n,'front');n.click('#tab-packaging');n.click('#product-key-open');await wait(()=>n.$('#key-back'));n.click('#key-back');await wait(()=>n.$('#product-form'));assert.equal(n.$('#inci-text').value,'Draft INCI');n.click('#tab-labels');assert.equal(n.$('[data-label-name=front]').textContent,'label.png');
+  n.submit('#product-form');await wait(()=>!n.$('#editor').open);const s=await n.saved();assert.equal(s.products[0].inci,'Draft INCI');assert.deepEqual(s.products[0].labelLanguages,['en','cs']);assert.equal(Object.keys(s.labelFiles).length,1);
+  n.click('[data-edit="0"]');n.change('#inci-status','not-applicable');n.submit('#product-form');await wait(()=>!n.$('#editor').open);assert.equal((await n.saved()).products[0].inciStatus,'not-applicable');
+  n.click('[data-edit="0"]');assert.equal(n.$('#inci-text').placeholder,'N/A');n.click('#editor-close');assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
+ await test('invalid label files and oversized inputs are rejected before replacing a working label',async()=>{
+  const n=await setup();await n.upload('products',[fixture]);n.click('[data-edit="0"]');await selectLabel(n,'front');const src=n.$('[data-label-preview=front] img').src;
+  await selectLabel(n,'front','fake.png',Buffer.from('<svg>bad</svg>').toString('base64'));assert.ok(n.$('#toast').textContent.includes('JPG'));assert.equal(n.$('[data-label-preview=front] img').src,src);
+  const big=new n.w.File(['png'],'large.png');Object.defineProperty(big,'size',{value:16*1024*1024});await assert.rejects(n.w.JasonStorage.label(big),/LABEL_SIZE/);
+  assert.deepEqual(n.errors,['LABEL_TYPE']);n.dom.window.close();
+ });
+ await test('discarding an uploaded label leaves the product and all files unchanged',async()=>{
+  const n=await setup();await n.upload('products',[fixture]);const before=await n.saved();n.click('[data-edit="0"]');await selectLabel(n,'front');n.click('#editor-close');await wait(()=>n.$('#confirm-dialog').open);n.click('#confirm-yes');assert.deepEqual(await n.saved(),before);n.dom.window.close();
+ });
+ await test('failed label upload blocks publishing product references; retry uploads original bytes before products',async()=>{
+  let remote={products:[clone(fixture)],logistics:clone(logistics)},fail=true,calls=[];
+  const n=await setup(true,async(url,args={})=>{
+   const name=new URL(url).pathname.split('/').pop();if(args.method==='PUT'){
+    const body=JSON.parse(args.body);calls.push({name,body});if(name==='upload-image'&&fail)return {ok:false,status:503,text:async()=>'Upload test failure'};
+    if(name!=='upload-image')remote[name]=body;return {ok:true,status:200};
+   }return {ok:true,status:200,json:async()=>clone(remote[name])};
+  });await wait(async()=>(await n.saved()).connected);n.click('[data-edit="0"]');await selectLabel(n,'front');n.submit('#product-form');await wait(()=>calls.length>0&&n.$('#save-status').textContent.includes('čekají'));
+  assert.deepEqual(calls.map(c=>c.name),['upload-image']);assert.equal(remote.products[0].labels,undefined);let s=await n.saved();assert.equal(s.pendingLabels.length,1);
+  fail=false;n.click('#retry');await wait(()=>n.$('#save-status').textContent.includes('společných'));s=await n.saved();
+  assert.deepEqual(calls.map(c=>c.name),['upload-image','upload-image','products']);assert.equal(calls[1].body.content,png);assert.equal(calls[1].body.path,remote.products[0].labels.front.path);assert.deepEqual(s.pendingLabels,[]);
+  const path=remote.products[0].labels.front.path;n.click('[data-edit="0"]');await selectLabel(n,'front','replacement.png');n.submit('#product-form');await wait(()=>remote.products[0].labels.front.path!==path);await wait(()=>n.$('#retry').hidden);assert.notEqual(remote.products[0].labels.front.path,path);
+  const before=calls.length;n.click('[data-edit="0"]');n.click('[data-label-remove=front]');n.submit('#product-form');await wait(()=>remote.products[0].labels.front===null);await wait(()=>n.$('#retry').hidden);
+  assert.deepEqual(calls.slice(before).map(c=>c.name),['products']);n.dom.window.close();
+ });
+ await test('backup restores label files and rejects paths outside the label directory',async()=>{
+  const n=await setup(),path='OrderSheet/img/labels/backup-front-test.png',data='data:image/png;base64,'+png;
+  const backup={format:'jason-backup',version:1,products:[{...fixture,labels:{front:{path,mimeType:'image/png'}}}],logistics,photos:{},labelFiles:{[path]:data}};
+  await n.upload('backup',backup);assert.equal((await n.saved()).labelFiles[path],data);n.click('[data-edit="0"]');n.click('#tab-labels');assert.equal(n.$('[data-label-preview=front] img').src,data);n.click('#editor-close');
+  const before=await n.saved();await n.upload('backup',{...backup,labelFiles:{'OrderSheet/products.json':data}},false);await wait(()=>n.$('#toast').className==='error');assert.deepEqual(await n.saved(),before);assert.equal(n.$('#confirm-dialog').open,false);n.dom.window.close();
+ });
  // Deterministic API adapter checks using fake responses, no network.
  const d=await setup();let remote={products:[clone(fixture)],logistics:clone(logistics)},puts=[],fail=false,conflict=false;
  d.w.fetch=async(url,args={})=>{const n=new URL(url).pathname.split('/').pop();if(!String(url).startsWith('https://mock.test'))return {ok:false,status:404,text:async()=>''};if(args.method==='PUT'){const value=JSON.parse(args.body);puts.push({name:n,data:value});if(n==='products'&&fail)return {ok:false,status:500,text:async()=>'TEST FAILURE'};if(n!=='upload-image')remote[n]=value;return {ok:true,status:200};}return {ok:true,status:200,json:async()=>clone(conflict&&n==='products'?[{...fixture,name:'OTHER USER'}]:remote[n])};};
