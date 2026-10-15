@@ -235,13 +235,32 @@ function openKeyExport(entry){
  d.showModal();
 }
 const labelLanguageCodes=['cs','en','sk','de','pl','hu','fr','it','es','ro','bg','uk','ru','ar','vi'];
+const allLabelLanguageCodes='aa ab ae af ak am an ar as av ay az ba be bg bh bi bm bn bo br bs ca ce ch co cr cs cu cv cy da de dv dz ee el en eo es et eu fa ff fi fj fo fr fy ga gd gl gn gu gv ha he hi ho hr ht hu hy hz ia id ie ig ii ik io is it iu ja jv ka kg ki kj kk kl km kn ko kr ks ku kv kw ky la lb lg li ln lo lt lu lv mg mh mi mk ml mn mr ms mt my na nb nd ne ng nl nn no nr nv ny oc oj om or os pa pi pl ps pt qu rm rn ro ru rw sa sc sd se sg si sk sl sm sn so sq sr ss st su sv sw ta te tg th ti tk tl tn to tr ts tt tw ty ug uk ur uz ve vi vo wa wo xh yi yo za zh zu'.split(' ');
+const languageCodeText=codes=>codes.map(code=>String(code).toUpperCase()).join(', ');
+function chooseLabelLanguages(current){
+ const d=$('#label-languages-dialog'),names=new Intl.DisplayNames([lang],{type:'language'}),chosen=new Set(current.map(code=>String(code).toLowerCase()));
+ const displayName=code=>{try{return names.of(code);}catch{return code;}};
+ const codes=[...new Set([...allLabelLanguageCodes,...chosen])];
+ d.innerHTML=`<form id="label-languages-form"><div class="language-dialog-heading"><h2 id="label-languages-title">${t('labelLanguages')}</h2><button type="button" class="close-button" id="label-languages-close" aria-label="${esc(t('cancel'))}">×</button></div><input id="label-language-search" type="search" placeholder="${esc(t('searchLanguage'))}" aria-label="${esc(t('searchLanguage'))}"><div class="label-language-grid" id="label-language-choices"></div><div class="dialog-actions"><button type="button" id="label-languages-cancel">${t('cancel')}</button><button type="submit" class="primary">${t('apply')}</button></div></form>`;
+ const render=()=>{const query=M.fold($('#label-language-search').value).trim(),visible=query?codes.filter(code=>M.fold(displayName(code)).includes(query)||code===query).sort((a,b)=>displayName(a).localeCompare(displayName(b),lang)):[...new Set([...labelLanguageCodes,...chosen])];
+  $('#label-language-choices').innerHTML=visible.map(code=>`<label class="checkbox-label"><input type="checkbox" data-label-language="${esc(code)}" ${chosen.has(code)?'checked':''}><span>${esc(displayName(code))}</span></label>`).join('')||`<p class="muted">${t('empty')}</p>`;
+  $$('[data-label-language]').forEach(input=>input.onchange=()=>{if(input.checked)chosen.add(input.dataset.labelLanguage);else chosen.delete(input.dataset.labelLanguage);});
+ };
+ render();$('#label-language-search').oninput=render;d.showModal();
+ return new Promise(resolve=>{
+  const finish=value=>{d.close();d.replaceChildren();d.oncancel=null;d.onkeydown=null;resolve(value);};
+  const apply=()=>{const unchanged=chosen.size===current.length&&current.every(code=>chosen.has(String(code).toLowerCase()));finish(unchanged?M.clone(current):[...current.filter(code=>chosen.has(String(code).toLowerCase())),...[...chosen].filter(code=>!current.some(old=>String(old).toLowerCase()===code))]);};
+  $('#label-languages-close').onclick=()=>finish(null);$('#label-languages-cancel').onclick=()=>finish(null);$('#label-languages-form').onsubmit=e=>{e.preventDefault();apply();};
+  d.oncancel=e=>{e.preventDefault();finish(null);};d.onkeydown=e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();e.stopPropagation();apply();}};
+ });
+}
 function labelSource(asset){const path=M.labelPath(asset);return path?(state.labelFiles[path]||`${state.imageBase.replace(/\/$/,'')}/labels/${path.split('/').pop()}`):'';}
-function productInfoSections(p){
+function productInfoSections(p,isNew=false){
  const available=typeof p.inci==='string'&&!!p.inci.trim()&&!['not-applicable','pending'].includes(p.inciStatus),status=p.inciStatus==='not-applicable'?'not-applicable':available?'provided':'pending';
- const languages=Array.isArray(p.labelLanguages)?p.labelLanguages:[],languageNames=new Intl.DisplayNames([lang],{type:'language'});
+ const languages=Array.isArray(p.labelLanguages)?p.labelLanguages:[];
  const labelCard=(slot,title)=>`<article class="label-card" data-label-slot="${slot}"><div class="label-card-heading"><h4>${t(title)}</h4></div><div class="label-placeholder" data-label-preview="${slot}" tabindex="0" role="button" aria-label="${esc(t('uploadLabel')+' — '+t(title))}"></div><p class="label-file-name" data-label-name="${slot}"></p><input type="file" id="label-input-${slot}" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" hidden><div class="label-card-actions"><button type="button" data-label-upload="${slot}">${t('uploadLabel')}</button><button type="button" data-label-view="${slot}">${t('viewLabel')}</button><button type="button" data-label-download="${slot}">${t('downloadLabel')}</button><button type="button" class="danger-quiet" data-label-remove="${slot}">${t('removeLabel')}</button></div></article>`;
  return `<section id="section-inci" class="tab-section" role="tabpanel" aria-labelledby="tab-inci"><div class="section-intro"><h3>${t('inci')}</h3><select id="inci-status" name="inciStatus" aria-label="${esc(t('status'))}">${['provided','pending','not-applicable'].map(v=>option(v,v==='provided'?t('filled'):v==='pending'?'TBD':'N/A',status)).join('')}</select></div><textarea id="inci-text" name="inci" rows="8" aria-label="INCI" placeholder="TBD" ${status==='not-applicable'?'disabled':''}>${esc(p.inci||'')}</textarea><div class="info-actions"><button id="copy-inci" type="button" ${available?'':'disabled'}>${t('copyInci')}</button></div></section>
- <section id="section-labelLanguages" class="tab-section" role="tabpanel" aria-labelledby="tab-labelLanguages"><div class="section-intro"><h3>${t('labelLanguages')}</h3><span id="label-languages-state" ${languages.length?'hidden':''}>TBD</span></div><div class="label-language-grid">${labelLanguageCodes.map(code=>`<label class="checkbox-label"><input type="checkbox" data-label-language="${code}" ${languages.includes(code)?'checked':''}>${esc(languageNames.of(code))} <small>${code.toUpperCase()}</small></label>`).join('')}</div><label class="field"><span>${t('otherLanguages')}</span><input id="label-other-languages" value="${esc(languages.filter(c=>!labelLanguageCodes.includes(c)).join(', '))}" placeholder="pt, nl, …"></label></section>
+ <section id="section-labelLanguages" class="tab-section" role="tabpanel" aria-labelledby="tab-labelLanguages"><div class="section-intro"><h3>${t('labelLanguages')}</h3></div><p id="label-language-codes" class="language-codes">${languages.length?esc(languageCodeText(languages)):'TBD'}</p><div class="info-actions language-actions">${button('copy-label-languages','copyLanguages')}${button('edit-label-languages',isNew?'chooseLanguages':'edit')}</div></section>
  <section id="section-labels" class="tab-section" role="tabpanel" aria-labelledby="tab-labels"><div class="section-intro"><h3>${t('labels')}</h3></div><div class="label-grid split" id="product-label-grid">${labelCard('front','frontLabel')}${labelCard('back','backLabel')}</div><p class="muted label-file-hint">${t('labelFileHint')}</p></section>`;
 }
 function openProduct(index=null,tab='details',duplicate=false){
@@ -257,16 +276,16 @@ function openProduct(index=null,tab='details',duplicate=false){
  <section id="section-packaging" class="tab-section" role="tabpanel" aria-labelledby="tab-packaging"><div class="section-intro"><h3>${t('packaging')}</h3></div><div class="form-grid"><label class="field"><span>${t('key')}</span><select name="key" id="product-key"></select></label>${field('carton_ean','carton_ean',p.carton_ean)}</div><p class="muted" id="key-summary"></p><section class="product-logistics"><div class="section-intro"><h3>${t('keyData')}</h3><div class="key-detail-actions">${button('product-key-open','editKey')}${button('product-key-export','exportNow')}</div></div><div id="product-key-data"></div></section></section>
  <section id="section-flags" class="tab-section" role="tabpanel" aria-labelledby="tab-flags"><h3>${t('flags')}</h3>${['new','discontinued'].map(v=>`<div class="flag-card"><label class="checkbox-label"><input type="checkbox" name="${v}" ${p[v]===true?'checked':''}>${t(v)}</label>${field(v+'_date',v+'_date',p[v+'_date'],'date')}</div>`).join('')}<div class="form-grid">${field('flags','customFlags',(p.flags||[]).join(', '),'text','',t('flagsHint'))}</div></section>
  <section id="section-photo" class="tab-section" role="tabpanel" aria-labelledby="tab-photo"><h3>${t('photo')}</h3><div class="photo-layout"><button type="button" class="photo-drop" id="photo-drop"><img id="photo-preview" alt="${esc(t('photo'))}" hidden><span id="photo-placeholder">+<small>${t('choosePhoto')}</small></span></button><div><p>${t(sandbox?'sandboxPhotoHint':'photoHint')}</p><input type="file" accept="image/jpeg,image/png,image/webp" id="photo-input" hidden>${button('photo-choose','choosePhoto')}${button('photo-download','downloadPhoto')}${button('photo-view','viewPhoto')}<p class="muted">${state.pendingPhotos.includes(p.id)?t('photoPending'):''}</p></div></div></section>
- ${productInfoSections(p)}</div>${formFooter()}</form>`);
+ ${productInfoSections(p,!original||duplicate)}</div>${formFooter()}</form>`);
  const form=$('#product-form'),elements=form.elements,selectedLabels={},labelReads=new Set(),labelReadRevisions={front:0,back:0};
  const originalInfo={inci:$('#inci-text').value,status:$('#inci-status').value,languages:Array.isArray(p.labelLanguages)?M.clone(p.labelLanguages):[]};
- const readLanguages=()=>[...new Set([...$$('[data-label-language]:checked').map(e=>e.dataset.labelLanguage),...$('#label-other-languages').value.split(',').map(v=>v.trim()).filter(Boolean)])];
- originalInfo.languagesRendered=readLanguages();
+ let languageDraft=M.clone(originalInfo.languages);
  const updateInci=()=>{$('#inci-text').disabled=$('#inci-status').value==='not-applicable';$('#inci-text').placeholder=$('#inci-status').value==='not-applicable'?'N/A':'TBD';$('#copy-inci').disabled=$('#inci-status').value!=='provided'||!$('#inci-text').value.trim();};
  $('#inci-text').addEventListener('input',()=>{$('#inci-status').value=$('#inci-text').value.trim()?'provided':'pending';updateInci();});$('#inci-status').onchange=updateInci;updateInci();
  $('#copy-inci').onclick=async()=>{try{await navigator.clipboard.writeText($('#inci-text').value);toast(t('inciCopied'));}catch(e){error(e);}};
- const updateLanguages=()=>{$('#label-languages-state').hidden=readLanguages().length>0;};
- for(const e of [...$$('[data-label-language]'),$('#label-other-languages')]){e.addEventListener('input',updateLanguages);e.addEventListener('change',updateLanguages);}
+ const updateLanguages=()=>{$('#label-language-codes').textContent=languageDraft.length?languageCodeText(languageDraft):'TBD';$('#copy-label-languages').disabled=!languageDraft.length;};
+ $('#copy-label-languages').onclick=async()=>{try{await navigator.clipboard.writeText(languageCodeText(languageDraft));toast(t('languagesCopied'));}catch(e){error(e);}};
+ $('#edit-label-languages').onclick=async()=>{const result=await chooseLabelLanguages(languageDraft);if(result!==null&&JSON.stringify(result)!==JSON.stringify(languageDraft)){languageDraft=result;editorDirty=true;updateLanguages();}};updateLanguages();
  function currentLabel(slot){return Object.hasOwn(selectedLabels,slot)?selectedLabels[slot]:p.labels?.[slot];}
  function labelUrl(slot){const asset=currentLabel(slot);return asset?.dataUrl||labelSource(asset);}
  function renderLabel(slot){
@@ -342,7 +361,7 @@ function openProduct(index=null,tab='details',duplicate=false){
    if($('#inci-text').value!==originalInfo.inci||$('#inci-status').value!==originalInfo.status){
     const status=$('#inci-status').value;patch.inci=status==='provided'?$('#inci-text').value:'';patch.inciStatus=status==='provided'&&patch.inci.trim()?'provided':status==='not-applicable'?'not-applicable':'pending';patch.inciSource={type:'manual',updatedAt:new Date().toISOString()};
    }
-   const languages=readLanguages();if(JSON.stringify(languages)!==JSON.stringify(originalInfo.languagesRendered)){
+   const languages=languageDraft;if(JSON.stringify(languages)!==JSON.stringify(originalInfo.languages)){
     if(languages.some(code=>!/^[a-zA-Z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(code)))throw Error('LABEL_LANGUAGES');patch.labelLanguages=languages;
    }
    const files={};if(Object.keys(selectedLabels).length){

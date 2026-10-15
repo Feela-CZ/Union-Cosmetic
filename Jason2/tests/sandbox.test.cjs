@@ -44,7 +44,7 @@ async function setup(real=false,cached=null){
  });
  await test('sandbox labels, INCI and languages survive reload and backup without sending files or touching live storage',async()=>{
   c.click('[data-view=products]');c.click('[data-edit="0"]');c.input('#inci-text','Aqua, Parfum');
-  c.$('[data-label-language=ar]').checked=true;c.$('[data-label-language=ar]').dispatchEvent(new c.w.Event('change',{bubbles:true}));
+  c.click('#edit-label-languages');c.$('[data-label-language=ar]').checked=true;c.$('[data-label-language=ar]').dispatchEvent(new c.w.Event('change',{bubbles:true}));c.submit('#label-languages-form');await wait(()=>!c.$('#label-languages-dialog').open);
   const png='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a3uoAAAAASUVORK5CYII=';
   const file=new c.w.File([Buffer.from(png,'base64')],'local-label.png',{type:'image/png'});
   Object.defineProperty(c.$('#label-input-front'),'files',{configurable:true,value:[file]});c.$('#label-input-front').dispatchEvent(new c.w.Event('change',{bubbles:true}));await wait(()=>!c.$('#label-input-front').disabled);

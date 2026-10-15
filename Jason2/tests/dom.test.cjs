@@ -33,6 +33,12 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
  const submit=s=>{$(s).dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));};
  return {w,dom,$,$$,click,input,change,saved,upload,submit,errors,photoObservers};
 }
+async function pickLanguages(n,codes,apply=true){
+ n.click('#edit-label-languages');
+ for(const code of codes){if(!n.$(`[data-label-language="${code}"]`))n.input('#label-language-search',code);const el=n.$(`[data-label-language="${code}"]`);assert.ok(el);el.checked=true;el.dispatchEvent(new n.w.Event('change',{bubbles:true}));n.input('#label-language-search','');}
+ if(apply)n.submit('#label-languages-form');else n.click('#label-languages-cancel');
+ await wait(()=>!n.$('#label-languages-dialog').open);
+}
 (async()=>{
  let passed=0;const c=await setup(),{w,$,$$,click,input,change,saved,upload,submit,errors}=c;
  async function test(name,fn){await fn();passed++;console.log('PASS',name);}
@@ -57,8 +63,9 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
   }
   assert.equal(n.$('#section-inci h3').textContent,'INCI');
   assert.equal(n.$('#section-labelLanguages h3').textContent,'Jazyky etikety');
-  assert.equal(n.$('[data-label-language=cs]').checked,false);
-  assert.equal(n.$('#label-languages-state').hidden,false);
+  assert.equal(n.$('[data-label-language=cs]'),null);
+  assert.equal(n.$('#label-language-codes').textContent,'TBD');
+  assert.equal(n.$('#copy-label-languages').disabled,true);
   assert.deepEqual(n.$$('[data-label-slot] h4').map(e=>e.textContent),['Přední','Zadní']);
   assert.equal(n.$('[data-label-layout]'),null);
   n.$('#tab-labels').dispatchEvent(new n.w.KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true}));
@@ -68,6 +75,24 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
   n.click('[data-lang=en]');n.click('[data-edit="0"]');assert.equal(n.$('#tab-labelLanguages').textContent,'Label languages');
   n.click('#tab-labels');assert.equal(n.$('[data-label-slot=front] h4').textContent,'Front');
   n.click('#editor-close');assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
+ await test('product languages are copyable codes only; picker cancellation and unchanged confirmation never dirty the product',async()=>{
+  const n=await setup();await n.upload('products',[{...fixture,labelLanguages:['en','cs','de']}]);const before=await n.saved();
+  let copied;Object.defineProperty(n.w.navigator,'clipboard',{value:{writeText:async value=>{copied=value;}}});
+  n.click('[data-edit="0"]');n.click('#tab-labelLanguages');assert.equal(n.$('#label-language-codes').textContent,'EN, CS, DE');assert.equal(n.$$('[data-label-language]').length,0);assert.equal(n.$('#label-other-languages'),null);
+  assert.equal(n.$('#section-labelLanguages').textContent.includes('čeština'),false);n.click('#copy-label-languages');await wait(()=>copied==='EN, CS, DE');assert.deepEqual(await n.saved(),before);
+  await pickLanguages(n,['ar'],false);assert.equal(n.$('#label-language-codes').textContent,'EN, CS, DE');
+  await pickLanguages(n,[]);assert.equal(n.$('#label-language-codes').textContent,'EN, CS, DE');
+  n.click('#editor-close');assert.equal(n.$('#confirm-dialog').open,false);assert.deepEqual(await n.saved(),before);assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
+ await test('compact language picker maps searched names to codes, supports clearing and only saves with the product',async()=>{
+  const n=await setup();await n.upload('products',[fixture]);const before=await n.saved();n.click('[data-edit="0"]');n.click('#tab-labelLanguages');n.click('#edit-label-languages');
+  assert.equal(n.$('#label-languages-dialog').open,true);assert.equal(n.$$('#label-language-choices small').length,0);assert.equal(n.$('#label-language-choices').textContent.includes('CS'),false);
+  n.input('#label-language-search','portugal');assert.equal(n.$$('[data-label-language]').length,1);assert.equal(n.$('[data-label-language]').dataset.labelLanguage,'pt');n.$('[data-label-language=pt]').click();
+  n.input('#label-language-search','');n.$('[data-label-language=ar]').click();n.submit('#label-languages-form');await wait(()=>!n.$('#label-languages-dialog').open);assert.equal(n.$('#label-language-codes').textContent,'PT, AR');assert.deepEqual(await n.saved(),before);
+  n.submit('#product-form');await wait(()=>!n.$('#editor').open);assert.deepEqual((await n.saved()).products[0].labelLanguages,['pt','ar']);
+  n.click('[data-edit="0"]');n.click('#edit-label-languages');for(const el of n.$$('[data-label-language]:checked'))el.click();n.submit('#label-languages-form');await wait(()=>!n.$('#label-languages-dialog').open);assert.equal(n.$('#label-language-codes').textContent,'TBD');assert.equal(n.$('#copy-label-languages').disabled,true);
+  n.submit('#product-form');await wait(()=>!n.$('#editor').open);assert.deepEqual((await n.saved()).products[0].labelLanguages,[]);assert.deepEqual(n.errors,[]);n.dom.window.close();
  });
  await test('INCI renders as text and copying never changes product data or submits the form',async()=>{
   const n=await setup(),inci='Aqua, <test>, Parfum.\nLinalool*';await n.upload('products',[{...fixture,inci,inciStatus:'verified'}]);
@@ -352,12 +377,12 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
  await test('existing product saves original front/back bytes, language selection and manually supplied INCI',async()=>{
   const n=await setup();await n.upload('products',[{...fixture,inci:'Old',inciStatus:'verified',inciSource:{url:'original'},labelLanguages:['en','cs'],labels:{future:{keep:true}},extra:'keep'}]);
   n.click('[data-edit="0"]');n.input('#inci-text','Aqua, Parfum.\nLinalool*');
-  n.$('[data-label-language=ar]').checked=true;n.$('[data-label-language=ar]').dispatchEvent(new n.w.Event('input',{bubbles:true}));n.input('#label-other-languages','pt, nl');
+  await pickLanguages(n,['ar','pt','nl']);
   await selectLabel(n,'front','přední.png');await selectLabel(n,'back','back.pdf',Buffer.from('%PDF-1.4\nlabel\n%%EOF').toString('base64'));
   assert.equal(n.$('[data-label-view=front]').disabled,false);n.click('[data-label-view=front]');assert.ok(n.$('#photo-dialog').open);n.click('#photo-close');
   n.submit('#product-form');await wait(()=>!n.$('#editor').open);const s=await n.saved(),p=s.products[0];
   assert.equal(p.inci,'Aqua, Parfum.\nLinalool*');assert.equal(p.inciStatus,'provided');assert.equal(p.inciSource.type,'manual');assert.equal(p.inciSource.url,undefined);
-  assert.deepEqual(p.labelLanguages,['cs','en','ar','pt','nl']);assert.deepEqual(p.labels.future,{keep:true});assert.equal(p.extra,'keep');
+  assert.deepEqual(p.labelLanguages,['en','cs','ar','pt','nl']);assert.deepEqual(p.labels.future,{keep:true});assert.equal(p.extra,'keep');
   assert.equal(p.labels.front.name,'přední.png');assert.equal(p.labels.back.mimeType,'application/pdf');
   assert.equal(s.labelFiles[p.labels.front.path],'data:image/png;base64,'+png);assert.equal(Object.keys(s.labelFiles).length,2);
   assert.ok(!JSON.stringify(p).includes('base64'));assert.equal(s.pendingLabels.length,2);
@@ -367,7 +392,7 @@ async function setup(shared=false,initialRemote=null,withPhotoObserver=false,kno
  });
  await test('new product has every information field and removing a back label restores N/A without deleting the front',async()=>{
   const n=await setup();n.click('#create');n.input('#field-id','0012345678901');n.input('#field-brand','Lilien');n.input('#field-name','New labelled product');n.input('#inci-text','Aqua');
-  n.$('[data-label-language=cs]').checked=true;n.$('[data-label-language=cs]').dispatchEvent(new n.w.Event('input',{bubbles:true}));
+  await pickLanguages(n,['cs']);
   await selectLabel(n,'front');await selectLabel(n,'back');n.submit('#product-form');await wait(()=>!n.$('#editor').open);
   let s=await n.saved();assert.equal(s.products[0].inci,'Aqua');assert.deepEqual(s.products[0].labelLanguages,['cs']);const front=s.products[0].labels.front.path;
   n.click('[data-edit="0"]');n.click('#tab-labels');n.click('[data-label-remove=back]');assert.equal(n.$('[data-label-preview=back]').textContent,'N/A');n.submit('#product-form');await wait(()=>!n.$('#editor').open);
