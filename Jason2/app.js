@@ -8,7 +8,7 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const icons={products:'▦',keys:'◇',checks:'✓',data:'↔',undo:'↶',redo:'↷',export:'↓',plus:'+'};
 let lang='cs',view='products',page=1,pageSize=30,sort={field:'name',asc:true},selected=new Set(),history=[],future=[],busy=false,editorDirty=false,editorSave=null,editorReturn=null,toastTimer,syncing=false,storageError=false;
 let state={products:[],logistics:M.clone(window.JASON_SEED_LOGISTICS||{}),photos:{},pendingPhotos:[],labelFiles:{},pendingLabels:[],connected:false,api:JASON_CONFIG.apiBase,imageBase:JASON_CONFIG.imageBase,baseline:{},updated:null};
-let filters={search:'',brand:'',type:'',key:'',status:'active',new:'',flag:'',scope:''};
+let filters={search:'',brand:'',type:'',key:'',status:'active',keyStatus:'active',new:'',flag:'',scope:''};
 let photoVersion=Date.now(),photoObserver=null;
 const photoVersions=new Map(),missingThumbnails=new Set();
 const photoIds=Array.isArray(window.JASON_PHOTO_IDS)&&window.JASON_PHOTO_IDS.every(id=>typeof id==='string')?new Set(window.JASON_PHOTO_IDS):null;
@@ -102,7 +102,7 @@ async function confirm(title,message,yes='confirm',danger=false){
 async function closeEditor(){if(busy)return;if(editorDirty&&!await confirm('discard',t('discardHint'),'discardYes'))return;formClose();}
 function openEditor(title,caption,html,small=false){
  const d=$('#editor');d.classList.toggle('small',small);$('#editor-title').textContent=title;$('#editor-caption').textContent=caption;$('#editor-body').innerHTML=html;editorDirty=false;editorSave=null;editorReturn=null;
- $('#editor-body').oninput=e=>{if(e.target.closest('form')&&!['include-products','include-empty'].includes(e.target.id))editorDirty=true;};$('#editor-body').onchange=e=>{if(e.target.closest('form')&&!['include-products','include-empty'].includes(e.target.id))editorDirty=true;};
+ $('#editor-body').oninput=e=>{if(e.target.closest('form')&&!['include-products','include-empty','include-inactive'].includes(e.target.id))editorDirty=true;};$('#editor-body').onchange=e=>{if(e.target.closest('form')&&!['include-products','include-empty','include-inactive'].includes(e.target.id))editorDirty=true;};
  if(!d.open)d.showModal();
  d.scrollTop=0;
 }
@@ -113,7 +113,7 @@ function render(){
  $$('[data-text]').forEach(e=>e.textContent=t(sandbox&&e.dataset.text==='readonlyNote'?'sandboxFooter':e.dataset.text));$$('[data-lang]').forEach(e=>{e.classList.toggle('active',e.dataset.lang===lang);e.setAttribute('aria-pressed',e.dataset.lang===lang);});
  $('#workspace-mode').textContent=`JASON 2.0 / ${t(sandbox?'sandboxVersion':'liveVersion')}`;
  $('#sandbox-banner').hidden=!sandbox;$('#sandbox-banner').textContent=t('sandboxNote');
- $('#nav').innerHTML=['products','keys','checks'].map(v=>`<button class="nav-button ${view===v?'active':''}" data-view="${v}" ${view===v?'aria-current="page"':''}><span class="nav-icon">${icons[v]}</span>${esc(t(v))}<span class="nav-count">${v==='products'?state.products.length:v==='keys'?M.keyEntries(state.logistics).length:dataIssues().length}</span></button>`).join('');
+ $('#nav').innerHTML=['products','keys','checks'].map(v=>`<button class="nav-button ${view===v?'active':''}" data-view="${v}" ${view===v?'aria-current="page"':''}><span class="nav-icon">${icons[v]}</span>${esc(t(v))}<span class="nav-count">${v==='products'?state.products.length:v==='keys'?M.keyEntries(state.logistics,{status:'active'}).length:dataIssues().length}</span></button>`).join('');
  $$('[data-view]').forEach(b=>b.onclick=()=>changeView(b.dataset.view));
  $('#data-button').innerHTML=`<span class="nav-icon">↔</span>${esc(t(sandbox?'sandboxData':'data'))}`;
  $('#crumb').textContent=t(view);$('#page-title').textContent=t(view);
@@ -122,22 +122,25 @@ function render(){
  $('#export').textContent=`↓ ${t('export')}`;$('#create').textContent=`+ ${t(view==='keys'?'addKey':'addProduct')}`;$('#create').hidden=view==='checks';$('#create').disabled=refreshing||(JASON_CONFIG.sharedOnly&&JASON_CONFIG.autoConnect&&!state.connected);
  renderToolbar();renderContent();renderStatus();
 }
-function changeView(next){view=next;page=1;selected.clear();filters={search:'',brand:'',type:'',key:'',status:'active',new:'',flag:'',scope:''};location.hash=next;render();}
+function changeView(next){view=next;page=1;selected.clear();filters={search:'',brand:'',type:'',key:'',status:'active',keyStatus:'active',new:'',flag:'',scope:''};location.hash=next;render();}
 function renderToolbar(){
  const searchPlaceholder=t(view==='products'?'search':view==='keys'?'keySearch':'issueSearch');
  let html=`<label class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="${esc(searchPlaceholder)}" aria-label="${esc(searchPlaceholder)}" value="${esc(filters.search)}"></label>`;
  html+=selectHTML('filter-brand','brand',brands(),filters.brand,'allBrands');
  if(view==='products'){
   html+=selectHTML('filter-type','type',[...new Set([...types(),...state.products.map(p=>p.type)])].filter(Boolean).map(v=>({value:v,label:typeLabel(v)})),filters.type,'allTypes');
-  html+=selectHTML('filter-key','key',[...new Set(M.keyEntries(state.logistics).filter(k=>!filters.brand||k.brand===filters.brand).map(k=>k.key))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})),filters.key,'allKeys');
+  html+=selectHTML('filter-key','key',[...new Set(M.keyEntries(state.logistics).filter(k=>(M.keyIsActive(k.data)||k.key===filters.key)&&(!filters.brand||k.brand===filters.brand)).map(k=>k.key))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})),filters.key,'allKeys');
   html+=`<label class="filter"><span>${t('status')}</span><select id="filter-status">${['active','all','discontinued'].map(v=>option(v,t(v),filters.status)).join('')}</select></label>`;
   html+=selectHTML('filter-new','new',[{value:'yes',label:t('yes')},{value:'no',label:t('no')}],filters.new,'all');
   if(flags().length)html+=selectHTML('filter-flag','flag',flags(),filters.flag,'allFlags');
- }else if(view==='keys')html+=selectHTML('filter-scope','keyScope',[{value:'used',label:t('used')},{value:'unused',label:t('unused')},{value:'incomplete',label:t('incomplete')}],filters.scope,'allScopes');
+ }else if(view==='keys'){
+  html+=`<label class="filter"><span>${t('status')}</span><select id="filter-keyStatus">${['active','inactive','all'].map(v=>option(v,t(v),filters.keyStatus)).join('')}</select></label>`;
+  html+=selectHTML('filter-scope','keyScope',[{value:'used',label:t('used')},{value:'unused',label:t('unused')},{value:'incomplete',label:t('incomplete')}],filters.scope,'allScopes');
+ }
  html+=`<button class="reset-button" id="reset">${t('reset')}</button>`;$('#toolbar').innerHTML=html;
  $('#search').oninput=e=>{filters.search=e.target.value;page=1;selected.clear();renderContent();};
- for(const f of ['brand','type','key','status','new','flag','scope']){const el=$(`#filter-${f}`);if(el)el.onchange=e=>{filters[f]=e.target.value;if(f==='brand')filters.key='';page=1;selected.clear();renderToolbar();renderContent();};}
- $('#reset').onclick=()=>{filters={search:'',brand:'',type:'',key:'',status:'active',new:'',flag:'',scope:''};page=1;selected.clear();renderToolbar();renderContent();};
+ for(const f of ['brand','type','key','status','keyStatus','new','flag','scope']){const el=$(`#filter-${f}`);if(el)el.onchange=e=>{filters[f]=e.target.value;if(f==='brand')filters.key='';page=1;selected.clear();renderToolbar();renderContent();};}
+ $('#reset').onclick=()=>{filters={search:'',brand:'',type:'',key:'',status:'active',keyStatus:'active',new:'',flag:'',scope:''};page=1;selected.clear();renderToolbar();renderContent();};
 }
 function filteredProducts(){
  const list=M.filterProducts(state.products,filters),byName=sort.field==='name';
@@ -153,7 +156,7 @@ function renderContent(){
  if(photoObserver){photoObserver.disconnect();photoObserver=null;}
  let rows,unit;
  if(view==='products'){rows=filteredProducts();unit=t('countProducts');}
- else if(view==='keys'){rows=M.keyEntries(state.logistics).filter(r=>{const used=state.products.filter(p=>p.brand===r.brand&&M.key(p.key)===r.key).length;return (!filters.brand||r.brand===filters.brand)&&M.fold(r.brand+' '+r.key).includes(M.fold(filters.search))&&(!filters.scope||filters.scope==='used'&&used>0||filters.scope==='unused'&&used===0||filters.scope==='incomplete'&&completion(r.data)<100);}).sort((a,b)=>a.brand.localeCompare(b.brand)||a.key.localeCompare(b.key,undefined,{numeric:true}));unit=t('countKeys');}
+ else if(view==='keys'){rows=M.keyEntries(state.logistics,{status:filters.keyStatus}).filter(r=>{const used=state.products.filter(p=>p.brand===r.brand&&M.key(p.key)===r.key).length;return (!filters.brand||r.brand===filters.brand)&&M.fold(r.brand+' '+r.key).includes(M.fold(filters.search))&&(!filters.scope||filters.scope==='used'&&used>0||filters.scope==='unused'&&used===0||filters.scope==='incomplete'&&completion(r.data)<100);}).sort((a,b)=>a.brand.localeCompare(b.brand)||a.key.localeCompare(b.key,undefined,{numeric:true}));unit=t('countKeys');}
  else{rows=dataIssues().filter(r=>{const p=r.kind==='product'?state.products[r.index]:null;return (!filters.brand||(p?.brand||r.brand)===filters.brand)&&M.fold([p?.name,p?.csName,p?.id,p?.brand,r.brand,r.key,t(r.code),issueFieldLabel(r.field)].join(' ')).includes(M.fold(filters.search));});unit=t('countIssues');}
  const perPage=pageSize==='all'?Math.max(1,rows.length):pageSize,pages=Math.max(1,Math.ceil(rows.length/perPage));page=Math.min(page,pages);const items=rows.slice((page-1)*perPage,page*perPage);
  if(!items.length){$('#content').innerHTML=`<div class="empty-state"><div class="empty-symbol">${view==='checks'?'✓':'◇'}</div><h2>${esc(t(view==='products'&&!state.products.length?'noProducts':view==='checks'&&!rows.length&&!filters.search&&!filters.brand?'noIssues':'empty'))}</h2><p>${esc(t(view==='products'&&!state.products.length?'noProductsHint':'emptyHint'))}</p>${view==='products'&&!state.products.length?button('empty-import','loadProducts','primary'):''}</div>`;if($('#empty-import'))$('#empty-import').onclick=()=>importFile('products');}
@@ -187,7 +190,7 @@ function renderProductSelection(){
 }
 function logisticsNumber(raw){const value=M.count(raw);return value===''||!Number.isFinite(value)||value<0?'—':esc(value.toLocaleString(lang==='cs'?'cs-CZ':'en-GB',{maximumFractionDigits:2}));}
 function renderKeyTable(items){
- $('#content').innerHTML=`<div class="table-scroll"><table><thead><tr>${['key','brand','palletItems','palletWeight','estimatedHeight','affected','complete','actions'].map(k=>`<th>${t(k)}</th>`).join('')}</tr></thead><tbody>${items.map(r=>{const used=state.products.filter(p=>p.brand===r.brand&&M.key(p.key)===r.key).length,percent=completion(r.data);return `<tr><td><button class="key-link key-large" data-key-edit="${esc(r.brand)}" data-key-name="${esc(r.key)}">${esc(r.key)}</button></td><td>${badge(r.brand)}</td><td class="numeric">${logisticsNumber(r.data.PALLET?.nr_of_items)}</td><td class="numeric">${logisticsNumber(r.data.PALLET?.weight)}</td><td class="numeric" title="${esc(t('estimatedHeightHint'))}">${M.estimatedPalletHeight(r.data)===''?'—':'≈ '+logisticsNumber(M.estimatedPalletHeight(r.data))}</td><td><button class="text-button" data-used-brand="${esc(r.brand)}" data-used-key="${esc(r.key)}">${used} ${!used?'· '+t('unused'):''}</button></td><td><span class="completeness"><span><i style="width:${percent}%"></i></span>${percent}%</span></td><td><button class="row-edit" data-key-edit="${esc(r.brand)}" data-key-name="${esc(r.key)}">${t('edit')}</button></td></tr>`;}).join('')}</tbody></table></div>`;
+ $('#content').innerHTML=`<div class="table-scroll"><table><thead><tr>${['key','brand','status','palletItems','palletWeight','estimatedHeight','affected','complete','actions'].map(k=>`<th>${t(k)}</th>`).join('')}</tr></thead><tbody>${items.map(r=>{const used=state.products.filter(p=>p.brand===r.brand&&M.key(p.key)===r.key).length,percent=completion(r.data);return `<tr><td><button class="key-link key-large" data-key-edit="${esc(r.brand)}" data-key-name="${esc(r.key)}">${esc(r.key)}</button></td><td>${badge(r.brand)}</td><td>${badge(t(M.keyIsActive(r.data)?'active':'inactive'),M.keyIsActive(r.data)?'status-active':'grey')}</td><td class="numeric">${logisticsNumber(r.data.PALLET?.nr_of_items)}</td><td class="numeric">${logisticsNumber(r.data.PALLET?.weight)}</td><td class="numeric" title="${esc(t('estimatedHeightHint'))}">${M.estimatedPalletHeight(r.data)===''?'—':'≈ '+logisticsNumber(M.estimatedPalletHeight(r.data))}</td><td><button class="text-button" data-used-brand="${esc(r.brand)}" data-used-key="${esc(r.key)}">${used} ${!used?'· '+t('unused'):''}</button></td><td><span class="completeness"><span><i style="width:${percent}%"></i></span>${percent}%</span></td><td><button class="row-edit" data-key-edit="${esc(r.brand)}" data-key-name="${esc(r.key)}">${t('edit')}</button></td></tr>`;}).join('')}</tbody></table></div>`;
  $$('[data-key-edit]').forEach(b=>b.onclick=()=>openKey(b.dataset.keyEdit,b.dataset.keyName));$$('[data-used-key]').forEach(b=>b.onclick=()=>{changeView('products');filters.brand=b.dataset.usedBrand;filters.key=b.dataset.usedKey;filters.status='all';renderToolbar();renderContent();});
 }
 function renderChecksTable(items){
@@ -324,15 +327,15 @@ function openProduct(index=null,tab='details',duplicate=false){
  }
  const showTab=v=>{$$('[data-tab]').forEach(b=>{b.setAttribute('aria-selected',b.dataset.tab===v);b.tabIndex=b.dataset.tab===v?0:-1;});$$('.tab-section').forEach(s=>{s.hidden=s.id!==`section-${v}`;});};
  $$('[data-tab]').forEach((b,i,list)=>{b.onclick=()=>showTab(b.dataset.tab);b.onkeydown=e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const n=e.key==='Home'?0:e.key==='End'?list.length-1:(i+(e.key==='ArrowRight'?1:-1)+list.length)%list.length;showTab(list[n].dataset.tab);list[n].focus();}};});showTab(tab);
- function keysForBrand(overwrite=false){const b=elements.brand.value,k=elements.key.value||p.key;const keys=M.keyEntries(state.logistics).filter(r=>r.brand===b).map(r=>r.key);$('#product-key').innerHTML=option('','—',k)+keys.map(v=>option(v,v,k)).join('')+(M.key(k)&&!keys.includes(String(k))?option(k,`${k} · ${t('keyUnknown')}`,k):'');if(overwrite){elements.key.value='';}updatePackaging();}
- function updatePackaging(){const l=state.logistics[elements.brand.value]?.[M.key(elements.key.value)];$('#key-summary').textContent=l?`${elements.brand.value} / ${elements.key.value} · ${state.products.filter(x=>x.brand===elements.brand.value&&M.key(x.key)===elements.key.value).length} ${t('countProducts')}`:t('keyMissing');$('#product-key-data').innerHTML=l?logisticsOverview(l):`<p class="muted">${t('keyMissing')}</p>`;$('#product-key-open').disabled=!l;$('#product-key-export').disabled=!l;}
+ function keysForBrand(overwrite=false){const b=elements.brand.value,k=overwrite?'':elements.key.value||p.key;const keys=M.keyEntries(state.logistics,{status:'active'}).filter(r=>r.brand===b).map(r=>r.key),assigned=!duplicate&&p.brand===b&&state.logistics[b]?.[M.key(k)];$('#product-key').innerHTML=option('','—',k)+keys.map(v=>option(v,v,k)).join('')+(M.key(k)&&!keys.includes(String(k))&&(!state.logistics[b]?.[M.key(k)]||assigned)?option(k,`${k} · ${t(assigned?'inactive':'keyUnknown')}`,k):'');if(overwrite){elements.key.value='';}updatePackaging();}
+ function updatePackaging(){const l=state.logistics[elements.brand.value]?.[M.key(elements.key.value)];$('#key-summary').textContent=l?`${elements.brand.value} / ${elements.key.value} · ${state.products.filter(x=>x.brand===elements.brand.value&&M.key(x.key)===elements.key.value).length} ${t('countProducts')}${M.keyIsActive(l)?'':' · '+t('inactive')}`:t('keyMissing');$('#product-key-data').innerHTML=l?logisticsOverview(l):`<p class="muted">${t('keyMissing')}</p>`;$('#product-key-open').disabled=!l;$('#product-key-export').disabled=!l;}
  keysForBrand();elements.brand.onchange=()=>keysForBrand(true);elements.key.onchange=()=>updatePackaging();
  function currentKeyEntry(){const brand=elements.brand.value,key=M.key(elements.key.value);return {brand,key,data:M.clone(state.logistics[brand][key])};}
  $('#product-key-open').onclick=async()=>{
   if(busy)return;await Promise.allSettled([...labelReads]);if($('#product-form')!==form)return;const entry=currentKeyEntry(),d=$('#editor'),body=$('#editor-body');
   const origin={view,page,filters:{...filters},selected:new Set(selected),title:$('#editor-title').textContent,caption:$('#editor-caption').textContent,small:d.classList.contains('small'),scroll:d.scrollTop,dirty:editorDirty,save:editorSave};
   const draft=document.createDocumentFragment();while(body.firstChild)draft.append(body.firstChild);
-  d.close();editorDirty=false;editorSave=null;changeView('keys');filters.brand=entry.brand;filters.search=entry.key;renderToolbar();renderContent();
+  d.close();editorDirty=false;editorSave=null;changeView('keys');filters.brand=entry.brand;filters.search=entry.key;filters.keyStatus=M.keyIsActive(entry.data)?'active':'inactive';renderToolbar();renderContent();
   const back=result=>{
    view=origin.view;page=origin.page;filters=origin.filters;selected=origin.selected;location.hash=view;render();
    $('#editor-title').textContent=origin.title;$('#editor-caption').textContent=origin.caption;body.replaceChildren(draft);d.classList.toggle('small',origin.small);editorDirty=origin.dirty;editorSave=origin.save;editorReturn=null;
@@ -395,14 +398,15 @@ function openBulk(){
 }
 function openKey(brand='',oldKey=null,template=null,returnToProduct=null){
  if(!canEdit())return;
- let original=oldKey?M.clone(state.logistics[brand]?.[oldKey]||M.emptyLogistics()):M.clone(template||M.emptyLogistics()),working=M.clone(original);
+ let original=oldKey?M.clone(state.logistics[brand]?.[oldKey]||M.emptyLogistics()):M.clone(template||M.emptyLogistics());if(!oldKey)delete original.active;let working=M.clone(original);
+ const copySources=M.keyEntries(state.logistics,{status:'active'});
  const used=oldKey?state.products.filter(p=>p.brand===brand&&M.key(p.key)===oldKey).length:0;
- openEditor(oldKey?`${brand} / ${oldKey}`:t('addKey'),t('keys'),`<form id="key-form" novalidate><div class="form-content">${returnToProduct?`<div class="editor-return">${button('key-back','backToProduct')}</div>`:''}<div class="notice ${used?'amber':''}">${used?`${t('sharedWarning')} ${t('affected')}: ${used}.`:t('keyHelp')}</div><div id="form-error" class="notice error-notice" hidden></div><div class="form-grid key-identity">${field('brand','brand',brand||filters.brand,'text',`required list="brands" ${oldKey?'readonly':''}`)}${field('key','keyName',oldKey||'','text','required',t('keyRename'))}${oldKey?'':`<label class="field"><span>${t('copyFrom')}</span><select id="copy-key">${option('',t('blankKey'),'')}${M.keyEntries(state.logistics).map((r,i)=>option(i,`${r.brand} / ${r.key}`,'')).join('')}</select></label>`}</div>${datalist('brands',brands())}<p class="muted">${t('dimensionHint')}</p><div class="logistics-grid" id="logistics-fields"></div>${oldKey?`<div class="key-secondary-actions">${button('key-copy','duplicate')}${button('key-delete','delete','danger-quiet')}</div>`:''}</div>${formFooter('save',used?`${used} ${t('countProducts')}`:'')}</form>`);
+ openEditor(oldKey?`${brand} / ${oldKey}`:t('addKey'),t('keys'),`<form id="key-form" novalidate><div class="form-content">${returnToProduct?`<div class="editor-return">${button('key-back','backToProduct')}</div>`:''}<div class="notice ${used?'amber':''}">${used?`${t('sharedWarning')} ${t('affected')}: ${used}.`:t('keyHelp')}</div><div id="form-error" class="notice error-notice" hidden></div><div class="form-grid key-identity">${field('brand','brand',brand||filters.brand,'text',`required list="brands" ${oldKey?'readonly':''}`)}${field('key','keyName',oldKey||'','text','required',t('keyRename'))}<label class="field"><span>${t('status')}</span><select id="key-status" name="active">${[true,false].map(v=>option(v,t(v?'active':'inactive'),M.keyIsActive(original))).join('')}</select><small>${t('keyStatusHint')}</small></label>${oldKey?'':`<label class="field"><span>${t('copyFrom')}</span><select id="copy-key">${option('',t('blankKey'),'')}${copySources.map((r,i)=>option(i,`${r.brand} / ${r.key}`,'')).join('')}</select></label>`}</div>${datalist('brands',brands())}<p class="muted">${t('dimensionHint')}</p><div class="logistics-grid" id="logistics-fields"></div>${oldKey?`<div class="key-secondary-actions">${button('key-copy','duplicate')}${button('key-delete','delete','danger-quiet')}</div>`:''}</div>${formFooter('save',used?`${used} ${t('countProducts')}`:'')}</form>`);
  const form=$('#key-form');editorReturn=returnToProduct;if(returnToProduct)$('#key-back').onclick=closeEditor;
  function renderFields(){
   $('#logistics-fields').innerHTML=Object.entries(M.sections).map(([s,fs])=>{const fields=[...new Set([...fs,...Object.keys(working[s]||{})])].filter(f=>f!=='carton_ean');return `<fieldset><legend>${t(s)}</legend>${fields.map((f,i)=>field(`${s}:${f}`,f,working[s]?.[f],'text',`data-section="${s}" data-field="${esc(f)}" inputmode="decimal"`)).join('')}</fieldset>`;}).join('');
  }
- renderFields();if($('#copy-key'))$('#copy-key').onchange=e=>{working=e.target.value===''?M.emptyLogistics():M.clone(M.keyEntries(state.logistics)[Number(e.target.value)].data);renderFields();};
+ renderFields();if($('#copy-key'))$('#copy-key').onchange=e=>{working=e.target.value===''?M.emptyLogistics():M.clone(copySources[Number(e.target.value)].data);renderFields();};
  if(oldKey){$('#key-delete').disabled=used>0;$('#key-delete').title=used?t('keyInUse'):'';$('#key-delete').onclick=async()=>{if(await confirm('deleteKey',t('deleteKeyHint'),'delete',true)){const next=M.clone(state);delete next.logistics[brand][oldKey];await commit(next);formClose();}};
  $('#key-copy').onclick=()=>{formClose(undefined,false);openKey(brand,null,original,returnToProduct);editorDirty=true;};}
  editorSave=()=>runForm(async()=>{
@@ -410,7 +414,7 @@ function openKey(brand='',oldKey=null,template=null,returnToProduct=null){
   try{
    const b=form.elements.brand.value.trim(),k=M.key(form.elements.key.value);if(!M.key(b)||!k)throw Error('KEY_REQUIRED');
    if((!oldKey||k!==oldKey)&&Object.hasOwn(state.logistics[b]||{},k))throw Error('KEY_DUPLICATE');
-   const data=M.clone(working);
+   const data=M.clone(working),active=form.elements.active.value==='true';if(M.keyIsActive(data)!==active)data.active=active;
    $$('[data-section]').forEach(input=>{const s=input.dataset.section,f=input.dataset.field,raw=input.value.trim(),old=data[s]?.[f];if(!data[s])data[s]={};
     if(String(old??'')===raw)return;
     if(M.sections[s].includes(f)&&raw){const m=raw.replace(',','.').match(/^\s*(\d+(?:\.\d+)?)\s*(cm|kg)?\s*$/i);if(!m||f.startsWith('nr_')&&(m[2]||!Number.isInteger(Number(m[1]))))throw Error('numeric');if(['length','width','height'].includes(f)&&m[2]&&m[2].toLowerCase()!=='cm'||f==='weight'&&m[2]&&m[2].toLowerCase()!=='kg')throw Error('numeric');}
@@ -463,13 +467,13 @@ $('#import-file').onchange=async e=>{
 };
 function openExport(){
  openEditor(t('exportTitle'),'JASON / EXCEL',`<form id="export-form"><div class="form-content"><p>${t('exportHint')}</p><div class="editor-tabs"><button type="button" id="export-tab-products">${t('exportProducts')}</button><button type="button" id="export-tab-keys">${t('exportKeys')}</button></div><div id="export-options"></div></div>${formFooter('exportNow')}</form>`,true);
- let mode=view==='keys'?'keys':'products',includeProducts=false,includeEmpty=false;
+ let mode=view==='keys'?'keys':'products',includeProducts=false,includeEmpty=false,includeInactive=false;
  function options(){
   $('#export-tab-products').setAttribute('aria-selected',mode==='products');$('#export-tab-keys').setAttribute('aria-selected',mode==='keys');
   if(mode==='products')$('#export-options').innerHTML=`<p class="notice">${productExportRows().length} ${t('countProducts')} · ${t(selected.size?'exportSelectedScope':'exportFilteredScope')}</p>`;
-  else{$('#export-options').innerHTML=`<label class="field"><span>${t('brand')}</span><select id="export-brand">${option('',t('allBrands'),filters.brand)}${brands().map(v=>option(v,v,filters.brand)).join('')}</select></label><div class="export-options-row"><label class="checkbox-label"><input type="checkbox" id="include-empty" ${includeEmpty?'checked':''}>${t('includeEmpty')}</label><label class="checkbox-label"><input type="checkbox" id="include-products" ${includeProducts?'checked':''}>${t('includeProductList')}</label></div><div class="export-controls">${button('keys-all','selectAll')}${button('keys-none','selectNone')}</div><div id="export-key-list" class="checkbox-list"></div>`;fillExportKeys();$('#include-products').onchange=e=>{includeProducts=e.target.checked;};$('#export-brand').onchange=fillExportKeys;$('#include-empty').onchange=e=>{includeEmpty=e.target.checked;fillExportKeys();};$('#keys-all').onclick=()=>$$('[data-export-key]').forEach(c=>c.checked=true);$('#keys-none').onclick=()=>$$('[data-export-key]').forEach(c=>c.checked=false);}
+  else{$('#export-options').innerHTML=`<label class="field"><span>${t('brand')}</span><select id="export-brand">${option('',t('allBrands'),filters.brand)}${brands().map(v=>option(v,v,filters.brand)).join('')}</select></label><div class="export-options-row"><label class="checkbox-label"><input type="checkbox" id="include-empty" ${includeEmpty?'checked':''}>${t('includeEmpty')}</label><label class="checkbox-label"><input type="checkbox" id="include-products" ${includeProducts?'checked':''}>${t('includeProductList')}</label><label class="checkbox-label"><input type="checkbox" id="include-inactive" ${includeInactive?'checked':''}>${t('includeInactiveKeys')}</label></div><div class="export-controls">${button('keys-all','selectAll')}${button('keys-none','selectNone')}</div><div id="export-key-list" class="checkbox-list"></div>`;fillExportKeys();$('#include-products').onchange=e=>{includeProducts=e.target.checked;};$('#export-brand').onchange=fillExportKeys;$('#include-empty').onchange=e=>{includeEmpty=e.target.checked;fillExportKeys();};$('#include-inactive').onchange=e=>{includeInactive=e.target.checked;fillExportKeys();};$('#keys-all').onclick=()=>$$('[data-export-key]').forEach(c=>c.checked=true);$('#keys-none').onclick=()=>$$('[data-export-key]').forEach(c=>c.checked=false);}
  }
- function fillExportKeys(){const b=$('#export-brand').value,include=$('#include-empty').checked;$('#export-key-list').innerHTML=M.keyEntries(state.logistics).map((r,i)=>({r,i})).filter(({r})=>(!b||r.brand===b)&&(include||completion(r.data)>0)).map(({r,i})=>`<label class="checkbox-label"><input type="checkbox" data-export-key="${i}" checked>${esc(r.brand)} / <strong>${esc(r.key)}</strong><small>${completion(r.data)}%</small></label>`).join('')||`<p class="muted">${t('nothing')}</p>`;}
+ function fillExportKeys(){const b=$('#export-brand').value,include=$('#include-empty').checked;$('#export-key-list').innerHTML=M.keyEntries(state.logistics).map((r,i)=>({r,i})).filter(({r})=>(!b||r.brand===b)&&(includeInactive||M.keyIsActive(r.data))&&(include||completion(r.data)>0)).map(({r,i})=>`<label class="checkbox-label"><input type="checkbox" data-export-key="${i}" checked>${esc(r.brand)} / <strong>${esc(r.key)}</strong>${M.keyIsActive(r.data)?'':badge(t('inactive'),'grey')}<small>${completion(r.data)}%</small></label>`).join('')||`<p class="muted">${t('nothing')}</p>`;}
  $('#export-tab-products').onclick=()=>{mode='products';options();};$('#export-tab-keys').onclick=()=>{mode='keys';options();};options();
  $('#export-form').onsubmit=e=>{e.preventDefault();void runForm(async()=>{if(mode==='products')await exportProducts();else await exportLogistics($$('[data-export-key]:checked').map(c=>M.keyEntries(state.logistics)[Number(c.dataset.exportKey)]),includeProducts);});};attachCancel();
 }

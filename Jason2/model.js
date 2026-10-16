@@ -25,6 +25,7 @@ function validateLogistics(value) {
   if(!brand || typeof brand!=='object' || Array.isArray(brand)) throw Error('LOGISTICS_FORMAT');
   for(const entry of Object.values(brand)) {
    if(!entry || typeof entry!=='object' || Array.isArray(entry)) throw Error('LOGISTICS_FORMAT');
+   if(entry.active!=null && typeof entry.active!=='boolean') throw Error('LOGISTICS_FORMAT');
    for(const sec of Object.keys(sections)) if(entry[sec]!=null && (typeof entry[sec]!=='object'||Array.isArray(entry[sec]))) throw Error('LOGISTICS_FORMAT');
   }
  }
@@ -62,7 +63,8 @@ function saveProduct(original,patch,products,index,logistics){
  if((index==null||!original||String(original.id)!==p.id)&&products.some((x,i)=>i!==index&&String(x.id)===p.id)) throw Error('EAN_DUPLICATE');
  return p;
 }
-function keyEntries(logistics){return Object.entries(logistics).flatMap(([brand,groups])=>Object.entries(groups).filter(([k])=>key(k)).map(([k,data])=>({brand,key:k,data})));}
+const keyIsActive=data=>data?.active!==false;
+function keyEntries(logistics,{status='all'}={}){return Object.entries(logistics).flatMap(([brand,groups])=>Object.entries(groups).filter(([k])=>key(k)).map(([k,data])=>({brand,key:k,data}))).filter(r=>status==='all'||keyIsActive(r.data)===(status==='active'));}
 function applyLogistics(state,brand,k,data){
  if(!key(k) || !key(brand))throw Error('KEY_REQUIRED');
  const next=clone(state);if(!Object.hasOwn(next.logistics,brand)) next.logistics[brand]={};
@@ -104,7 +106,7 @@ function issues(state,photoIds=null){
   if(!k)add('keyMissing','key');else if(!l)add('keyUnknown','key');
   if(photoIds&&!state.photos?.[p.id]&&!photoIds.has(String(p.id??'')))add('photoMissing','photo');
  });
- for(const {brand,key:k,data} of keyEntries(state.logistics)){
+ for(const {brand,key:k,data} of keyEntries(state.logistics,{status:'active'})){
   const add=(code,field)=>out.push({kind:'key',brand,key:k,code,...(field?{field}:{})});
   for(const [s,fs] of Object.entries(sections))for(const f of fs)if(isMissing(data[s]?.[f]))add('keyIncomplete',s+'.'+f);
   const c=count(data.CARTON?.nr_of_items),lc=count(data.LAYER?.nr_of_cartons),pc=count(data.PALLET?.nr_of_cartons),pi=count(data.PALLET?.nr_of_items),li=count(data.LAYER?.nr_of_items),layers=count(data.PALLET?.nr_of_layers);
@@ -113,7 +115,7 @@ function issues(state,photoIds=null){
  }
  return out;
 }
-const api={clone,sections,key,fold,isMissing,count,validateProducts,validateLogistics,labelPath,labelReferences,validateLabelFiles,emptyLogistics,estimatedPalletHeight,cleanProducts,packaging,saveProduct,keyEntries,applyLogistics,renameKey,filterProducts,eanValid,issues};
+const api={clone,sections,key,fold,isMissing,count,validateProducts,validateLogistics,labelPath,labelReferences,validateLabelFiles,emptyLogistics,estimatedPalletHeight,cleanProducts,packaging,saveProduct,keyIsActive,keyEntries,applyLogistics,renameKey,filterProducts,eanValid,issues};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.JasonModel=api;
 })(typeof window!=='undefined'?window:globalThis);
 

@@ -33,6 +33,18 @@ test('EAN validates checksum and leading zeros',()=>{assert.equal(M.eanValid('85
 test('data checks ignore obsolete product counts but retain duplicates and key arithmetic',()=>{const state={products:[{...product,pack:3},{...product}],logistics};const codes=M.issues(state).map(r=>r.code);assert.ok(!codes.includes('packMismatch'));assert.ok(codes.includes('eanDuplicate'));const l=M.clone(logistics);l.Lilien['500'].PALLET.nr_of_items=7;assert.ok(M.issues({products:[product],logistics:l}).some(r=>r.code==='keyMath'));});
 test('bad imports are rejected, safe extension fields retained',()=>{for(const value of [{},null,[null],[{flags:'bad'}],[{volume:[]}],[{brand:{}}]])assert.throws(()=>M.validateProducts(value));for(const value of [[],null,{Lilien:[]},{Lilien:{'500':{ITEM:'bad'}}}])assert.throws(()=>M.validateLogistics(value));assert.deepEqual(M.validateProducts([product]),M.cleanProducts([product]));});
 test('placeholder keys excluded without deleting original data',()=>{const data={Lilien:{null:{x:1},___:{x:2},'500':{x:3}}};assert.equal(M.keyEntries(data).length,1);assert.deepEqual(data.Lilien.null,{x:1});assert.equal(M.key('null'),null);});
+test('key activity defaults to active and filters without changing data or deriving it from usage',()=>{
+ const l={Lilien:{legacy:M.emptyLogistics(),explicit:{...M.emptyLogistics(),active:true},sleeping:{...M.emptyLogistics(),active:false,extra:{keep:'yes'}}}},before=M.clone(l);
+ assert.deepEqual(M.keyEntries(l,{status:'active'}).map(r=>r.key),['legacy','explicit']);assert.deepEqual(M.keyEntries(l,{status:'inactive'}).map(r=>r.key),['sleeping']);assert.equal(M.keyEntries(l).length,3);assert.deepEqual(l,before);
+ assert.deepEqual(M.validateLogistics(l),before);assert.throws(()=>M.validateLogistics({Lilien:{bad:{active:'false'}}}),/LOGISTICS_FORMAT/);
+});
+test('sleeping keys keep packaging and assignments through edits, rename and JSON backup while leaving routine checks',()=>{
+ const l=M.clone(logistics);l.Lilien['500'].active=false;l.Lilien['500'].ITEM={};l.Lilien['500'].PALLET.nr_of_items=7;
+ const state={products:[product],logistics:l},before=M.clone(state);assert.equal(M.packaging(product,l).pack,10);assert.ok(!M.issues(state).some(r=>r.kind==='key'||r.code==='keyUnknown'));
+ const renamed=M.renameKey(state,'Lilien','500','sleeping');assert.equal(renamed.products[0].key,'sleeping');assert.equal(renamed.logistics.Lilien.sleeping.active,false);assert.deepEqual(state,before);
+ const restored=JSON.parse(JSON.stringify(renamed));assert.equal(M.validateLogistics(restored.logistics).Lilien.sleeping.active,false);assert.equal(M.packaging(restored.products[0],restored.logistics).pack,10);
+ restored.logistics.Lilien.sleeping.active=true;assert.ok(M.issues(restored).some(r=>r.code==='keyMath'));assert.ok(M.issues(restored).some(r=>r.code==='keyIncomplete'));
+});
 
 test('historical duplicate EAN does not block unrelated edits but new duplicates are rejected',()=>{const rows=[product,{...product,name:'Historical duplicate'}];assert.equal(M.saveProduct(product,{price:2},rows,0,logistics).price,2);assert.throws(()=>M.saveProduct(product,{id:product.id},rows,null,logistics),/EAN_DUPLICATE/);});
 

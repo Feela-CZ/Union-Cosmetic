@@ -70,6 +70,8 @@ Object.assign(window.JasonText.en,{backToProduct:"← Back to product",includePr
 
 Object.assign(window.JasonText.cs,{pageAll:"Vše",EXCEL_LOAD_FAILED:"Export se nepodařilo načíst. Zkuste to znovu."});
 Object.assign(window.JasonText.en,{pageAll:"All",EXCEL_LOAD_FAILED:"Could not load the export library. Please try again."});
+Object.assign(window.JasonText.cs,{inactive:'Neaktivní',includeInactiveKeys:'Zahrnout neaktivní klíče',keyStatusHint:'Neaktivní klíč se běžně nenabízí. Stávající přiřazení a logistické údaje zůstávají zachované.'});
+Object.assign(window.JasonText.en,{inactive:'Inactive',includeInactiveKeys:'Include inactive keys',keyStatusHint:'Inactive keys are hidden from the usual lists. Existing assignments and logistics data are retained.'});
 Object.assign(window.JasonText.cs,{openLabelPdf:'Otevřít PDF'});
 Object.assign(window.JasonText.en,{openLabelPdf:'Open PDF'});
 Object.assign(window.JasonText.cs,{copyLanguages:'Kopírovat',chooseLanguages:'Vybrat jazyky',searchLanguage:'Hledat jazyk…',languagesCopied:'Jazyky zkopírovány'});
