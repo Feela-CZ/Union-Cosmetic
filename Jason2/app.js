@@ -13,7 +13,11 @@ let photoVersion=Date.now(),photoObserver=null;
 const photoVersions=new Map(),missingThumbnails=new Set();
 const photoIds=Array.isArray(window.JASON_PHOTO_IDS)&&window.JASON_PHOTO_IDS.every(id=>typeof id==='string')?new Set(window.JASON_PHOTO_IDS):null;
 const dataIssues=()=>M.issues(state,photoIds);
-const t=k=>JasonText[lang][k]||JasonText.cs[k]||k;
+const t=k=>{
+ const text=JasonText[lang][k]||JasonText.cs[k]||k;if(!text.includes('{date}'))return text;
+ const date=new Date(`${window.JASON_SANDBOX_SEED?.snapshotAt}T00:00:00Z`),label=Number.isNaN(date.getTime())?'—':new Intl.DateTimeFormat(lang==='cs'?'cs-CZ':'en-GB',{day:'numeric',month:lang==='cs'?'numeric':'long',year:'numeric',timeZone:'UTC'}).format(date);
+ return text.replaceAll('{date}',label);
+};
 const types=()=>Object.keys(JasonTypes.en);
 const typeLabel=v=>JasonTypes[lang][v]||v;
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
@@ -530,7 +534,7 @@ function sandboxSeed(){
  const seed=window.JASON_SANDBOX_SEED;
  if(!seed)throw Error('SANDBOX_SEED_MISSING');
  M.validateProducts(seed.products);M.validateLogistics(seed.logistics);
- return isolate({...M.clone(state),products:M.clone(seed.products),logistics:M.clone(seed.logistics),photos:{},labelFiles:{},pendingLabels:[],updated:seed.snapshotAt,sandboxNameRevision:seed.nameRevision,sandboxInciRevision:seed.inciRevision});
+ return isolate({...M.clone(state),products:M.clone(seed.products),logistics:M.clone(seed.logistics),photos:{},labelFiles:{},pendingLabels:[],updated:seed.snapshotAt,sandboxNameRevision:seed.nameRevision,sandboxInciRevision:seed.inciRevision,sandboxStatusRevision:seed.statusRevision});
 }
 async function upgradeSandboxNames(){
  const seed=window.JASON_SANDBOX_SEED;
@@ -568,6 +572,29 @@ async function upgradeSandboxInci(){
  if(history.length)await S.put('recovery',M.clone(history.at(-1)));
  await persist();
 }
+async function upgradeSandboxStatuses(){
+ const seed=window.JASON_SANDBOX_SEED;
+ if(!sandbox||!seed?.statusRevision||state.sandboxStatusRevision===seed.statusRevision)return;
+ const identity=p=>JSON.stringify([p.brand,p.id,p.volume?.number,p.volume?.unit]);
+ const repair=snapshot=>{
+  for(const c of seed.statusCorrections?.products||[]){
+   const matches=snapshot.products.filter(p=>identity(p)===identity(c));if(matches.length!==1)continue;const p=matches[0];
+   // Missing/false and an empty date both represent the original active state.
+   if((p.discontinued===true)!==(c.before.discontinued===true)||String(p.discontinued_date||'')!==String(c.before.discontinued_date||''))continue;
+   for(const field of ['discontinued','discontinued_date']){if(Object.hasOwn(c.after,field))p[field]=M.clone(c.after[field]);else delete p[field];}
+  }
+  for(const c of seed.statusCorrections?.keys||[]){
+   const data=snapshot.logistics?.[c.brand]?.[c.key];if(!data||M.keyIsActive(data)!==M.keyIsActive(c.before))continue;
+   // A locally added/reassigned active product still needs its key in the sandbox.
+   if(c.after.active===false&&snapshot.products.some(p=>p.brand===c.brand&&M.key(p.key)===c.key&&p.discontinued!==true))continue;
+   data.active=c.after.active;
+  }
+  snapshot.sandboxStatusRevision=seed.statusRevision;
+ };
+ repair(state);history.forEach(repair);
+ if(history.length)await S.put('recovery',M.clone(history.at(-1)));
+ await persist();
+}
 async function resetSandbox(){
  if(!sandbox||busy||!await confirm('sandboxResetTitle',t('sandboxResetHint'),'sandboxReset'))return;
  try{const next=sandboxSeed();await S.put('recovery',null);state=next;history=[];future=[];selected.clear();await persist();formClose();render();toast(t('loaded'));}catch(e){error(e);}
@@ -577,7 +604,7 @@ async function boot(){
  try{const saved=await S.get('state');if(saved?.state){M.validateProducts(saved.state.products);M.validateLogistics(saved.state.logistics);state=isolate({...state,...saved.state});hasSavedState=true;lang=saved.lang==='en'?'en':'cs';const recovery=await S.get('recovery');if(recovery)history=[recovery];}}
  catch(e){storageError=true;toast(t('localError'),true);}
  if(sandbox&&!hasSavedState){try{state=sandboxSeed();await persist();}catch(e){error(e);}}
- if(sandbox&&hasSavedState){try{await upgradeSandboxNames();await upgradeSandboxInci();}catch(e){storageError=true;toast(t('localError'),true);}}
+ if(sandbox&&hasSavedState){try{await upgradeSandboxNames();await upgradeSandboxInci();await upgradeSandboxStatuses();}catch(e){storageError=true;toast(t('localError'),true);}}
  if(JASON_CONFIG.sharedOnly){state.api=JASON_CONFIG.apiBase;state.imageBase=JASON_CONFIG.imageBase;}
  view=['products','keys','checks'].includes(location.hash.slice(1))?location.hash.slice(1):'products';render();
  if(sandbox)return;

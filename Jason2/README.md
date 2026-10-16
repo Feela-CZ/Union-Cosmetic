@@ -14,7 +14,9 @@
 ## Bezpečné pískoviště
 
 - `Jason2/test/` používá stejný kód rozhraní a vlastní konfiguraci, bez adresy API a bez automatického připojení.
-- Výchozí snapshot `test/seed.js` obsahuje **317 produktů a 78 logistických klíčů** z repozitáře k 9. 10. 2026, commit `92d030ded71979ac28ef51f1ed242c35093b2710`. Snapshot se automaticky neobnovuje.
+- Výchozí snapshot `test/seed.js` obsahuje **317 produktů a 78 logistických klíčů**. Přesné datum a zdrojový commit určují `snapshotAt` a `sourceCommit`; informační pruh i dialog obnovení používají toto datum.
+- Při každé změně katalogu, logistiky nebo funkcí udržujte aktuální ostrou i testovací verzi. Produkty a logistiku pro testovací snapshot převezměte z jednoho zdrojového commitu. Při změně výchozích dat aktualizujte také uložené testovací kopie cílenou migrací a ověřte čerstvé i existující pískoviště; samotná výměna `seed.js` stávající pracovní kopie neaktualizuje.
+- Stavová migrace `statusRevision` doplňuje konkrétní změny produktů a klíčů z `statusCorrections`, zachovává ostatní místní údaje i bod obnovy a běží pouze jednou. Vlastní změněné datum ukončení se nepřepisuje; klíč s místně přidaným aktivním produktem se neuspí. Pozdější testovací úpravy se při obnovení stránky nevracejí na výchozí hodnoty.
 - Změny jsou pouze v samostatné IndexedDB `union-cosmetic-jason2-sandbox`. Ostrá pracovní kopie zůstává v `union-cosmetic-jason2`. Každý prohlížeč má vlastní pískoviště a testovací úpravy zůstanou i po obnovení stránky.
 - Testovací konfigurace je neměnná. API adaptér odmítá všechny požadavky včetně GET a uploadu fotografií. Připojení, synchronizace a obnovení společných dat mají další ochranu přímo v aplikaci; nastavení ze záloh či staré pracovní kopie se nemohou přenést do připojení.
 - Stránka má CSP omezující síť na vlastní statické soubory; společný Worker není povolen. Původní fotografie se jen zobrazují ze statických souborů stejného webu, nové fotografie jsou pouze v místní testovací kopii.

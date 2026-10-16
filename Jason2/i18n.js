@@ -17,9 +17,9 @@ Object.assign(window.JasonText.cs,{
  readonlyNote:'Ostrá verze · Uložené změny se projeví také v původním Jasonovi.',
  sharedOnly:'Jason 2.0 používá stejná společná data jako původní Jason. Uložené úpravy mění skutečná data.',
  sandboxLocal:'Testovací verze · Pouze v tomto prohlížeči',sandboxData:'Testovací data',
- sandboxNote:'Bezpečné pískoviště · Kopie dat z 12. 10. 2026. Změny zůstávají pouze v tomto prohlížeči a neovlivní ostrá data ani ostatní kolegy.',
+ sandboxNote:'Bezpečné pískoviště · Kopie dat z {date}. Změny zůstávají pouze v tomto prohlížeči a neovlivní ostrá data ani ostatní kolegy.',
  sandboxResetTitle:'Vrátit výchozí testovací data',sandboxReset:'Vrátit výchozí data',
- sandboxResetHint:'Všechny vaše testovací úpravy a fotografie budou nahrazeny výchozí kopií z 12. 10. 2026. Případně si nejprve stáhněte zálohu.',
+ sandboxResetHint:'Všechny vaše testovací úpravy a fotografie budou nahrazeny výchozí kopií z {date}. Případně si nejprve stáhněte zálohu.',
  sandboxPhotoHint:'Fotografie se uloží pouze do testovací kopie v tomto prohlížeči.',
  SANDBOX_OFFLINE:'Testovací verze nemá přístup ke společnému API.',SANDBOX_SEED_MISSING:'Výchozí testovací data se nepodařilo načíst. Obnovte stránku.'
 });
@@ -28,9 +28,9 @@ Object.assign(window.JasonText.en,{
  readonlyNote:'Live version · Saved changes also appear in the original Jason.',
  sharedOnly:'Jason 2.0 uses the same shared data as the original Jason. Saved edits change real data.',
  sandboxLocal:'Test version · This browser only',sandboxData:'Test data',
- sandboxNote:'Safe sandbox · Data snapshot from 12 October 2026. Changes stay in this browser and do not affect live data or other colleagues.',
+ sandboxNote:'Safe sandbox · Data snapshot from {date}. Changes stay in this browser and do not affect live data or other colleagues.',
  sandboxResetTitle:'Restore initial test data',sandboxReset:'Restore initial data',
- sandboxResetHint:'All your test edits and photos will be replaced by the initial snapshot from 12 October 2026. Download a backup first if needed.',
+ sandboxResetHint:'All your test edits and photos will be replaced by the initial snapshot from {date}. Download a backup first if needed.',
  sandboxPhotoHint:'Photos are saved only in this browser’s test copy.',
  SANDBOX_OFFLINE:'The test version cannot access the shared API.',SANDBOX_SEED_MISSING:'Initial test data could not be loaded. Reload the page.'
 });

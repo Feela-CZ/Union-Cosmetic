@@ -67,6 +67,35 @@ async function setup(real=false,cached=null){
  await test('sandbox reset requires confirmation and preserves live storage',async()=>{
   c.click('#data-button');c.click('#reset-sandbox');await wait(()=>c.$('#confirm-dialog').open);c.click('#confirm-no');assert.equal((await c.saved()).products[0].price,10);c.click('#reset-sandbox');await wait(()=>c.$('#confirm-dialog').open);c.click('#confirm-yes');await wait(()=>!c.$('#editor').open);const s=await c.saved();assert.deepEqual(s.products,clone(c.w.JasonModel.cleanProducts(seed.products)));assert.deepEqual(s.logistics,seed.logistics);assert.deepEqual(s.photos,{});assert.equal(c.$('#undo').disabled,true);assert.equal(c.$('#redo').disabled,true);assert.deepEqual(network,[]);assert.deepEqual(await liveState(),{sentinel:'LIVE DATA'});
  });
+ await test('fresh sandbox reflects current product and key activity and uses the actual seed date',async()=>{
+  const r=await setup(true),s=await r.saved();assert.equal(s.sandboxStatusRevision,r.w.JASON_SANDBOX_SEED.statusRevision);assert.match(r.$('#sandbox-banner').textContent,/16\. 10\. 2026/);
+  const sleeping=r.w.JasonModel.keyEntries(s.logistics,{status:'inactive'}).map(k=>k.brand+'/'+k.key).sort();assert.deepEqual(clone(sleeping),['Lilien/45','Lilien/5000','Natava/500g','Naturalis/250g','Sunnoré/75'].sort());assert.equal(r.w.JasonModel.keyEntries(s.logistics,{status:'active'}).length,73);
+  for(const id of ['8596048004367','8596048004336','8596048004343'])assert.equal(s.products.find(p=>String(p.id)===id).discontinued,true);
+  for(const id of ['8596048004312','8596048004329','8596048004350'])assert.notEqual(s.products.find(p=>String(p.id)===id).discontinued,true);
+  r.click('[data-view=keys]');assert.equal(r.$('#filter-keyStatus').value,'active');r.$('#filter-keyStatus').value='inactive';r.$('#filter-keyStatus').dispatchEvent(new r.w.Event('change',{bubbles:true}));assert.equal(r.w.document.querySelectorAll('tbody tr').length,5);assert.match(r.$('tbody').textContent,/Neaktivní/);
+  r.click('[data-lang=en]');await wait(()=>r.$('#page-title').textContent==='Logistics keys');assert.match(r.$('#sandbox-banner').textContent,/16 October 2026/);assert.match(r.$('tbody').textContent,/Inactive/);r.dom.window.close();assert.deepEqual(network,[]);
+ });
+ await test('cached sandbox and undo receive activity corrections without losing local product, logistics or label edits',async()=>{
+  const fresh=await setup(true),expected=await fresh.saved(),corrections=clone(fresh.w.JASON_SANDBOX_SEED.statusCorrections);fresh.dom.window.close();const old=clone(expected);delete old.sandboxStatusRevision;
+  for(const c of corrections.products){const p=old.products.find(p=>p.id===c.id);for(const k of ['discontinued','discontinued_date']){if(Object.hasOwn(c.before,k))p[k]=c.before[k];else delete p[k];}}
+  for(const c of corrections.keys){const data=old.logistics[c.brand][c.key];if(Object.hasOwn(c.before,'active'))data.active=c.before.active;else delete data.active;}
+  const p=old.products.find(p=>String(p.id)==='8596048004367');p.price=77;p.name='Local name';p.inci='Local formula';p.custom={keep:true};p.discontinued=false;p.discontinued_date='';p.labels={front:{path:'OrderSheet/img/labels/local-status.png'}};old.labelFiles={'OrderSheet/img/labels/local-status.png':'data:image/png;base64,aGVsbG8='};old.photos={local:'data:image/jpeg;base64,local'};old.logistics.Lilien['45'].ITEM.weight=42;
+  const recovery=clone(old);recovery.products.find(p=>String(p.id)==='8596048004367').price=66;const before=clone(old);
+  const r=await setup(true,{state:old,recovery});await wait(async()=>(await r.saved()).sandboxStatusRevision===expected.sandboxStatusRevision);
+  for(const s of [await r.saved(),clone(await r.w.JasonStorage.get('recovery'))]){
+   assert.equal(r.w.JasonModel.keyEntries(s.logistics,{status:'inactive'}).length,5);assert.equal(s.logistics.Lilien['45'].ITEM.weight,42);assert.deepEqual(s.photos,old.photos);assert.deepEqual(s.labelFiles,old.labelFiles);
+   const p=s.products.find(p=>String(p.id)==='8596048004367');assert.equal(p.discontinued,true);assert.equal(p.discontinued_date,'2026-10-16');assert.equal(p.name,'Local name');assert.equal(p.inci,'Local formula');assert.deepEqual(p.custom,{keep:true});assert.deepEqual(p.labels,old.products.find(p=>String(p.id)==='8596048004367').labels);
+  }
+  assert.deepEqual(old,before);r.click('#undo');await wait(async()=>(await r.saved()).products.find(p=>String(p.id)==='8596048004367').price===66);assert.equal((await r.saved()).logistics.Lilien['45'].active,false);assert.deepEqual(await liveState(),{sentinel:'LIVE DATA'});assert.deepEqual(network,[]);r.dom.window.close();
+ });
+ await test('activity migration preserves custom status dates, missing keys and keys serving local active products; it runs only once',async()=>{
+  const fresh=await setup(true),expected=await fresh.saved(),corrections=clone(fresh.w.JASON_SANDBOX_SEED.statusCorrections);fresh.dom.window.close();const old=clone(expected);delete old.sandboxStatusRevision;
+  for(const c of corrections.products){const p=old.products.find(p=>p.id===c.id);delete p.discontinued;delete p.discontinued_date;}
+  for(const c of corrections.keys)delete old.logistics[c.brand][c.key].active;
+  const p=old.products.find(p=>String(p.id)==='8596048004336');p.discontinued=true;p.discontinued_date='2026-10-01';delete old.logistics.Natava['500g'];old.products.push({...fixture,id:'local-added-product',key:'45'});
+  const r=await setup(true,{state:old});await wait(async()=>(await r.saved()).sandboxStatusRevision===expected.sandboxStatusRevision);const current=await r.saved();assert.equal(current.products.find(p=>String(p.id)==='8596048004336').discontinued_date,'2026-10-01');assert.equal(current.logistics.Natava['500g'],undefined);assert.notEqual(current.logistics.Lilien['45'].active,false);assert.equal(current.products.at(-1).id,'local-added-product');
+  current.products.find(p=>String(p.id)==='8596048004343').discontinued=false;current.products.find(p=>String(p.id)==='8596048004343').discontinued_date='';current.logistics.Sunnoré['75'].active=true;r.dom.window.close();const again=await setup(true,{state:current});assert.deepEqual(await again.saved(),current);assert.deepEqual(network,[]);again.dom.window.close();
+ });
  await test('real sandbox names sort correctly in Czech and English on fresh load',async()=>{
   const r=await setup(true),p=(await r.saved()).products;
   assert.equal(r.$('.product-link strong').textContent,'Lilien balzám na rty - Brusinka');
