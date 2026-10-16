@@ -446,7 +446,8 @@
         "nr_of_cartons": 96,
         "nr_of_items": 96,
         "nr_of_layers": 3
-      }
+      },
+      "active": false
     },
     "1000A": {
       "ITEM": {
@@ -1092,7 +1093,8 @@
         "nr_of_cartons": 120,
         "nr_of_items": 1440,
         "nr_of_layers": 10
-      }
+      },
+      "active": false
     },
     "1000g": {
       "ITEM": {
@@ -2048,7 +2050,8 @@
         "nr_of_cartons": 180,
         "nr_of_items": 540,
         "nr_of_layers": 9
-      }
+      },
+      "active": false
     },
     "50g": {
       "ITEM": {
@@ -2134,7 +2137,8 @@
         "nr_of_cartons": 410,
         "nr_of_items": 4920,
         "nr_of_layers": 10
-      }
+      },
+      "active": false
     },
     "200D": {
       "ITEM": {
