@@ -7,6 +7,7 @@ function isolate(next){next.products=M.cleanProducts(next.products);const refs=M
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const icons={products:'▦',keys:'◇',checks:'✓',data:'↔',undo:'↶',redo:'↷',export:'↓',plus:'+'};
 let lang='cs',view='products',page=1,pageSize=30,sort={field:'name',asc:true},selected=new Set(),history=[],future=[],busy=false,editorDirty=false,editorSave=null,editorReturn=null,toastTimer,syncing=false,storageError=false;
+let keySort={field:'brand',asc:true};
 let state={products:[],logistics:M.clone(window.JASON_SEED_LOGISTICS||{}),photos:{},pendingPhotos:[],labelFiles:{},pendingLabels:[],connected:false,api:JASON_CONFIG.apiBase,imageBase:JASON_CONFIG.imageBase,baseline:{},updated:null};
 let filters={search:'',brand:'',type:'',key:'',status:'active',keyStatus:'active',new:'',flag:'',scope:''};
 let photoVersion=Date.now(),photoObserver=null;
@@ -153,6 +154,19 @@ function filteredProducts(){
  return list.sort((a,b)=>{const av=value(a.p),bv=value(b.p);return (typeof av==='number'&&typeof bv==='number'?av-bv:collator.compare(String(av??''),String(bv??'')))*(sort.asc?1:-1);});
 }
 function productExportRows(){const rows=filteredProducts();return selected.size?rows.filter(r=>selected.has(r.index)):rows;}
+function filteredKeys(){
+ const used=new Map(),identity=(brand,key)=>JSON.stringify([brand,key]);
+ for(const p of state.products){const k=M.key(p.key);if(k){const id=identity(p.brand,k);used.set(id,(used.get(id)||0)+1);}}
+ const rows=M.keyEntries(state.logistics,{status:filters.keyStatus}).map(r=>({...r,used:used.get(identity(r.brand,r.key))||0,percent:completion(r.data)})).filter(r=>(!filters.brand||r.brand===filters.brand)&&M.fold(r.brand+' '+r.key).includes(M.fold(filters.search))&&(!filters.scope||filters.scope==='used'&&r.used>0||filters.scope==='unused'&&r.used===0||filters.scope==='incomplete'&&r.percent<100));
+ const number=raw=>{const n=M.count(raw);return n===''||!Number.isFinite(n)||n<0?null:n;},collator=new Intl.Collator(lang,{numeric:true});
+ const value=r=>({key:r.key,brand:r.brand,status:M.keyIsActive(r.data)?0:1,palletItems:number(r.data.PALLET?.nr_of_items),palletWeight:number(r.data.PALLET?.weight),estimatedHeight:number(M.estimatedPalletHeight(r.data)),affected:r.used,complete:r.percent})[keySort.field];
+ return rows.map(r=>({r,value:value(r)})).sort((a,b)=>{
+  const av=a.value,bv=b.value;
+  if((av==null)!==(bv==null))return av==null?1:-1;
+  const order=av==null?0:typeof av==='number'&&typeof bv==='number'?av-bv:collator.compare(av,bv);
+  return order*(keySort.asc?1:-1)||collator.compare(a.r.brand,b.r.brand)||collator.compare(a.r.key,b.r.key);
+ }).map(({r})=>r);
+}
 function completion(data){let done=0,total=0;Object.entries(M.sections).forEach(([s,fs])=>fs.forEach(f=>{total++;if(!M.isMissing(data[s]?.[f]))done++;}));return Math.round(done/total*100);}
 function issueFieldLabel(field){if(!field)return '';if(field==='id')return t('ean');if(field.startsWith('volume.'))return t(field);return field.split('.').map(t).join(' / ');}
 function badge(text,cls=''){return `<span class="badge ${cls}">${esc(text)}</span>`;}
@@ -160,7 +174,7 @@ function renderContent(){
  if(photoObserver){photoObserver.disconnect();photoObserver=null;}
  let rows,unit;
  if(view==='products'){rows=filteredProducts();unit=t('countProducts');}
- else if(view==='keys'){rows=M.keyEntries(state.logistics,{status:filters.keyStatus}).filter(r=>{const used=state.products.filter(p=>p.brand===r.brand&&M.key(p.key)===r.key).length;return (!filters.brand||r.brand===filters.brand)&&M.fold(r.brand+' '+r.key).includes(M.fold(filters.search))&&(!filters.scope||filters.scope==='used'&&used>0||filters.scope==='unused'&&used===0||filters.scope==='incomplete'&&completion(r.data)<100);}).sort((a,b)=>a.brand.localeCompare(b.brand)||a.key.localeCompare(b.key,undefined,{numeric:true}));unit=t('countKeys');}
+ else if(view==='keys'){rows=filteredKeys();unit=t('countKeys');}
  else{rows=dataIssues().filter(r=>{const p=r.kind==='product'?state.products[r.index]:null;return (!filters.brand||(p?.brand||r.brand)===filters.brand)&&M.fold([p?.name,p?.csName,p?.id,p?.brand,r.brand,r.key,t(r.code),issueFieldLabel(r.field)].join(' ')).includes(M.fold(filters.search));});unit=t('countIssues');}
  const perPage=pageSize==='all'?Math.max(1,rows.length):pageSize,pages=Math.max(1,Math.ceil(rows.length/perPage));page=Math.min(page,pages);const items=rows.slice((page-1)*perPage,page*perPage);
  if(!items.length){$('#content').innerHTML=`<div class="empty-state"><div class="empty-symbol">${view==='checks'?'✓':'◇'}</div><h2>${esc(t(view==='products'&&!state.products.length?'noProducts':view==='checks'&&!rows.length&&!filters.search&&!filters.brand?'noIssues':'empty'))}</h2><p>${esc(t(view==='products'&&!state.products.length?'noProductsHint':'emptyHint'))}</p>${view==='products'&&!state.products.length?button('empty-import','loadProducts','primary'):''}</div>`;if($('#empty-import'))$('#empty-import').onclick=()=>importFile('products');}
@@ -194,7 +208,8 @@ function renderProductSelection(){
 }
 function logisticsNumber(raw){const value=M.count(raw);return value===''||!Number.isFinite(value)||value<0?'—':esc(value.toLocaleString(lang==='cs'?'cs-CZ':'en-GB',{maximumFractionDigits:2}));}
 function renderKeyTable(items){
- $('#content').innerHTML=`<div class="table-scroll"><table><thead><tr>${['key','brand','status','palletItems','palletWeight','estimatedHeight','affected','complete','actions'].map(k=>`<th>${t(k)}</th>`).join('')}</tr></thead><tbody>${items.map(r=>{const used=state.products.filter(p=>p.brand===r.brand&&M.key(p.key)===r.key).length,percent=completion(r.data);return `<tr><td><button class="key-link key-large" data-key-edit="${esc(r.brand)}" data-key-name="${esc(r.key)}">${esc(r.key)}</button></td><td>${badge(r.brand)}</td><td>${badge(t(M.keyIsActive(r.data)?'active':'inactive'),M.keyIsActive(r.data)?'status-active':'grey')}</td><td class="numeric">${logisticsNumber(r.data.PALLET?.nr_of_items)}</td><td class="numeric">${logisticsNumber(r.data.PALLET?.weight)}</td><td class="numeric" title="${esc(t('estimatedHeightHint'))}">${M.estimatedPalletHeight(r.data)===''?'—':'≈ '+logisticsNumber(M.estimatedPalletHeight(r.data))}</td><td><button class="text-button" data-used-brand="${esc(r.brand)}" data-used-key="${esc(r.key)}">${used} ${!used?'· '+t('unused'):''}</button></td><td><span class="completeness"><span><i style="width:${percent}%"></i></span>${percent}%</span></td><td><button class="row-edit" data-key-edit="${esc(r.brand)}" data-key-name="${esc(r.key)}">${t('edit')}</button></td></tr>`;}).join('')}</tbody></table></div>`;
+ $('#content').innerHTML=`<div class="table-scroll"><table><thead><tr>${['key','brand','status','palletItems','palletWeight','estimatedHeight','affected','complete','actions'].map(k=>k==='actions'?`<th scope="col">${t(k)}</th>`:`<th scope="col" aria-sort="${keySort.field===k?(keySort.asc?'ascending':'descending'):'none'}"><button class="sort-button" data-key-sort="${k}">${t(k)}${keySort.field===k?(keySort.asc?' ↑':' ↓'):''}</button></th>`).join('')}</tr></thead><tbody>${items.map(r=>{const used=r.used,percent=r.percent;return `<tr><td><button class="key-link key-large" data-key-edit="${esc(r.brand)}" data-key-name="${esc(r.key)}">${esc(r.key)}</button></td><td>${badge(r.brand)}</td><td>${badge(t(M.keyIsActive(r.data)?'active':'inactive'),M.keyIsActive(r.data)?'status-active':'grey')}</td><td class="numeric">${logisticsNumber(r.data.PALLET?.nr_of_items)}</td><td class="numeric">${logisticsNumber(r.data.PALLET?.weight)}</td><td class="numeric" title="${esc(t('estimatedHeightHint'))}">${M.estimatedPalletHeight(r.data)===''?'—':'≈ '+logisticsNumber(M.estimatedPalletHeight(r.data))}</td><td><button class="text-button" data-used-brand="${esc(r.brand)}" data-used-key="${esc(r.key)}">${used} ${!used?'· '+t('unused'):''}</button></td><td><span class="completeness"><span><i style="width:${percent}%"></i></span>${percent}%</span></td><td><button class="row-edit" data-key-edit="${esc(r.brand)}" data-key-name="${esc(r.key)}">${t('edit')}</button></td></tr>`;}).join('')}</tbody></table></div>`;
+ $$('[data-key-sort]').forEach(b=>b.onclick=()=>{keySort={field:b.dataset.keySort,asc:keySort.field===b.dataset.keySort?!keySort.asc:true};page=1;renderContent();});
  $$('[data-key-edit]').forEach(b=>b.onclick=()=>openKey(b.dataset.keyEdit,b.dataset.keyName));$$('[data-used-key]').forEach(b=>b.onclick=()=>{changeView('products');filters.brand=b.dataset.usedBrand;filters.key=b.dataset.usedKey;filters.status='all';renderToolbar();renderContent();});
 }
 function renderChecksTable(items){

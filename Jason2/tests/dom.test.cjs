@@ -246,6 +246,29 @@ async function pickLanguages(n,codes,apply=true){
   n.photoObservers.at(-1).show(image.closest('button'));image.dispatchEvent(new n.w.Event('load'));image.closest('button').click();
   assert.equal(n.$('#large-photo').src,data);assert.ok(n.$('#photo-dialog').open);n.dom.window.close();
  });
+ await test('key headings sort all displayed values in both directions without changing product sort or data',async()=>{
+  const n=await setup(),full=()=>Object.fromEntries(Object.entries(n.w.JasonModel.sections).map(([s,fields])=>[s,Object.fromEntries(fields.map(f=>[f,1]))]));
+  const keys={Lilien:{'2':full(),'10':full()},Natava:{'1':full(),A:n.w.JasonModel.emptyLogistics()},Naturalis:{'3':n.w.JasonModel.emptyLogistics()}};
+  Object.assign(keys.Lilien['2'].PALLET,{nr_of_items:'100 pcs',weight:'10 kg',nr_of_layers:2});keys.Lilien['2'].CARTON.height='10 cm';
+  keys.Lilien['10'].active=false;Object.assign(keys.Lilien['10'].PALLET,{nr_of_items:20,weight:'2,5 kg',nr_of_layers:2});keys.Lilien['10'].CARTON.height='200 mm';
+  Object.assign(keys.Natava['1'].PALLET,{nr_of_items:0,weight:0});keys.Natava['1'].CARTON.height=0;keys.Natava.A.active=false;keys.Natava.A.PALLET.nr_of_layers=2;
+  Object.assign(keys.Naturalis['3'].PALLET,{nr_of_items:10,weight:'20 kg',nr_of_layers:3});keys.Naturalis['3'].CARTON.height=5;
+  const products=[['Lilien','2'],['Lilien','2'],['Lilien','10'],['Natava','A'],['Natava','A'],['Natava','A']].map(([brand,key],i)=>({...fixture,brand,key,id:String(i+1),price:i+1}));
+  await n.upload('products',products);await n.upload('logistics',keys);n.click('[data-sort=price]');n.click('[data-sort=price]');const productOrder=()=>n.$$('tbody [data-select]').map(e=>Number(e.dataset.select));assert.deepEqual(productOrder(),[5,4,3,2,1,0]);const before=await n.saved();
+  n.click('[data-view=keys]');n.change('#filter-keyStatus','all');assert.equal(n.$$('[data-key-sort]').length,8);assert.equal(n.$('thead th:last-child button'),null);
+  const order=()=>n.$$('tbody tr').map(row=>{const e=row.querySelector('[data-key-name]');return e.dataset.keyEdit+'/'+e.dataset.keyName;});
+  const A='Lilien/2',B='Lilien/10',C='Natava/1',D='Natava/A',E='Naturalis/3';
+  const expected={key:[[C,A,E,B,D],[D,B,E,A,C]],brand:[[A,B,C,D,E],[E,C,D,A,B]],status:[[A,C,E,B,D],[B,D,A,C,E]],palletItems:[[C,E,B,A,D],[A,B,E,C,D]],palletWeight:[[C,B,A,E,D],[E,A,B,C,D]],estimatedHeight:[[E,A,B,C,D],[B,A,E,C,D]],affected:[[C,E,B,A,D],[D,A,B,C,E]],complete:[[D,E,A,B,C],[A,B,C,E,D]]};
+  for(const [field,directions]of Object.entries(expected))for(const [i,wanted]of directions.entries()){
+   const target=i===0?'ascending':'descending',selector=`[data-key-sort="${field}"]`;if(n.$(selector).closest('th').getAttribute('aria-sort')!==target)n.click(selector);
+   assert.equal(n.$(selector).closest('th').getAttribute('aria-sort'),target);assert.deepEqual(order(),wanted,field+' '+target);assert.equal(n.$$('th[aria-sort=ascending],th[aria-sort=descending]').length,1);
+  }
+  n.click('[data-key-sort=palletWeight]');n.click('[data-key-sort=palletWeight]');n.click('[data-lang=en]');await wait(()=>n.$('[data-key-sort=palletWeight]').textContent.includes('Pallet weight'));assert.deepEqual(order(),expected.palletWeight[1]);assert.match(n.$('[data-key-sort=palletWeight]').textContent,/Pallet weight.*↓/);
+  n.change('#filter-keyStatus','inactive');assert.deepEqual(order(),[B,D]);n.change('#filter-keyStatus','active');assert.deepEqual(order(),[E,A,C]);n.click('[data-view=products]');assert.deepEqual(productOrder(),[5,4,3,2,1,0]);assert.deepEqual(await n.saved(),before);assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
+ await test('key sorting covers all pages, returns to page one and uses numeric key order',async()=>{
+  const n=await setup(),keys={Lilien:Object.fromEntries(Array.from({length:40},(_,i)=>['K'+i,{...n.w.JasonModel.emptyLogistics(),PALLET:{weight:40-i}}]))};await n.upload('logistics',keys);const before=await n.saved();n.click('[data-view=keys]');n.click('#next');assert.match(n.$('#pagination').textContent,/31–40/);n.click('[data-key-sort=palletWeight]');assert.match(n.$('#pagination').textContent,/1–30/);assert.equal(n.$('tbody [data-key-name]').dataset.keyName,'K39');n.click('#next');assert.equal(n.$('tbody [data-key-name]').dataset.keyName,'K9');n.click('[data-key-sort=key]');assert.match(n.$('#pagination').textContent,/1–30/);assert.equal(n.$('tbody [data-key-name]').dataset.keyName,'K0');n.change('#page-size','all');assert.deepEqual(n.$$('tbody tr').map(row=>row.querySelector('[data-key-name]').dataset.keyName),Array.from({length:40},(_,i)=>'K'+i));assert.deepEqual(await n.saved(),before);assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
  await test('key overview shows pallet items, weight and display-only estimated height with plain legends',async()=>{
   const n=await setup(),keys=clone(logistics);keys.Lilien['500A'].PALLET.weight='500,5 kg';keys.Lilien['missing']=n.w.JasonModel.emptyLogistics();
   await n.upload('products',[fixture]);await n.upload('logistics',keys);const before=await n.saved();
