@@ -54,7 +54,8 @@
         "nr_of_cartons": null,
         "nr_of_items": null,
         "nr_of_layers": null
-      }
+      },
+      "active": false
     },
     "50": {
       "ITEM": {

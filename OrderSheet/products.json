@@ -1792,7 +1792,9 @@
     "inciSource": {
       "url": "https://www.unioncosmetic.cz/lilien-men-art-beard--hair-oil-black--1",
       "checkedAt": "2026-10-13T12:19:36Z"
-    }
+    },
+    "discontinued": true,
+    "discontinued_date": "2026-10-16"
   },
   {
     "brand": "Lilien",
@@ -1815,7 +1817,9 @@
     "inciSource": {
       "url": "https://www.unioncosmetic.cz/lilien-men-art-beard--hair-wax-white--1",
       "checkedAt": "2026-10-13T12:19:36Z"
-    }
+    },
+    "discontinued": true,
+    "discontinued_date": "2026-10-16"
   },
   {
     "brand": "Lilien",
@@ -1838,7 +1842,9 @@
     "inciSource": {
       "url": "https://www.unioncosmetic.cz/lilien-men-art-beard--hair-wax-black--1",
       "checkedAt": "2026-10-13T12:19:36Z"
-    }
+    },
+    "discontinued": true,
+    "discontinued_date": "2026-10-16"
   },
   {
     "brand": "Lilien",
