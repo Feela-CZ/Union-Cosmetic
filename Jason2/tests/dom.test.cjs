@@ -343,6 +343,24 @@ async function pickLanguages(n,codes,apply=true){
   const pages=await setup(),rows=Array.from({length:35},(_,i)=>({...fixture,id:String(1000000000000+i),name:'TEST PAGE '+String(i).padStart(3,'0'),csName:'TEST PAGE '+String(i).padStart(3,'0')}));
   await pages.upload('products',rows);let wb;pages.w.JasonExport.download=async x=>{wb=x;};pages.click('[data-select="0"]');pages.click('#next');pages.click('[data-select="30"]');pages.click('#export');assert.match(pages.$('#export-options').textContent,/2 produktů.*vybrané položky/);pages.submit('#export-form');await wait(()=>wb);const ws=wb.getWorksheet('Products');assert.equal(ws.rowCount,5);assert.deepEqual([ws.getCell('C4').value,ws.getCell('C5').value].sort(),[rows[0].id,rows[30].id].sort());await wait(()=>!pages.$('#export-form [type=submit]').disabled);pages.click('#editor-close');pages.click('#bulk-clear');pages.input('#search',rows[0].id);wb=null;pages.click('#export');assert.match(pages.$('#export-options').textContent,/1 produktů.*aktuálních filtrů/);pages.submit('#export-form');await wait(()=>wb);assert.equal(wb.getWorksheet('Products').rowCount,4);pages.dom.window.close();
  });
+ await test('product XLSX roundtrip includes copyable language codes, exact INCI and explicit missing states in both UI languages',async()=>{
+  const n=await setup(),inci='Aqua, Parfum, Linalool*.\n'+('Butyrospermum Parkii Butter, ').repeat(25)+'Citral*.';
+  const products=[{...fixture,id:'0012345678901',name:'A formula',labelLanguages:['cs','en','de'],inci,inciStatus:'verified'}, {...fixture,id:'0012345678902',name:'B pending',labelLanguages:[],inci:'Old formula',inciStatus:'pending'}, {...fixture,id:'0012345678903',name:'C accessory',inci:'Old formula',inciStatus:'not-applicable'}, {...fixture,id:'0012345678904',name:'D legacy',labelLanguages:['pt-BR','uk'],inci:'Aqua, Limonene*'}, {...fixture,id:'0012345678905',name:'E unknown'}];
+  await n.upload('products',products);const before=await n.saved();
+  for(const language of ['cs','en']){
+   if(language==='en')n.click('[data-lang=en]');
+   let wb;n.w.JasonExport.download=async book=>{wb=book;};n.click('#export');n.submit('#export-form');await wait(()=>wb);
+   const restored=new n.w.ExcelJS.Workbook();await restored.xlsx.load(await wb.xlsx.writeBuffer());const ws=restored.getWorksheet('Products');
+   assert.equal(ws.getCell('S3').value,language==='cs'?'Jazyky etikety':'Label languages');assert.equal(ws.getCell('T3').value,'INCI');
+   assert.deepEqual([4,5,6,7,8].map(row=>ws.getCell('S'+row).value),['CS, EN, DE','TBD','TBD','PT-BR, UK','TBD']);
+   assert.deepEqual([4,5,6,7,8].map(row=>ws.getCell('T'+row).value),[inci,'TBD','N/A','Aqua, Limonene*','TBD']);
+   assert.equal(ws.getCell('T4').alignment.wrapText,true);assert.equal(ws.getCell('T4').alignment.vertical,'top');assert.equal(ws.getCell('T4').numFmt,'@');assert.ok(ws.getRow(4).height>100);assert.equal(ws.getColumn(20).width,95);
+   assert.equal(ws.autoFilter,'A3:T8');assert.equal(ws.pageSetup.printArea,'A1:T8');assert.deepEqual((await n.saved()).products,before.products);
+   await wait(()=>!n.$('#export-form [type=submit]').disabled);n.click('#editor-close');
+  }
+  let selected;n.w.JasonExport.download=async book=>{selected=book;};n.click('[data-select="3"]');n.click('#export');n.submit('#export-form');await wait(()=>selected);const ws=selected.getWorksheet('Products');assert.equal(ws.rowCount,4);assert.equal(ws.getCell('C4').value,products[3].id);assert.equal(ws.getCell('S4').value,'PT-BR, UK');assert.equal(ws.getCell('T4').value,products[3].inci);
+  assert.deepEqual(n.errors,[]);n.dom.window.close();
+ });
  await test('logistics XLSX matrix exports partial keys, numeric counts and units',async()=>{let wb;w.JasonExport.download=async x=>{wb=x;};click('[data-view=keys]');click('#export');assert.equal($('#include-products').checked,false);submit('#export-form');await wait(()=>wb);const ws=wb.getWorksheet('Lilien Data');assert.equal(ws.getCell('C2').value,'500B');assert.equal(ws.getCell('C11').value,6);assert.match(ws.getCell('B3').value,/\(cm\)/);assert.match(ws.getCell('B6').value,/\(kg\)/);assert.equal(ws.getCell('A3').fill.fgColor.argb,ws.getCell('A7').fill.fgColor.argb);assert.equal(ws.getImages().length,0);await wait(()=>!$('#export-form [type=submit]').disabled);click('#editor-close');});
  await test('optional logistics product list respects selected keys and checkbox survives tab switches',async()=>{
   const n=await setup(),keys=clone(logistics);keys.Lilien['500B']=clone(keys.Lilien['500A']);keys.Natava={'500A':clone(keys.Lilien['500A'])};

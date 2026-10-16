@@ -475,8 +475,8 @@ function openExport(){
 }
 async function exportProducts(){
  const rows=productExportRows();if(!rows.length)throw Error(t('nothing'));
- const names=['brand','type','id','hs','name','csName','volume','price','key','pack','boxes_per_layer','boxes_per_pallet','carton_ean','new','new_date','discontinued','discontinued_date','flags'];
- const data=rows.map(({p})=>names.map(n=>['pack','boxes_per_layer','boxes_per_pallet'].includes(n)?M.packaging(p,state.logistics)[n]:n==='volume'?`${p.volume?.number??''} ${p.volume?.unit||''}`.trim():n==='flags'?(p.flags||[]).join(', '):n==='type'?typeLabel(p[n]):['id','hs','carton_ean'].includes(n)?String(p[n]??''):['new','discontinued'].includes(n)?(p[n]===true?t('yes'):t('no')):p[n]??''));
+ const names=['brand','type','id','hs','name','csName','volume','price','key','pack','boxes_per_layer','boxes_per_pallet','carton_ean','new','new_date','discontinued','discontinued_date','flags','labelLanguages','inci'];
+ const data=rows.map(({p})=>names.map(n=>['pack','boxes_per_layer','boxes_per_pallet'].includes(n)?M.packaging(p,state.logistics)[n]:n==='volume'?`${p.volume?.number??''} ${p.volume?.unit||''}`.trim():n==='flags'?(p.flags||[]).join(', '):n==='labelLanguages'?(Array.isArray(p.labelLanguages)&&p.labelLanguages.length?languageCodeText(p.labelLanguages):'TBD'):n==='inci'?(p.inciStatus==='not-applicable'?'N/A':p.inciStatus==='pending'||typeof p.inci!=='string'||!p.inci.trim()?'TBD':p.inci):n==='type'?typeLabel(p[n]):['id','hs','carton_ean'].includes(n)?String(p[n]??''):['new','discontinued'].includes(n)?(p[n]===true?t('yes'):t('no')):p[n]??''));
  await JasonExport.ready();
  const wb=JasonExport.products({fields:names,headers:names.map(n=>t(n==='id'?'ean':n)),rows:data,title:t('exportProducts'),date:today(),count:rows.length,countLabel:t('countProducts')});
  await JasonExport.download(wb,`products-${today()}.xlsx`);

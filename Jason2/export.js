@@ -57,7 +57,7 @@ function products({fields,headers,rows,title:label,date,count,countLabel='produc
  ws.getCell(2,1).font={name:'Calibri',size:10,color:{argb:colors.blue}};
  ws.getCell(2,1).alignment={vertical:'middle',horizontal:'left'};ws.getRow(2).height=24;
  ws.addRow(headers);header(ws.getRow(3),lastColumn);
- const widths={brand:15,type:27,id:20,hs:15,name:48,csName:48,volume:19,price:16,key:18,pack:18,boxes_per_layer:20,boxes_per_pallet:20,carton_ean:20,new:13,new_date:17,discontinued:15,discontinued_date:17,flags:28};
+ const widths={brand:15,type:27,id:20,hs:15,name:48,csName:48,volume:19,price:16,key:18,pack:18,boxes_per_layer:20,boxes_per_pallet:20,carton_ean:20,new:13,new_date:17,discontinued:15,discontinued_date:17,flags:28,labelLanguages:28,inci:95};
  fields.forEach((field,i)=>{ws.getColumn(i+1).width=widths[field]||18;});
  for(const values of rows){
   const row=ws.addRow(values);let lines=1;
@@ -66,7 +66,8 @@ function products({fields,headers,rows,title:label,date,count,countLabel='produc
    if(['price','pack','boxes_per_layer','boxes_per_pallet'].includes(field)&&value!==''&&value!=null&&Number.isFinite(Number(value))){c.value=Number(value);c.numFmt=field==='price'?'0.00 "€"':'0';c.alignment.horizontal='right';}
    if(['id','hs','carton_ean','key'].includes(field)){c.value=String(value??'');c.numFmt='@';}
    if(['new','discontinued'].includes(field))c.alignment.horizontal='center';
-   if(['name','csName','flags'].includes(field))lines=Math.max(lines,Math.ceil(String(value??'').length/(widths[field]-4)));
+   if(['name','csName','flags','labelLanguages','inci'].includes(field))lines=Math.max(lines,String(value??'').split(/\r?\n/).reduce((n,line)=>n+Math.max(1,Math.ceil(line.length/(widths[field]-4))),0));
+   if(['labelLanguages','inci'].includes(field)){c.numFmt='@';c.alignment.vertical='top';}
   });
   row.height=Math.max(28,lines*15+10);
  }
