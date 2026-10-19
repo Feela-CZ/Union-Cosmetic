@@ -2529,7 +2529,9 @@
     "key": "500A",
     "carton_ean": 8595196900897,
     "csName": "Naturalis tělové mléko s extraktem z Rakytníku",
-    "inciStatus": "pending"
+    "inciStatus": "pending",
+    "discontinued": true,
+    "discontinued_date": "2026-10-19"
   },
   {
     "brand": "Naturalis",
@@ -2547,7 +2549,9 @@
     "key": "500A",
     "carton_ean": 8596048006163,
     "csName": "Naturalis tělové mléko s Makadamovým olejem",
-    "inciStatus": "pending"
+    "inciStatus": "pending",
+    "discontinued": true,
+    "discontinued_date": "2026-10-19"
   },
   {
     "brand": "Naturalis",
@@ -2562,8 +2566,8 @@
     "price": 1.2,
     "new": false,
     "new_date": "",
-    "discontinued": false,
-    "discontinued_date": "",
+    "discontinued": true,
+    "discontinued_date": "2026-10-19",
     "key": "500A",
     "carton_ean": 8595196904086,
     "csName": "Naturalis tělové mléko s Olivovým olejem",
@@ -2582,8 +2586,8 @@
     "price": 1.2,
     "new": false,
     "new_date": "",
-    "discontinued": false,
-    "discontinued_date": "",
+    "discontinued": true,
+    "discontinued_date": "2026-10-19",
     "key": "500A",
     "carton_ean": 8596048000857,
     "csName": "Naturalis tělové mléko s Kokosovým olejem",
