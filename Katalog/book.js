@@ -43,13 +43,28 @@
     const outgoing=single?index:dir>0?before[1]:before[0];
     // Decode both surfaces before starting the turn, so the reverse is never blank.
     await Promise.all([incoming,outgoing].map(n=>{if(n<1||n>total)return;const im=new Image();im.src=`pages/${String(n).padStart(2,'0')}.webp`;return im.decode?im.decode().catch(()=>{}):Promise.resolve();}));
+    if(single){
+      // Two complete pages share one flat track, clipped at the book edges.
+      const track=document.createElement('div');track.className='mobile-slide';track.setAttribute('aria-hidden','true');
+      const pages=dir>0?[outgoing,incoming]:[incoming,outgoing];
+      pages.forEach(n=>track.append(page(n,false)));
+      const start=dir>0?'translate3d(0,0,0)':'translate3d(-50%,0,0)';
+      const end=dir>0?'translate3d(-50%,0,0)':'translate3d(0,0,0)';
+      track.style.transform=start;book.append(track);book.classList.add('sliding');
+      if(typeof track.animate==='function'&&!reduce){
+        animation=track.animate([{transform:start},{transform:end}],{duration:340,easing:'cubic-bezier(.22,.61,.36,1)',fill:'forwards'});
+        await animation.finished.catch(()=>{});
+      }
+      // Replace the static page before removing the moving track, in one frame.
+      index=target;render();track.remove();book.classList.remove('sliding');
+      if(animation){animation.cancel();animation=null;}busy=false;resize();return;
+    }
     let from,to;
-    if(single){setPage(front,outgoing,false);setPage(back,incoming,false);from=0;to=dir>0?-180:180;}
-    else if(dir>0){setPage(front,outgoing,false);setPage(back,incoming,false);setPage(right,after[1]);from=0;to=-180;}
+    if(dir>0){setPage(front,outgoing,false);setPage(back,incoming,false);setPage(right,after[1]);from=0;to=-180;}
     else{setPage(front,incoming,false);setPage(back,outgoing,false);setPage(left,after[0]);from=-180;to=0;}
     turner.style.transform=`rotateY(${from}deg)`;turner.classList.add('active');
     if(typeof turner.animate==='function'&&!reduce){
-      animation=turner.animate([{transform:`rotateY(${from}deg)`},{transform:`rotateY(${to}deg)`}],{duration:single?650:1050,easing:'cubic-bezier(.32,.02,.2,1)',fill:'forwards'});
+      animation=turner.animate([{transform:`rotateY(${from}deg)`},{transform:`rotateY(${to}deg)`}],{duration:1050,easing:'cubic-bezier(.32,.02,.2,1)',fill:'forwards'});
       await animation.finished.catch(()=>{});
     }
     index=target;render();turner.classList.remove('active');if(animation){animation.cancel();animation=null;}front.replaceChildren();back.replaceChildren();busy=false;resize();
