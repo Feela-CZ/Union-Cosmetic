@@ -44,15 +44,19 @@
     // Decode both surfaces before starting the turn, so the reverse is never blank.
     await Promise.all([incoming,outgoing].map(n=>{if(n<1||n>total)return;const im=new Image();im.src=`pages/${String(n).padStart(2,'0')}.webp`;return im.decode?im.decode().catch(()=>{}):Promise.resolve();}));
     if(single){
-      // Two complete pages share one flat track, clipped at the book edges.
+      // Layer complete pages: one settles back while the other glides over it.
       const track=document.createElement('div');track.className='mobile-slide';track.setAttribute('aria-hidden','true');
-      const pages=dir>0?[outgoing,incoming]:[incoming,outgoing];
-      pages.forEach(n=>track.append(page(n,false)));
-      const start=dir>0?'translate3d(0,0,0)':'translate3d(-50%,0,0)';
-      const end=dir>0?'translate3d(-50%,0,0)':'translate3d(0,0,0)';
-      track.style.transform=start;book.append(track);book.classList.add('sliding');
+      const currentPage=page(outgoing,false),nextPage=page(incoming,false);
+      const settle=[{transform:'translate3d(0,0,0) scale(1)',opacity:1},{transform:'translate3d(0,4%,0) scale(.95)',opacity:.78}];
+      const arrive=[{transform:'translate3d(103%,-2%,0) scale(1.01)',opacity:1},{transform:'translate3d(0,0,0) scale(1)',opacity:1}];
+      const currentFrames=dir>0?settle:[...arrive].reverse(),nextFrames=dir>0?arrive:[...settle].reverse();
+      currentPage.style.zIndex=dir>0?'1':'2';nextPage.style.zIndex=dir>0?'2':'1';
+      Object.assign(currentPage.style,currentFrames[0]);Object.assign(nextPage.style,nextFrames[0]);
+      track.append(currentPage,nextPage);book.append(track);book.classList.add('sliding');
       if(typeof track.animate==='function'&&!reduce){
-        animation=track.animate([{transform:start},{transform:end}],{duration:340,easing:'cubic-bezier(.22,.61,.36,1)',fill:'forwards'});
+        const timing={duration:460,easing:'cubic-bezier(.22,.61,.36,1)',fill:'forwards'};
+        const motions=[currentPage.animate(currentFrames,timing),nextPage.animate(nextFrames,timing)];
+        animation={finished:Promise.all(motions.map(m=>m.finished)),finish(){motions.forEach(m=>m.finish());},cancel(){motions.forEach(m=>m.cancel());}};
         await animation.finished.catch(()=>{});
       }
       // Replace the static page before removing the moving track, in one frame.
