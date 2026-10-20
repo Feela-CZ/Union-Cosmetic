@@ -54,7 +54,7 @@
       Object.assign(currentPage.style,currentFrames[0]);Object.assign(nextPage.style,nextFrames[0]);
       track.append(currentPage,nextPage);book.append(track);book.classList.add('sliding');
       if(typeof track.animate==='function'&&!reduce){
-        const timing={duration:460,easing:'cubic-bezier(.22,.61,.36,1)',fill:'forwards'};
+        const timing={duration:610,easing:'cubic-bezier(.22,.61,.36,1)',fill:'forwards'};
         const motions=[currentPage.animate(currentFrames,timing),nextPage.animate(nextFrames,timing)];
         animation={finished:Promise.all(motions.map(m=>m.finished)),finish(){motions.forEach(m=>m.finish());},cancel(){motions.forEach(m=>m.cancel());}};
         await animation.finished.catch(()=>{});
