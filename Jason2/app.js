@@ -216,7 +216,7 @@ function renderChecksTable(items){
  $('#content').innerHTML=`<div class="table-scroll"><table><thead><tr><th>${t('product')} / ${t('key')}</th><th>${t('brand')}</th><th>${t('issue')}</th><th>${t('actions')}</th></tr></thead><tbody>${items.map((r,i)=>{const p=r.kind==='product'?state.products[r.index]:null;return `<tr><td><strong>${esc(p?(lang==='cs'?p.csName||p.name:p.name||p.csName):r.key)}</strong><small class="cell-sub mono">${esc(p?.id||'')}</small></td><td>${esc(p?.brand||r.brand)}</td><td><span class="issue-dot ${r.code==='keyUnused'?'info':''}"></span>${esc(t(r.code))}${r.field?' · '+esc(issueFieldLabel(r.field)):''}</td><td><button data-issue="${i}" class="row-edit">${t('open')}</button></td></tr>`;}).join('')}</tbody></table></div>`;
  $$('[data-issue]').forEach(b=>b.onclick=()=>{const r=items[Number(b.dataset.issue)];if(r.kind==='product'){const tab=r.field==='photo'?'photo':['key','carton_ean'].includes(r.field)?'packaging':r.field==='new_date'?'flags':'details';openProduct(r.index,tab);}else openKey(r.brand,r.key);});
 }
-function renderBulk(){const e=$('#bulk-bar');e.hidden=!selected.size||view!=='products';if(e.hidden)return;e.innerHTML=`<span><strong>${selected.size}</strong> ${t('selected')}</span>${button('bulk-edit','bulk')}${button('bulk-select-all','selectAll')}${button('bulk-clear','selectNone')}`;$('#bulk-edit').onclick=openBulk;$('#bulk-select-all').onclick=()=>{filteredProducts().forEach(r=>selected.add(r.index));renderProductSelection();};$('#bulk-clear').onclick=()=>{selected.clear();renderProductSelection();};}
+function renderBulk(){const e=$('#bulk-bar');e.hidden=!selected.size||view!=='products';if(e.hidden)return;e.innerHTML=`<span><strong>${selected.size}</strong> ${t('selected')}</span>${button('bulk-edit','bulk')}${button('bulk-ppwr','ppwrUpload')}${button('bulk-select-all','selectAll')}${button('bulk-clear','selectNone')}`;$('#bulk-edit').onclick=openBulk;$('#bulk-ppwr').onclick=openBulkPPWR;$('#bulk-select-all').onclick=()=>{filteredProducts().forEach(r=>selected.add(r.index));renderProductSelection();};$('#bulk-clear').onclick=()=>{selected.clear();renderProductSelection();};}
 function field(name,label,value,type='text',extra='',hint=''){return `<label class="field"><span>${esc(t(label))}</span><input name="${esc(name)}" id="field-${esc(name)}" type="${type}" value="${esc(value??'')}" ${extra}>${hint?`<small>${esc(hint)}</small>`:''}</label>`;}
 function datalist(id,values){return `<datalist id="${id}">${values.map(v=>`<option value="${esc(v)}">${esc(id==='types'?typeLabel(v):v)}</option>`).join('')}</datalist>`;}
 function formFooter(label='save',left=''){return `<div class="form-footer"><span class="muted">${left}</span><div>${button('form-cancel','cancel')}<button type="submit" class="primary">${esc(t(label))}</button></div></div>`;}
@@ -292,16 +292,17 @@ function openProduct(index=null,tab='details',duplicate=false){
  if(duplicate)p.id='';
  let selectedPhoto=duplicate&&original?state.photos[original.id]||null:null,photoExists=false;
  const title=duplicate?t('duplicate'):original?(lang==='cs'?p.csName||p.name:p.name)||t('edit'):t('addProduct');
- openEditor(title,original&&!duplicate?`${p.brand} / ${p.id}`:t('product'),`<form id="product-form" novalidate><div class="editor-tabs" role="tablist" aria-label="${esc(t('product'))}">${['details','packaging','inci','labelLanguages','labels','photo','flags'].map(v=>`<button type="button" role="tab" id="tab-${v}" aria-controls="section-${v}" data-tab="${v}" aria-selected="${v===tab}">${t(v)}</button>`).join('')}</div>
+ openEditor(title,original&&!duplicate?`${p.brand} / ${p.id}`:t('product'),`<form id="product-form" novalidate><div class="editor-tabs" role="tablist" aria-label="${esc(t('product'))}">${['details','packaging','inci','labelLanguages','labels','ppwr','photo','flags'].map(v=>`<button type="button" role="tab" id="tab-${v}" aria-controls="section-${v}" data-tab="${v}" aria-selected="${v===tab}">${t(v)}</button>`).join('')}</div>
  <div class="form-content"><div id="form-error" class="notice error-notice" role="alert" hidden></div>
  <section id="section-details" class="tab-section" role="tabpanel" aria-labelledby="tab-details"><div class="section-intro"><h3>${t('details')}</h3></div><div class="form-grid">${field('brand','brand',p.brand,'text','list="brands" required')}${field('type','type',p.type,'text','list="types"')}${field('id','ean',p.id,'text','required inputmode="numeric"',t('required'))}${field('hs','hs',p.hs,'text','inputmode="numeric"')}${field('name','name',p.name)}${field('csName','csName',p.csName)}<label class="field"><span>${t('volume')}</span><div class="input-group"><input name="volume-number" type="text" inputmode="decimal" value="${esc(p.volume?.number??'')}"><input name="volume-unit" list="units" value="${esc(p.volume?.unit??'')}" aria-label="${lang==='cs'?'Jednotka':'Unit'}"></div></label>${field('price','price',p.price,'number','min="0" step="any"')}</div>${datalist('brands',brands())}${datalist('types',[...new Set([...types(),...state.products.map(p=>p.type)])].filter(Boolean))}${datalist('units',['ml','g','pc','l','kg'])}<p class="notice" id="draft-warning" hidden>${t('draftWarning')}</p></section>
  <section id="section-packaging" class="tab-section" role="tabpanel" aria-labelledby="tab-packaging"><div class="section-intro"><h3>${t('packaging')}</h3></div><div class="form-grid"><label class="field"><span>${t('key')}</span><select name="key" id="product-key"></select></label>${field('carton_ean','carton_ean',p.carton_ean)}</div><p class="muted" id="key-summary"></p><section class="product-logistics"><div class="section-intro"><h3>${t('keyData')}</h3><div class="key-detail-actions">${button('product-key-open','editKey')}${button('product-key-export','exportNow')}</div></div><div id="product-key-data"></div></section></section>
  <section id="section-flags" class="tab-section" role="tabpanel" aria-labelledby="tab-flags"><h3>${t('flags')}</h3>${['new','discontinued'].map(v=>`<div class="flag-card"><label class="checkbox-label"><input type="checkbox" name="${v}" ${p[v]===true?'checked':''}>${t(v)}</label>${field(v+'_date',v+'_date',p[v+'_date'],'date')}</div>`).join('')}<div class="form-grid">${field('flags','customFlags',(p.flags||[]).join(', '),'text','',t('flagsHint'))}</div></section>
  <section id="section-photo" class="tab-section" role="tabpanel" aria-labelledby="tab-photo"><h3>${t('photo')}</h3><div class="photo-layout"><button type="button" class="photo-drop" id="photo-drop"><img id="photo-preview" alt="${esc(t('photo'))}" hidden><span id="photo-placeholder">+<small>${t('choosePhoto')}</small></span></button><div><p>${t(sandbox?'sandboxPhotoHint':'photoHint')}</p><input type="file" accept="image/jpeg,image/png,image/webp" id="photo-input" hidden>${button('photo-choose','choosePhoto')}${button('photo-download','downloadPhoto')}${button('photo-view','viewPhoto')}<p class="muted">${state.pendingPhotos.includes(p.id)?t('photoPending'):''}</p></div></div></section>
- ${productInfoSections(p,!original||duplicate)}</div>${formFooter()}</form>`);
+ ${productInfoSections(p,!original||duplicate)}<section id="section-ppwr" class="tab-section" role="tabpanel" aria-labelledby="tab-ppwr"></section></div>${formFooter()}</form>`);
  const form=$('#product-form'),elements=form.elements,selectedLabels={},labelReads=new Set(),labelReadRevisions={front:0,back:0};
  const originalInfo={inci:$('#inci-text').value,status:$('#inci-status').value,languages:Array.isArray(p.labelLanguages)?M.clone(p.labelLanguages):[]};
  let languageDraft=M.clone(originalInfo.languages);
+ const ppwrEditor=mountPPWR($('#section-ppwr'),p.ppwr,()=>editorDirty=true);
  const updateInci=()=>{$('#inci-text').disabled=$('#inci-status').value==='not-applicable';$('#inci-text').placeholder=$('#inci-status').value==='not-applicable'?'N/A':'TBD';$('#copy-inci').disabled=$('#inci-status').value!=='provided'||!$('#inci-text').value.trim();};
  $('#inci-text').addEventListener('input',()=>{$('#inci-status').value=$('#inci-text').value.trim()?'provided':'pending';updateInci();});$('#inci-status').onchange=updateInci;updateInci();
  $('#copy-inci').onclick=async()=>{try{await navigator.clipboard.writeText($('#inci-text').value);toast(t('inciCopied'));}catch(e){error(e);}};
@@ -351,7 +352,7 @@ function openProduct(index=null,tab='details',duplicate=false){
  keysForBrand();elements.brand.onchange=()=>keysForBrand(true);elements.key.onchange=()=>updatePackaging();
  function currentKeyEntry(){const brand=elements.brand.value,key=M.key(elements.key.value);return {brand,key,data:M.clone(state.logistics[brand][key])};}
  $('#product-key-open').onclick=async()=>{
-  if(busy)return;await Promise.allSettled([...labelReads]);if($('#product-form')!==form)return;const entry=currentKeyEntry(),d=$('#editor'),body=$('#editor-body');
+  if(busy)return;await Promise.allSettled([...labelReads]);await ppwrEditor.ready();if($('#product-form')!==form)return;const entry=currentKeyEntry(),d=$('#editor'),body=$('#editor-body');
   const origin={view,page,filters:{...filters},selected:new Set(selected),title:$('#editor-title').textContent,caption:$('#editor-caption').textContent,small:d.classList.contains('small'),scroll:d.scrollTop,dirty:editorDirty,save:editorSave};
   const draft=document.createDocumentFragment();while(body.firstChild)draft.append(body.firstChild);
   d.close();editorDirty=false;editorSave=null;changeView('keys');filters.brand=entry.brand;filters.search=entry.key;filters.keyStatus=M.keyIsActive(entry.data)?'active':'inactive';renderToolbar();renderContent();
@@ -373,7 +374,7 @@ function openProduct(index=null,tab='details',duplicate=false){
  function preserve(name,old,value){return String(old??'')===String(value??'')?old:value;}
  editorSave=()=>runForm(async()=>{
   const notice=$('#form-error');notice.hidden=true;
-  await Promise.allSettled([...labelReads]);
+  await Promise.allSettled([...labelReads]);await ppwrEditor.ready();
   if(!editorDirty&&!selectedPhoto&&original&&!duplicate){formClose();return;}
   try{
    const str=n=>elements[n].value.trim(),num=n=>str(n)===''?'':Number(str(n));
@@ -386,7 +387,8 @@ function openProduct(index=null,tab='details',duplicate=false){
    const languages=languageDraft;if(JSON.stringify(languages)!==JSON.stringify(originalInfo.languages)){
     if(languages.some(code=>!/^[a-zA-Z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(code)))throw Error('LABEL_LANGUAGES');patch.labelLanguages=languages;
    }
-   const files={};if(Object.keys(selectedLabels).length){
+   const files={};if(ppwrEditor.changed()){patch.ppwr=ppwrEditor.value();Object.assign(files,ppwrEditor.files());}
+   if(Object.keys(selectedLabels).length){
     patch.labels=p.labels&&typeof p.labels==='object'&&!Array.isArray(p.labels)?M.clone(p.labels):{};
     for(const [slot,asset] of Object.entries(selectedLabels)){
      if(!asset){patch.labels[slot]=null;continue;}
@@ -407,6 +409,71 @@ function openProduct(index=null,tab='details',duplicate=false){
  });
  form.onsubmit=e=>{e.preventDefault();void editorSave();};attachCancel();
 }
+
+const ppwrAccept='application/pdf,image/jpeg,image/png,image/webp,.pdf,.jpg,.jpeg,.png,.webp';
+const ppwrDate=asset=>new Intl.DateTimeFormat(lang==='cs'?'cs-CZ':'en-GB',{dateStyle:'medium',timeStyle:'short'}).format(new Date(asset.uploadedAt));
+function ppwrSource(asset,files={}){return files[asset.path]||labelSource(asset);}
+function ppwrAsset(file){return {path:S.ppwrPath(file.extension),name:file.name,mimeType:file.mimeType,size:file.size,uploadedAt:new Date().toISOString()};}
+async function openPPWRFile(asset,files,download=false){
+ try{const src=ppwrSource(asset,files);if(!src)return;
+  if(download){if(src.startsWith('data:'))downloadData(src,asset.name);else{const response=await fetch(src);if(!response.ok)throw Error('HTTP '+response.status);downloadBlob(await response.blob(),asset.name);}return;}
+  if(src.startsWith('data:')){const bytes=Uint8Array.from(atob(src.split(',')[1]),c=>c.charCodeAt(0)),url=URL.createObjectURL(new Blob([bytes],{type:asset.mimeType}));window.open(url,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(url),60000);}
+  else window.open(src,'_blank','noopener');
+ }catch(e){error(e);}
+}
+function showPPWRProducts(asset){
+ let d=$('#ppwr-products-dialog');if(!d){d=document.createElement('dialog');d.id='ppwr-products-dialog';d.className='ppwr-products-dialog';d.setAttribute('aria-labelledby','ppwr-products-title');document.body.append(d);}
+ const rows=M.ppwrProducts(state.products,asset.path);
+ d.innerHTML=`<div class="dialog-top"><div><span class="eyebrow">PPWR</span><h2 id="ppwr-products-title">${t('ppwrSameProducts')} (${rows.length})</h2></div><button type="button" class="close-button" id="ppwr-products-close" aria-label="${esc(t('cancel'))}">×</button></div><div class="form-content"><p class="ppwr-filename">${esc(asset.name)}</p><div class="table-scroll"><table><thead><tr><th>${t('product')}</th><th>${t('brand')}</th><th>${t('ean')}</th><th>${t('status')}</th></tr></thead><tbody>${rows.map(({p,current})=>`<tr><td>${esc((lang==='cs'?p.csName||p.name:p.name||p.csName)||'—')}</td><td>${esc(p.brand)}</td><td class="mono">${esc(p.id)}</td><td>${esc(t(current?'ppwrCurrent':'ppwrArchive'))}</td></tr>`).join('')}</tbody></table></div>${rows.length?'':`<p class="muted">${t('ppwrUnsaved')}</p>`}</div>`;
+ $('#ppwr-products-close').onclick=()=>d.close();d.showModal();
+}
+function mountPPWR(host,initial,onChange){
+ const before=sig(initial||null);let draft=M.clone(initial||{current:null,archive:[]}),reading=null,revision=0;
+ const files={};let archiveOpen=false;
+ function fileCard(asset,archived=false){const count=M.ppwrProducts(state.products,asset.path).length;
+  return `<article class="ppwr-file ${archived?'archived':''}"><div class="ppwr-file-info"><span class="ppwr-file-icon" aria-hidden="true">${esc(asset.path.split('.').pop().toUpperCase())}</span><div><strong class="ppwr-filename">${esc(asset.name)}</strong><small>${esc(ppwrDate(asset))} · ${esc((asset.size/1024).toLocaleString(lang==='cs'?'cs-CZ':'en-GB',{maximumFractionDigits:0}))} kB</small></div></div><div class="ppwr-file-actions"><button type="button" data-ppwr-open="${esc(asset.path)}">${t('ppwrOpen')}</button><button type="button" data-ppwr-download="${esc(asset.path)}">${t('downloadLabel')}</button><button type="button" data-ppwr-products="${esc(asset.path)}">${t('products')} (${count})</button><button type="button" class="danger-quiet" data-ppwr-delete="${esc(asset.path)}">${t('delete')}</button></div></article>`;
+ }
+ function render(){
+  host.innerHTML=`<div class="ppwr-current">${draft.current?fileCard(draft.current):`<p class="muted ppwr-empty">${t('ppwrEmpty')}</p>`}</div><input type="file" id="ppwr-input" accept="${ppwrAccept}" hidden><button type="button" class="ppwr-drop" id="ppwr-drop" ${reading?'disabled':''}><span class="ppwr-drop-icon" aria-hidden="true">↑</span><strong>${t(reading?'ppwrReading':draft.current?'ppwrReplace':'ppwrUpload')}</strong><small>${t('ppwrDropHint')}</small></button><p class="muted ppwr-hint">${t('ppwrArchiveHint')}</p><details id="ppwr-archive" ${archiveOpen?'open':''}><summary>${t('ppwrArchive')} (${draft.archive.length})</summary><div class="ppwr-archive-list">${draft.archive.map(a=>fileCard(a,true)).join('')||`<p class="muted">${t('ppwrArchiveEmpty')}</p>`}</div></details>`;
+  const input=host.querySelector('#ppwr-input'),drop=host.querySelector('#ppwr-drop');
+  drop.onclick=()=>input.click();input.onchange=()=>{if(input.files[0])void choose(input.files[0]);};
+  drop.ondragover=e=>{e.preventDefault();drop.classList.add('dragover');};drop.ondragleave=()=>drop.classList.remove('dragover');drop.ondrop=e=>{e.preventDefault();drop.classList.remove('dragover');if(e.dataTransfer.files.length!==1){error(Error('PPWR_SINGLE'));return;}void choose(e.dataTransfer.files[0]);};
+  host.querySelector('#ppwr-archive').ontoggle=e=>{archiveOpen=e.target.open;};
+  const assets=()=>[draft.current,...draft.archive].filter(Boolean);
+  for(const action of ['open','download','products','delete'])host.querySelectorAll(`[data-ppwr-${action}]`).forEach(button=>button.onclick=async()=>{
+   const path=button.getAttribute('data-ppwr-'+action),asset=assets().find(a=>a.path===path);if(!asset||busy)return;
+   if(action==='open'||action==='download'){await openPPWRFile(asset,files,action==='download');return;}
+   if(action==='products'){showPPWRProducts(asset);return;}
+   if(await confirm('ppwrDelete',t('ppwrDeleteHint'),'delete',true)){
+    draft=M.removePPWR(draft,path);delete files[path];onChange();render();
+   }
+  });
+ }
+ async function choose(file){
+  if(busy||reading)return;
+  const current=++revision,promise=S.ppwr(file);reading=promise;render();
+  try{const selected=await promise;if(current!==revision||!host.isConnected)return;const asset=ppwrAsset(selected);files[asset.path]=selected.dataUrl;draft=M.replacePPWR(draft,asset);onChange();}
+  catch(e){if(host.isConnected)error(e);}
+  finally{if(current===revision){reading=null;if(host.isConnected)render();}}
+ }
+ render();
+ return {ready:async()=>{if(reading)await reading.catch(()=>{});},value:()=>M.clone(draft),files:()=>Object.fromEntries(Object.entries(files).filter(([path])=>M.ppwrAssets({ppwr:draft}).some(a=>a.path===path))),changed:()=>before!==sig(draft)&&!(before==='null'&&!draft.current&&!draft.archive.length)};
+}
+function openBulkPPWR(){
+ if(!canEdit())return;const chosen=[...selected],before=chosen.map(i=>sig(state.products[i]));let dirty=false;
+ openEditor(t('ppwrUpload'),`${chosen.length} ${t('selected')}`,`<form id="bulk-ppwr-form"><div class="form-content"><p class="notice">${esc(t('ppwrBulkHint').replace('{count}',chosen.length))}</p><input type="file" id="ppwr-bulk-input" accept="${ppwrAccept}" hidden><button type="button" id="ppwr-bulk-drop" class="ppwr-drop"><span class="ppwr-drop-icon" aria-hidden="true">↑</span><strong>${t('ppwrUpload')}</strong><small>${t('ppwrDropHint')}</small></button><p id="ppwr-bulk-name" class="ppwr-filename" role="status"></p><div id="form-error" class="notice error-notice" role="alert" hidden></div></div>${formFooter('apply')}</form>`,true);
+ const form=$('#bulk-ppwr-form'),input=$('#ppwr-bulk-input'),drop=$('#ppwr-bulk-drop');let asset=null,reading=null;
+ const choose=async file=>{if(busy||reading)return;reading=S.ppwr(file);drop.disabled=true;try{const result=await reading;if(!form.isConnected)return;asset=result;dirty=true;editorDirty=true;$('#ppwr-bulk-name').textContent=result.name;}catch(e){error(e);}finally{reading=null;drop.disabled=false;}};
+ drop.onclick=()=>input.click();input.onchange=()=>{if(input.files[0])void choose(input.files[0]);};drop.ondragover=e=>{e.preventDefault();drop.classList.add('dragover');};drop.ondragleave=()=>drop.classList.remove('dragover');drop.ondrop=e=>{e.preventDefault();drop.classList.remove('dragover');if(e.dataTransfer.files.length!==1){error(Error('PPWR_SINGLE'));return;}void choose(e.dataTransfer.files[0]);};
+ editorSave=()=>runForm(async()=>{
+  if(reading)await reading.catch(()=>{});const notice=$('#form-error');notice.hidden=true;
+  try{if(!dirty||!asset)throw Error('PPWR_REQUIRED');if(chosen.some((index,n)=>sig(state.products[index])!==before[n]))throw Error('sharedConflict');
+   const record=ppwrAsset(asset),next=M.clone(state);for(const index of chosen)next.products[index].ppwr=M.replacePPWR(next.products[index].ppwr,record);
+   next.labelFiles[record.path]=asset.dataUrl;next.pendingLabels=[...new Set([...next.pendingLabels,record.path])];await commit(next);formClose();
+  }catch(e){notice.textContent=t(e.message);notice.hidden=false;}
+ });form.onsubmit=e=>{e.preventDefault();void editorSave();};attachCancel();
+}
+
 function productActions(index){if(!canEdit())return;const p=state.products[index];openEditor(lang==='cs'?p.csName||p.name:p.name,`${p.brand} / ${p.id}`,`<div class="action-menu">${button('action-edit','edit')}${button('action-copy','duplicate')}${button('action-delete','delete','danger-quiet')}</div>`,true);$('#action-edit').onclick=()=>openProduct(index);$('#action-copy').onclick=()=>openProduct(index,'details',true);$('#action-delete').onclick=async()=>{if(await confirm('deleteProduct',`${p.name||p.csName} (${p.id})\n\n${t('deleteProductHint')}`,'confirmDelete',true)){const next=M.clone(state);next.products.splice(index,1);await commit(next);formClose();}};}
 function openBulk(){
  if(!canEdit())return;const chosen=[...selected];openEditor(t('bulk'),`${chosen.length} ${t('selected')}`,`<form id="bulk-form"><div class="form-content"><p>${t('bulkHint')}</p><label class="field"><span>${t('operation')}</span><select name="operation">${['setNew','clearNew','setDisc','clearDisc','addFlag','removeFlag'].map(v=>option(v,t(v),'')).join('')}</select></label>${field('flag','flag','','text','list="flag-list"')}${datalist('flag-list',flags())}<div id="form-error" class="notice error-notice" hidden></div></div>${formFooter('apply')}</form>`,true);
@@ -513,7 +580,7 @@ async function exportLogistics(entries,includeProducts=false){
 $('#editor-close').onclick=closeEditor;$('#editor').oncancel=e=>{e.preventDefault();void closeEditor();};$('#photo-close').onclick=()=>$('#photo-dialog').close();$('#data-button').onclick=openData;$('#export').onclick=openExport;$('#create').onclick=()=>view==='keys'?openKey():openProduct();$('#undo').onclick=()=>undo();$('#redo').onclick=()=>undo(true);$('#retry').onclick=()=>syncRemote();$$('[data-lang]').forEach(b=>b.onclick=async()=>{if($('#editor').open)await closeEditor();if($('#editor').open)return;lang=b.dataset.lang;await persist();render();});
 window.addEventListener('beforeunload',e=>{if(syncing||storageError||editorDirty||editorReturn?.dirty||hasPending()){e.preventDefault();e.returnValue='';}});
 document.addEventListener('keydown',e=>{
- const mod=e.ctrlKey||e.metaKey;if($('#single-key-export-dialog').open){if(mod&&['s','z'].includes(e.key.toLowerCase()))e.preventDefault();return;}if(!mod||$('#confirm-dialog').open)return;
+ const mod=e.ctrlKey||e.metaKey;if($('#ppwr-products-dialog')?.open){if(mod&&['s','z'].includes(e.key.toLowerCase()))e.preventDefault();return;}if($('#single-key-export-dialog').open){if(mod&&['s','z'].includes(e.key.toLowerCase()))e.preventDefault();return;}if(!mod||$('#confirm-dialog').open)return;
  if(e.key.toLowerCase()==='s'){e.preventDefault();if(editorSave)void editorSave();else if(!$('#editor').open)backup();}
  if(e.key.toLowerCase()==='z'&&!e.target.closest('input,textarea,[contenteditable]')){e.preventDefault();if(!$('#editor').open)void undo(e.shiftKey);}
 });
@@ -633,4 +700,5 @@ window.addEventListener('focus',()=>{if(state.connected&&Date.now()-lastRefresh>
 
 void boot();
 })();
+
 

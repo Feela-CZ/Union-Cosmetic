@@ -13,6 +13,7 @@ const count = v => { if(v == null || v === '') return ''; const m=String(v).repl
 function validateProducts(value) {
  if(!Array.isArray(value) || value.some(p => !p || typeof p!=='object' || Array.isArray(p))) throw Error('PRODUCTS_FORMAT');
  for(const p of value) {
+  if(p.ppwr!=null)validatePPWR(p.ppwr);
   for(const field of ['brand','type','id','hs','name','csName','key','carton_ean']) if(p[field]!=null && !['string','number'].includes(typeof p[field])) throw Error('PRODUCTS_FORMAT');
   if(p.volume!=null && (typeof p.volume!=='object' || Array.isArray(p.volume))) throw Error('PRODUCTS_FORMAT');
   if(p.flags!=null && (!Array.isArray(p.flags) || p.flags.some(f=>typeof f!=='string'))) throw Error('PRODUCTS_FORMAT');
@@ -35,7 +36,33 @@ function labelPath(value){
  const path=typeof value==='string'?value:value?.path;
  return typeof path==='string'&&/^OrderSheet\/img\/labels\/[a-zA-Z0-9_-]+\.(jpg|png|webp|pdf)$/.test(path)?path:null;
 }
-function labelReferences(products){return new Set(products.flatMap(p=>['front','back'].map(slot=>labelPath(p.labels?.[slot]))).filter(Boolean));}
+function labelReferences(products){return new Set(products.flatMap(p=>[...['front','back'].map(slot=>labelPath(p.labels?.[slot])),...ppwrAssets(p).map(asset=>ppwrPath(asset))]).filter(Boolean));}
+// PPWR references share immutable attachment storage with labels. A document is
+// identified by its path, never its filename; a batch shares exactly one path.
+function ppwrPath(asset){const path=labelPath(asset);return path&&/^OrderSheet\/img\/labels\/ppwr-[a-zA-Z0-9_-]+\.(pdf|jpg|png|webp)$/.test(path)?path:null;}
+function ppwrAssets(product){return [product?.ppwr?.current,...(Array.isArray(product?.ppwr?.archive)?product.ppwr.archive:[])].filter(Boolean);}
+function validatePPWR(value){
+ if(!value||typeof value!=='object'||Array.isArray(value)||!Array.isArray(value.archive))throw Error('PPWR_FORMAT');
+ if(value.deleted!=null&&(!Array.isArray(value.deleted)||value.deleted.some(x=>!x||!ppwrPath(x)||typeof x.deletedAt!=='string'||!Number.isFinite(Date.parse(x.deletedAt)))))throw Error('PPWR_FORMAT');
+ for(const asset of [value.current,...value.archive].filter(x=>x!=null)){
+  if(!asset||typeof asset!=='object'||Array.isArray(asset)||!ppwrPath(asset)||typeof asset.name!=='string'||!asset.name||typeof asset.uploadedAt!=='string'||!Number.isFinite(Date.parse(asset.uploadedAt)))throw Error('PPWR_FORMAT');
+  if(!['application/pdf','image/jpeg','image/png','image/webp'].includes(asset.mimeType)||!Number.isInteger(asset.size)||asset.size<=0||asset.size>15*1024*1024)throw Error('PPWR_FORMAT');
+  const ext=asset.path.split('.').pop();if(asset.mimeType!=={pdf:'application/pdf',jpg:'image/jpeg',png:'image/png',webp:'image/webp'}[ext])throw Error('PPWR_FORMAT');
+ }
+ if(value.archive.some(x=>x==null))throw Error('PPWR_FORMAT');
+ const paths=[value.current,...value.archive].filter(Boolean).map(x=>x.path);if(new Set(paths).size!==paths.length)throw Error('PPWR_FORMAT');
+ return value;
+}
+function replacePPWR(value,asset){
+ const next=clone(value||{current:null,archive:[]});validatePPWR({...next,current:null});
+ if(!ppwrPath(asset))throw Error('PPWR_FORMAT');
+ next.archive=next.archive.filter(x=>x.path!==asset.path);
+ if(next.current&&next.current.path!==asset.path)next.archive.unshift(next.current);
+ if(next.deleted)next.deleted=next.deleted.filter(x=>x.path!==asset.path);
+ next.current=clone(asset);return validatePPWR(next);
+}
+function removePPWR(value,path){const next=clone(value||{current:null,archive:[]});if(!ppwrPath(path))throw Error('PPWR_FORMAT');const removed=ppwrAssets({ppwr:next}).some(x=>x.path===path);if(next.current?.path===path)next.current=null;next.archive=next.archive.filter(x=>x.path!==path);if(removed)next.deleted=[...(next.deleted||[]).filter(x=>x.path!==path),{path,deletedAt:new Date().toISOString()}];return validatePPWR(next);}
+function ppwrProducts(products,path){return products.map((p,index)=>({p,index,current:p.ppwr?.current?.path===path})).filter(r=>ppwrAssets(r.p).some(a=>a.path===path));}
 function validateLabelFiles(value){
  if(!value||typeof value!=='object'||Array.isArray(value))throw Error('BACKUP_FORMAT');
  for(const [path,data] of Object.entries(value)){
@@ -115,7 +142,8 @@ function issues(state,photoIds=null){
  }
  return out;
 }
-const api={clone,sections,key,fold,isMissing,count,validateProducts,validateLogistics,labelPath,labelReferences,validateLabelFiles,emptyLogistics,estimatedPalletHeight,cleanProducts,packaging,saveProduct,keyIsActive,keyEntries,applyLogistics,renameKey,filterProducts,eanValid,issues};
+const api={ppwrPath,ppwrAssets,validatePPWR,replacePPWR,removePPWR,ppwrProducts,clone,sections,key,fold,isMissing,count,validateProducts,validateLogistics,labelPath,labelReferences,validateLabelFiles,emptyLogistics,estimatedPalletHeight,cleanProducts,packaging,saveProduct,keyIsActive,keyEntries,applyLogistics,renameKey,filterProducts,eanValid,issues};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.JasonModel=api;
 })(typeof window!=='undefined'?window:globalThis);
+
 

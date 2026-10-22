@@ -1,0 +1,25 @@
+name: Remove deleted PPWR attachments
+on:
+  push:
+    branches: [main]
+    paths: ['OrderSheet/products.json']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: ppwr-cleanup-main
+  cancel-in-progress: false
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate cleanup rules
+        run: python -m unittest discover -s .github/scripts -p test_ppwr_cleanup.py
+      - name: Remove explicitly deleted unused PPWR files
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python .github/scripts/ppwr_cleanup.py

@@ -23,6 +23,9 @@ async function label(file){
  return {dataUrl:`data:${mimeType};base64,${content}`,name:file.name,mimeType,extension,size:file.size};
 }
 function labelPath(id,slot,extension){return `OrderSheet/img/labels/${String(id).replace(/[^a-zA-Z0-9_-]/g,'_').slice(0,80)||'product'}-${slot}-${crypto.randomUUID()}.${extension}`;}
-root.JasonStorage={get,put,request,jpeg,label,labelPath};
+async function ppwr(file){if(!file||!file.size)throw Error('PPWR_SIZE');try{return await label(file);}catch(e){throw Error(e.message.replace('LABEL_','PPWR_'));}}
+function ppwrPath(extension){return `OrderSheet/img/labels/ppwr-${crypto.randomUUID()}.${extension}`;}
+root.JasonStorage={get,put,request,jpeg,label,labelPath,ppwr,ppwrPath};
 })(window);
+
 

@@ -68,12 +68,12 @@ async function setup(real=false,cached=null){
   c.click('#data-button');c.click('#reset-sandbox');await wait(()=>c.$('#confirm-dialog').open);c.click('#confirm-no');assert.equal((await c.saved()).products[0].price,10);c.click('#reset-sandbox');await wait(()=>c.$('#confirm-dialog').open);c.click('#confirm-yes');await wait(()=>!c.$('#editor').open);const s=await c.saved();assert.deepEqual(s.products,clone(c.w.JasonModel.cleanProducts(seed.products)));assert.deepEqual(s.logistics,seed.logistics);assert.deepEqual(s.photos,{});assert.equal(c.$('#undo').disabled,true);assert.equal(c.$('#redo').disabled,true);assert.deepEqual(network,[]);assert.deepEqual(await liveState(),{sentinel:'LIVE DATA'});
  });
  await test('fresh sandbox reflects current product and key activity and uses the actual seed date',async()=>{
-  const r=await setup(true),s=await r.saved();assert.equal(s.sandboxStatusRevision,r.w.JASON_SANDBOX_SEED.statusRevision);assert.match(r.$('#sandbox-banner').textContent,/16\. 10\. 2026/);
+  const r=await setup(true),s=await r.saved();assert.equal(s.sandboxStatusRevision,r.w.JASON_SANDBOX_SEED.statusRevision);assert.match(r.$('#sandbox-banner').textContent,/22\. 10\. 2026/);
   const sleeping=r.w.JasonModel.keyEntries(s.logistics,{status:'inactive'}).map(k=>k.brand+'/'+k.key).sort();assert.deepEqual(clone(sleeping),['Lilien/45','Lilien/5000','Natava/500g','Naturalis/250g','Sunnoré/75'].sort());assert.equal(r.w.JasonModel.keyEntries(s.logistics,{status:'active'}).length,73);
   for(const id of ['8596048004367','8596048004336','8596048004343'])assert.equal(s.products.find(p=>String(p.id)===id).discontinued,true);
   for(const id of ['8596048004312','8596048004329','8596048004350'])assert.notEqual(s.products.find(p=>String(p.id)===id).discontinued,true);
   r.click('[data-view=keys]');assert.equal(r.$('#filter-keyStatus').value,'active');r.$('#filter-keyStatus').value='inactive';r.$('#filter-keyStatus').dispatchEvent(new r.w.Event('change',{bubbles:true}));assert.equal(r.w.document.querySelectorAll('tbody tr').length,5);assert.match(r.$('tbody').textContent,/Neaktivní/);
-  r.click('[data-lang=en]');await wait(()=>r.$('#page-title').textContent==='Logistics keys');assert.match(r.$('#sandbox-banner').textContent,/16 October 2026/);assert.match(r.$('tbody').textContent,/Inactive/);r.dom.window.close();assert.deepEqual(network,[]);
+  r.click('[data-lang=en]');await wait(()=>r.$('#page-title').textContent==='Logistics keys');assert.match(r.$('#sandbox-banner').textContent,/22 October 2026/);assert.match(r.$('tbody').textContent,/Inactive/);r.dom.window.close();assert.deepEqual(network,[]);
  });
  await test('cached sandbox and undo receive activity corrections without losing local product, logistics or label edits',async()=>{
   const fresh=await setup(true),expected=await fresh.saved(),corrections=clone(fresh.w.JASON_SANDBOX_SEED.statusCorrections);fresh.dom.window.close();const old=clone(expected);delete old.sandboxStatusRevision;
@@ -197,3 +197,4 @@ async function setup(real=false,cached=null){
  });
  c.dom.window.close();live.close();console.log(`ALL ${count} SANDBOX FLOW CHECKS PASSED`);
 })().catch(e=>{console.error(e);process.exitCode=1;});
+

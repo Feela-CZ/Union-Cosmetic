@@ -25,6 +25,16 @@
 
 ## Funkce
 
+### PPWR
+
+- Záložka PPWR je součástí založení, úpravy a kopírování produktu. Aktuální dokument a archiv jsou v `product.ppwr.current` a `product.ppwr.archive`. Pole se nevytváří pouhým otevřením karty. Nahrazení přesune původní metadata do archivu a nový dokument označí jako aktuální; přílohy se nepřepisují.
+- Podporované formáty: PDF, JPG, PNG a WebP, 1 bajt až 15 MB. Typ se ověřuje podle obsahu. Nahrání i přetažení a mazání se potvrdí uložením produktu; zrušení formuláře změny zahodí. Mazání aktuálního dokumentu nevrací automaticky starší verzi.
+- Po zaškrtnutí produktů v přehledu se zobrazí **Nahrát PPWR**. Výběr platí i napříč stránkami; lze využít Vše. Jeden soubor dostane jedinou cestu a všechny vybrané produkty stejný odkaz. Každý produkt si při výměně zachová svůj vlastní archiv. Stejný název souboru sám o sobě neznamená stejný dokument.
+- Tlačítko **Produkty (N)** zobrazí všechny uložené produkty používající tentýž soubor, včetně těch, které jej mají v archivu; seznam uvádí EAN, značku a Aktuální / Archiv. Obsah souboru se nekopíruje do jednotlivých produktů ani do seznamu.
+- Přílohy používají stávající `/api/upload-image` a jedinečné cesty `OrderSheet/img/labels/ppwr-UUID.ext`. Nejdříve se odešlou soubory, potom společný katalog. Při chybě zůstávají data v IndexedDB a lze je znovu odeslat. Produkty i soubory zahrnuje ruční záloha; denní archiv obsahuje metadata a soubory jsou dostupné ze zdrojového Git commitu.
+- **Smazat** odstraní aktuální nebo archivní záznam u daného produktu; ostatní produkty se stejným dokumentem se nezmění. Nepoužívané místní bajty se odstraní z pracovní kopie. Výslovné smazání zaznamená pouze cestu a čas do `ppwr.deleted`. Workflow `ppwr-cleanup.yml` po změně produktů odstraní takto označený fyzický soubor z aktuálního repozitáře, pokud jej již žádný produkt nepoužívá jako aktuální dokument, archiv ani etiketu. Nikdy nesbírá neoznačené osiřelé soubory, takže neodstraní právě probíhající upload. Při souběžném zápisu přepočítá seznam z čerstvého main; zachovává Git historii i historické zálohy. Publikovaná statická kopie může zůstat v cache do další aktualizace webu. Nejde o vymazání z historie Git.
+- Pískoviště ukládá vše pouze místně a nevolá API. Při nasazení nebyly změněny živé produkty, logistika ani přílohy a nebyly přidány demonstrační dokumenty. Pro demonstraci lze nahrát vlastní zkušební PDF v testovací verzi.
+
 ### Produktové informace a etikety
 
 - Záložky INCI, Jazyky etikety a Etikety se upravují stejným formulářem při založení, duplikování i dodatečné úpravě produktu. Vše se potvrdí tlačítkem Uložit změny. Pouhé otevření formuláře neukládá prázdné hodnoty ani nemění zdroj ověřeného INCI; ručně změněné INCI má stav `provided` a zdroj `manual`, nikoli automaticky `verified`.
@@ -55,3 +65,4 @@ Stejnou funkci `shared/packaging.js` používá původní Jason, Jason 2.0, pís
 Přehled klíčů zobrazuje kusy na paletě a hmotnost palety z PALLET, dále orientační výšku v cm: 14,4 + CARTON.height × PALLET.nr_of_layers. Výška europalety EPAL 1 je 144 mm (https://www.epal-pallets.org/eu-en/load-carriers/epal-euro-pallet). Výpočet podporuje vstup cm, mm, m i číslo v cm; při chybějících nebo neplatných vstupech zobrazuje pomlčku. Odhad nepočítá proložky ani přesahy obalu a nikdy se neukládá do JSON, nemění PALLET.height ani stávající exporty. Stejný přehled používá ostrá i testovací verze. Editor logistiky má názvy sekcí bez písmenových značek I/C/L/P.
 
 Kliknutí na záhlaví datových sloupců klíčů přepíná vzestupné a sestupné řazení celého filtrovaného seznamu před stránkováním. Číselné hodnoty včetně jednotek se porovnávají jako čísla; klíče mají přirozené číselné pořadí. Chybějící nebo neplatné hodnoty zůstávají na konci v obou směrech. Šipka a `aria-sort` označují směr; změna řazení vrací první stránku a nijak nemění řazení produktů ani uložená data.
+

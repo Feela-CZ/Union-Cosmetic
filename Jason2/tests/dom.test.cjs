@@ -45,7 +45,7 @@ async function pickLanguages(n,codes,apply=true){
  await test('product information editor has accessible tabs and both upload slots without a layout selector',async()=>{
   const n=await setup();await n.upload('products',[fixture]);const before=await n.saved();
   n.click('[data-edit="0"]');
-  assert.deepEqual(n.$$('[data-tab]').map(b=>b.dataset.tab),['details','packaging','inci','labelLanguages','labels','photo','flags']);
+  assert.deepEqual(n.$$('[data-tab]').map(b=>b.dataset.tab),['details','packaging','inci','labelLanguages','labels','ppwr','photo','flags']);
   for(const tab of ['inci','labelLanguages','labels']){
    n.click('#tab-'+tab);assert.equal(n.$('#section-'+tab).hidden,false);
    assert.equal(n.$$('.tab-section:not([hidden])').length,1);
@@ -528,4 +528,5 @@ async function pickLanguages(n,codes,apply=true){
  await test('automatic refresh never overwrites an open product form',async()=>{f.click('[data-edit="0"]');f.input('#field-name','DRAFT');live.products[0].name='ANOTHER EDIT';f.w.dispatchEvent(new f.w.Event('focus'));await sleep(30);assert.equal(f.$('#field-name').value,'DRAFT');assert.equal((await f.saved()).products[0].name,'LEGACY UPDATED');});
  f.dom.window.close();console.log(`ALL ${passed} DOM/API FLOW CHECKS PASSED`);
 })().catch(e=>{console.error(e);process.exit(1);});
+
 
