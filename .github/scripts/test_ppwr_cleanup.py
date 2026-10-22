@@ -55,3 +55,14 @@ class Publish(unittest.TestCase):
                 if url.startswith('/git/commits/'): return {'tree':{'sha':'tree'}}
                 return {'truncated':True,'tree':TREE}
         with self.assertRaises(ValueError): cleanup(API())
+
+
+class AdditionalFormats(unittest.TestCase):
+    def test_new_extensions_are_deleted_only_when_explicit_and_unused(self):
+        for ext in ['docx','xlsx','zip']:
+            path='OrderSheet/img/labels/ppwr-new.'+ext
+            rows=[{'path':path,'type':'blob','mode':'100644'}]
+            deleted={'ppwr':{'current':None,'archive':[],'deleted':[{**T,'path':path}]}}
+            self.assertEqual(deletion_paths([deleted],rows),[path])
+            self.assertEqual(deletion_paths([deleted,{'ppwr':{'current':{'path':path},'archive':[]}}],rows),[])
+            self.assertEqual(deletion_paths([deleted,{'ppwr':{'current':None,'archive':[{'path':path}]}}],rows),[])

@@ -410,15 +410,14 @@ function openProduct(index=null,tab='details',duplicate=false){
  form.onsubmit=e=>{e.preventDefault();void editorSave();};attachCancel();
 }
 
-const ppwrAccept='application/pdf,image/jpeg,image/png,image/webp,.pdf,.jpg,.jpeg,.png,.webp';
+const ppwrAccept='application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip,application/x-zip-compressed,image/jpeg,image/png,image/webp,.pdf,.docx,.xlsx,.zip,.jpg,.jpeg,.png,.webp';
 const ppwrDate=asset=>new Intl.DateTimeFormat(lang==='cs'?'cs-CZ':'en-GB',{dateStyle:'medium',timeStyle:'short'}).format(new Date(asset.uploadedAt));
-function ppwrSource(asset,files={}){return files[asset.path]||labelSource(asset);}
+function ppwrSource(asset,files={}){const path=M.ppwrPath(asset);return path?(files[path]||state.labelFiles[path]||`${state.imageBase.replace(/\/$/,'')}/labels/${path.split('/').pop()}`):'';}
 function ppwrAsset(file){return {path:S.ppwrPath(file.extension),name:file.name,mimeType:file.mimeType,size:file.size,uploadedAt:new Date().toISOString()};}
-async function openPPWRFile(asset,files,download=false){
+async function downloadPPWRFile(asset,files){
  try{const src=ppwrSource(asset,files);if(!src)return;
-  if(download){if(src.startsWith('data:'))downloadData(src,asset.name);else{const response=await fetch(src);if(!response.ok)throw Error('HTTP '+response.status);downloadBlob(await response.blob(),asset.name);}return;}
-  if(src.startsWith('data:')){const bytes=Uint8Array.from(atob(src.split(',')[1]),c=>c.charCodeAt(0)),url=URL.createObjectURL(new Blob([bytes],{type:asset.mimeType}));window.open(url,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(url),60000);}
-  else window.open(src,'_blank','noopener');
+  if(src.startsWith('data:'))downloadData(src,asset.name);
+  else{const response=await fetch(src);if(!response.ok)throw Error('HTTP '+response.status);downloadBlob(await response.blob(),asset.name);}
  }catch(e){error(e);}
 }
 function showPPWRProducts(asset){
@@ -431,7 +430,7 @@ function mountPPWR(host,initial,onChange){
  const before=sig(initial||null);let draft=M.clone(initial||{current:null,archive:[]}),reading=null,revision=0;
  const files={};let archiveOpen=false;
  function fileCard(asset,archived=false){const count=M.ppwrProducts(state.products,asset.path).length;
-  return `<article class="ppwr-file ${archived?'archived':''}"><div class="ppwr-file-info"><span class="ppwr-file-icon" aria-hidden="true">${esc(asset.path.split('.').pop().toUpperCase())}</span><div><strong class="ppwr-filename">${esc(asset.name)}</strong><small>${esc(ppwrDate(asset))} · ${esc((asset.size/1024).toLocaleString(lang==='cs'?'cs-CZ':'en-GB',{maximumFractionDigits:0}))} kB</small></div></div><div class="ppwr-file-actions"><button type="button" data-ppwr-open="${esc(asset.path)}">${t('ppwrOpen')}</button><button type="button" data-ppwr-download="${esc(asset.path)}">${t('downloadLabel')}</button><button type="button" data-ppwr-products="${esc(asset.path)}">${t('products')} (${count})</button><button type="button" class="danger-quiet" data-ppwr-delete="${esc(asset.path)}">${t('delete')}</button></div></article>`;
+  return `<article class="ppwr-file ${archived?'archived':''}"><div class="ppwr-file-info"><span class="ppwr-file-icon" aria-hidden="true">${esc(asset.path.split('.').pop().toUpperCase())}</span><div><strong class="ppwr-filename">${esc(asset.name)}</strong><small>${esc(ppwrDate(asset))} · ${esc((asset.size/1024).toLocaleString(lang==='cs'?'cs-CZ':'en-GB',{maximumFractionDigits:0}))} kB</small></div></div><div class="ppwr-file-actions"><button type="button" data-ppwr-download="${esc(asset.path)}">${t('downloadLabel')}</button><button type="button" data-ppwr-products="${esc(asset.path)}">${t('products')} (${count})</button><button type="button" class="danger-quiet" data-ppwr-delete="${esc(asset.path)}">${t('delete')}</button></div></article>`;
  }
  function render(){
   host.innerHTML=`<div class="ppwr-current">${draft.current?fileCard(draft.current):`<p class="muted ppwr-empty">${t('ppwrEmpty')}</p>`}</div><input type="file" id="ppwr-input" accept="${ppwrAccept}" hidden><button type="button" class="ppwr-drop" id="ppwr-drop" ${reading?'disabled':''}><span class="ppwr-drop-icon" aria-hidden="true">↑</span><strong>${t(reading?'ppwrReading':draft.current?'ppwrReplace':'ppwrUpload')}</strong><small>${t('ppwrDropHint')}</small></button><p class="muted ppwr-hint">${t('ppwrArchiveHint')}</p><details id="ppwr-archive" ${archiveOpen?'open':''}><summary>${t('ppwrArchive')} (${draft.archive.length})</summary><div class="ppwr-archive-list">${draft.archive.map(a=>fileCard(a,true)).join('')||`<p class="muted">${t('ppwrArchiveEmpty')}</p>`}</div></details>`;
@@ -440,9 +439,9 @@ function mountPPWR(host,initial,onChange){
   drop.ondragover=e=>{e.preventDefault();drop.classList.add('dragover');};drop.ondragleave=()=>drop.classList.remove('dragover');drop.ondrop=e=>{e.preventDefault();drop.classList.remove('dragover');if(e.dataTransfer.files.length!==1){error(Error('PPWR_SINGLE'));return;}void choose(e.dataTransfer.files[0]);};
   host.querySelector('#ppwr-archive').ontoggle=e=>{archiveOpen=e.target.open;};
   const assets=()=>[draft.current,...draft.archive].filter(Boolean);
-  for(const action of ['open','download','products','delete'])host.querySelectorAll(`[data-ppwr-${action}]`).forEach(button=>button.onclick=async()=>{
+  for(const action of ['download','products','delete'])host.querySelectorAll(`[data-ppwr-${action}]`).forEach(button=>button.onclick=async()=>{
    const path=button.getAttribute('data-ppwr-'+action),asset=assets().find(a=>a.path===path);if(!asset||busy)return;
-   if(action==='open'||action==='download'){await openPPWRFile(asset,files,action==='download');return;}
+   if(action==='download'){await downloadPPWRFile(asset,files);return;}
    if(action==='products'){showPPWRProducts(asset);return;}
    if(await confirm('ppwrDelete',t('ppwrDeleteHint'),'delete',true)){
     draft=M.removePPWR(draft,path);delete files[path];onChange();render();
@@ -700,5 +699,3 @@ window.addEventListener('focus',()=>{if(state.connected&&Date.now()-lastRefresh>
 
 void boot();
 })();
-
-

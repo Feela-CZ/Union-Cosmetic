@@ -39,15 +39,16 @@ function labelPath(value){
 function labelReferences(products){return new Set(products.flatMap(p=>[...['front','back'].map(slot=>labelPath(p.labels?.[slot])),...ppwrAssets(p).map(asset=>ppwrPath(asset))]).filter(Boolean));}
 // PPWR references share immutable attachment storage with labels. A document is
 // identified by its path, never its filename; a batch shares exactly one path.
-function ppwrPath(asset){const path=labelPath(asset);return path&&/^OrderSheet\/img\/labels\/ppwr-[a-zA-Z0-9_-]+\.(pdf|jpg|png|webp)$/.test(path)?path:null;}
+const ppwrMimeTypes={pdf:'application/pdf',jpg:'image/jpeg',png:'image/png',webp:'image/webp',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',zip:'application/zip'};
+function ppwrPath(asset){const path=typeof asset==='string'?asset:asset?.path;return typeof path==='string'&&/^OrderSheet\/img\/labels\/ppwr-[a-zA-Z0-9_-]+\.(pdf|jpg|png|webp|docx|xlsx|zip)$/.test(path)?path:null;}
 function ppwrAssets(product){return [product?.ppwr?.current,...(Array.isArray(product?.ppwr?.archive)?product.ppwr.archive:[])].filter(Boolean);}
 function validatePPWR(value){
  if(!value||typeof value!=='object'||Array.isArray(value)||!Array.isArray(value.archive))throw Error('PPWR_FORMAT');
  if(value.deleted!=null&&(!Array.isArray(value.deleted)||value.deleted.some(x=>!x||!ppwrPath(x)||typeof x.deletedAt!=='string'||!Number.isFinite(Date.parse(x.deletedAt)))))throw Error('PPWR_FORMAT');
  for(const asset of [value.current,...value.archive].filter(x=>x!=null)){
   if(!asset||typeof asset!=='object'||Array.isArray(asset)||!ppwrPath(asset)||typeof asset.name!=='string'||!asset.name||typeof asset.uploadedAt!=='string'||!Number.isFinite(Date.parse(asset.uploadedAt)))throw Error('PPWR_FORMAT');
-  if(!['application/pdf','image/jpeg','image/png','image/webp'].includes(asset.mimeType)||!Number.isInteger(asset.size)||asset.size<=0||asset.size>15*1024*1024)throw Error('PPWR_FORMAT');
-  const ext=asset.path.split('.').pop();if(asset.mimeType!=={pdf:'application/pdf',jpg:'image/jpeg',png:'image/png',webp:'image/webp'}[ext])throw Error('PPWR_FORMAT');
+  if(!Object.values(ppwrMimeTypes).includes(asset.mimeType)||!Number.isInteger(asset.size)||asset.size<=0||asset.size>15*1024*1024)throw Error('PPWR_FORMAT');
+  const ext=asset.path.split('.').pop();if(asset.mimeType!==ppwrMimeTypes[ext])throw Error('PPWR_FORMAT');
  }
  if(value.archive.some(x=>x==null))throw Error('PPWR_FORMAT');
  const paths=[value.current,...value.archive].filter(Boolean).map(x=>x.path);if(new Set(paths).size!==paths.length)throw Error('PPWR_FORMAT');
@@ -66,9 +67,9 @@ function ppwrProducts(products,path){return products.map((p,index)=>({p,index,cu
 function validateLabelFiles(value){
  if(!value||typeof value!=='object'||Array.isArray(value))throw Error('BACKUP_FORMAT');
  for(const [path,data] of Object.entries(value)){
-  if(!labelPath(path)||typeof data!=='string'||!/^data:(image\/(jpeg|png|webp)|application\/pdf);base64,[A-Za-z0-9+/]+={0,2}$/.test(data))throw Error('BACKUP_FORMAT');
-  const expected={jpg:'image/jpeg',png:'image/png',webp:'image/webp',pdf:'application/pdf'}[path.split('.').pop()];
-  if(!data.startsWith('data:'+expected+';base64,'))throw Error('BACKUP_FORMAT');
+  if(!(labelPath(path)||ppwrPath(path))||typeof data!=='string')throw Error('BACKUP_FORMAT');
+  const expected=ppwrMimeTypes[path.split('.').pop()],prefix='data:'+expected+';base64,';
+  if(!expected||!data.startsWith(prefix)||!/[A-Za-z0-9+/]/.test(data.slice(prefix.length))||!/^[A-Za-z0-9+/]+={0,2}$/.test(data.slice(prefix.length)))throw Error('BACKUP_FORMAT');
  }
  return value;
 }
@@ -142,8 +143,6 @@ function issues(state,photoIds=null){
  }
  return out;
 }
-const api={ppwrPath,ppwrAssets,validatePPWR,replacePPWR,removePPWR,ppwrProducts,clone,sections,key,fold,isMissing,count,validateProducts,validateLogistics,labelPath,labelReferences,validateLabelFiles,emptyLogistics,estimatedPalletHeight,cleanProducts,packaging,saveProduct,keyIsActive,keyEntries,applyLogistics,renameKey,filterProducts,eanValid,issues};
+const api={ppwrMimeTypes,ppwrPath,ppwrAssets,validatePPWR,replacePPWR,removePPWR,ppwrProducts,clone,sections,key,fold,isMissing,count,validateProducts,validateLogistics,labelPath,labelReferences,validateLabelFiles,emptyLogistics,estimatedPalletHeight,cleanProducts,packaging,saveProduct,keyIsActive,keyEntries,applyLogistics,renameKey,filterProducts,eanValid,issues};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.JasonModel=api;
 })(typeof window!=='undefined'?window:globalThis);
-
-

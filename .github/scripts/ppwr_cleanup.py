@@ -9,7 +9,7 @@ from datetime import datetime
 from daily_backup import GitHub, read_file, validate, ApiError
 import json
 
-FILE = re.compile(r"OrderSheet/img/labels/ppwr-[a-zA-Z0-9_-]+\.(pdf|jpg|png|webp)\Z")
+FILE = re.compile(r"OrderSheet/img/labels/ppwr-[a-zA-Z0-9_-]+\.(pdf|jpg|png|webp|docx|xlsx|zip)\Z")
 
 
 def ppwr_path(value):
