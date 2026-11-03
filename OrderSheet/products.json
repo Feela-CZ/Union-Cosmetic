@@ -1319,8 +1319,8 @@
   {
     "brand": "Lilien",
     "type": "Liquid Soap",
-    "id": 8596048012317,
-    "hs": 34012090,
+    "id": "8596048012317",
+    "hs": "34012090",
     "name": "Lilien Exclusive liquid soap Pomegranate XXL",
     "volume": {
       "number": "1250",
