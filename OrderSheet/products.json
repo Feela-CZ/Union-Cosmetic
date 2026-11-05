@@ -1365,9 +1365,9 @@
   {
     "brand": "Lilien",
     "type": "Liquid Soap",
-    "id": 8596048011501,
-    "hs": 34012090,
-    "name": "Lilien Exclusive liquid soap Olive Milk XXL",
+    "id": "8596048011501",
+    "hs": "34012090",
+    "name": "Lilien Exclusive cream soap Olive Milk XXL",
     "volume": {
       "number": "1250",
       "unit": "ml"
