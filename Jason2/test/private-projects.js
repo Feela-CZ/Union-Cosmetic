@@ -278,9 +278,10 @@ function createCategory(draft){
 function attachmentsHTML(record){
  return attachmentSections.map(({key,label,multiple})=>{
   const files=record.attachments?.[key]??[];
-  return '<section class="project-section project-attachment-section"><div class="project-attachment-heading"><h2>'+escape(local(label))+
-   '</h2>'+button(!multiple&&files.length?'replaceFile':'addFile','data-add-attachment="'+key+'"')+
-   '<input data-attachment-input="'+key+'" type="file"'+(multiple?' multiple':'')+' hidden></div>'+
+  const action=multiple?'dropFiles':files.length?'dropReplacement':'dropFile';
+  return '<section class="project-section project-attachment-section"><h2 id="project-attachment-'+key+'">'+escape(local(label))+
+   '</h2>'+button(action,'data-add-attachment="'+key+'" aria-describedby="project-attachment-'+key+'"','ppwr-drop project-attachment-drop')+
+   '<input data-attachment-input="'+key+'" type="file"'+(multiple?' multiple':'')+' hidden>'+
    (files.length?'<ul class="project-attachment-list">'+files.map(file=>'<li><span>'+escape(file.name)+'</span><div>'+
     button('getFile','data-download-attachment="'+file.id+'"')+
     button('removeFile','data-remove-attachment="'+file.id+'"')+'</div></li>').join('')+'</ul>':
@@ -288,6 +289,17 @@ function attachmentsHTML(record){
  }).join('');
 }
 function bindAttachments(panel,draft){
+ function addFiles(key,fileList){
+  const section=attachmentSections.find(item=>item.key===key);
+  if(!section||!fileList?.length)return;
+  const files=Array.from(fileList).slice(0,section.multiple?undefined:1);
+  const slots=draft.record.attachments??={};
+  const selected=files.map(file=>({id:crypto.randomUUID(),name:file.name,blob:file}));
+  slots[key]=section.multiple?[...(slots[key]??[]),...selected]:selected;
+  markEdited(draft);
+  detail(route(),draft);
+  $('[data-add-attachment="'+key+'"]')?.focus({preventScroll:true});
+ }
  panel.onclick=event=>{
   const control=event.target.closest('button');
   if(!control)return;
@@ -305,17 +317,21 @@ function bindAttachments(panel,draft){
    detail(route(),draft);
   }
  };
- panel.onchange=event=>{
-  const key=event.target.dataset.attachmentInput;
-  const section=attachmentSections.find(item=>item.key===key);
-  const files=Array.from(event.target.files??[]);
-  if(!section||!files.length)return;
-  const slots=draft.record.attachments??={};
-  const selected=files.map(file=>({id:crypto.randomUUID(),name:file.name,blob:file}));
-  slots[key]=section.multiple?[...(slots[key]??[]),...selected]:selected.slice(0,1);
-  markEdited(draft);
-  detail(route(),draft);
- };
+ panel.onchange=event=>addFiles(event.target.dataset.attachmentInput,event.target.files);
+ for(const box of panel.querySelectorAll('[data-add-attachment]')){
+  box.ondragover=event=>{
+   if(!Array.from(event.dataTransfer?.types??[]).includes('Files'))return;
+   event.preventDefault();
+   event.dataTransfer.dropEffect='copy';
+   box.classList.add('dragover');
+  };
+  box.ondragleave=()=>box.classList.remove('dragover');
+  box.ondrop=event=>{
+   event.preventDefault();
+   box.classList.remove('dragover');
+   addFiles(box.dataset.addAttachment,event.dataTransfer?.files);
+  };
+ }
 }
 
 function detail(id,draft){

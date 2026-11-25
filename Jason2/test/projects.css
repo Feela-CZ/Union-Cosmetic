@@ -27,8 +27,7 @@
 .project-category-dialog { width:min(420px,calc(100% - 24px)); padding:20px }
 .project-category-dialog h2 { margin:0 0 16px; font-size:1.2rem }
 .project-category-dialog .dialog-actions { padding:12px 0 0 }
-.project-attachment-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap }
-.project-attachment-heading h2 { margin:0 }
+.ppwr-drop.project-attachment-drop { min-height:72px; margin:0; padding:12px; font-size:.85rem }
 .project-attachment-empty { color:var(--muted); margin:8px 0 0 }
 .project-attachment-list { list-style:none; padding:0; margin:8px 0 0 }
 .project-attachment-list li { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; flex-wrap:wrap }

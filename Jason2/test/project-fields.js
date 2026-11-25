@@ -201,7 +201,10 @@ const ui={
  requiredField:['Nutné pro vyplnění na 100 %','Required for 100% completion'],
  otherCategory:['Jiné…','Other…'],newCategory:['Nová kategorie','New category'],categoryName:['Název kategorie','Category name'],
  categoryError:['Kategorii se nepodařilo uložit.','The category could not be saved.'],
- cancel:['Zrušit','Cancel'],addFile:['Přidat soubor','Add file'],replaceFile:['Nahradit soubor','Replace file'],
+ cancel:['Zrušit','Cancel'],
+ dropFile:['Přetáhněte soubor nebo klikněte','Drop a file or click to browse'],
+ dropFiles:['Přetáhněte soubory nebo klikněte','Drop files or click to browse'],
+ dropReplacement:['Přetáhněte nový soubor nebo klikněte','Drop a replacement file or click to browse'],
  getFile:['Stáhnout','Download'],removeFile:['Odebrat','Remove'],
  print:['Tisk','Print'],download:['Stáhnout přehled','Download summary'],next:['Další','Next']
 };
