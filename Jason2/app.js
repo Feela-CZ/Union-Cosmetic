@@ -3,9 +3,16 @@
 'use strict';
 const M=JasonModel,S=JasonStorage,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const sandbox=JASON_CONFIG.sandbox===true;
+const projects=sandbox?window.JasonPrivateProjects:null;
+const views=projects?['products','projects','keys','checks']:['products','keys','checks'];
+const viewFromHash=()=>{
+ const hash=location.hash.slice(1);
+ if(projects&&hash.startsWith('projects/'))return 'projects';
+ return views.includes(hash)?hash:'';
+};
 function isolate(next){next.products=M.cleanProducts(next.products);const refs=M.labelReferences(next.products);next.labelFiles=Object.fromEntries(Object.entries(next.labelFiles||{}).filter(([path])=>refs.has(path)));next.pendingLabels=(next.pendingLabels||[]).filter(path=>Object.hasOwn(next.labelFiles,path));if(next.baseline?.products){try{next.baseline.products=sig(M.cleanProducts(JSON.parse(next.baseline.products)));}catch{}}if(sandbox){next.connected=false;next.api='';next.imageBase=JASON_CONFIG.imageBase;next.baseline={};next.pendingPhotos=[];next.pendingLabels=[];}return next;}
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const icons={products:'▦',keys:'◇',checks:'✓',data:'↔',undo:'↶',redo:'↷',export:'↓',plus:'+'};
+const icons={products:'▦',projects:'▤',keys:'◇',checks:'✓',data:'↔',undo:'↶',redo:'↷',export:'↓',plus:'+'};
 let lang='cs',view='products',page=1,pageSize=30,sort={field:'name',asc:true},selected=new Set(),history=[],future=[],busy=false,editorDirty=false,editorSave=null,editorReturn=null,toastTimer,syncing=false,storageError=false;
 let keySort={field:'brand',asc:true};
 let state={products:[],logistics:M.clone(window.JASON_SEED_LOGISTICS||{}),photos:{},pendingPhotos:[],labelFiles:{},pendingLabels:[],connected:false,api:JASON_CONFIG.apiBase,imageBase:JASON_CONFIG.imageBase,baseline:{},updated:null};
@@ -15,6 +22,7 @@ const photoVersions=new Map(),missingThumbnails=new Set();
 const photoIds=Array.isArray(window.JASON_PHOTO_IDS)&&window.JASON_PHOTO_IDS.every(id=>typeof id==='string')?new Set(window.JASON_PHOTO_IDS):null;
 const dataIssues=()=>M.issues(state,photoIds);
 const t=k=>{
+ if(k==='projects'&&projects)return projects.title(lang);
  const text=JasonText[lang][k]||JasonText.cs[k]||k;if(!text.includes('{date}'))return text;
  const date=new Date(`${window.JASON_SANDBOX_SEED?.snapshotAt}T00:00:00Z`),label=Number.isNaN(date.getTime())?'—':new Intl.DateTimeFormat(lang==='cs'?'cs-CZ':'en-GB',{day:'numeric',month:lang==='cs'?'numeric':'long',year:'numeric',timeZone:'UTC'}).format(date);
  return text.replaceAll('{date}',label);
@@ -118,16 +126,18 @@ function render(){
  $$('[data-text]').forEach(e=>e.textContent=t(sandbox&&e.dataset.text==='readonlyNote'?'sandboxFooter':e.dataset.text));$$('[data-lang]').forEach(e=>{e.classList.toggle('active',e.dataset.lang===lang);e.setAttribute('aria-pressed',e.dataset.lang===lang);});
  $('#workspace-mode').textContent=`JASON 2.0 / ${t(sandbox?'sandboxVersion':'liveVersion')}`;
  $('#sandbox-banner').hidden=!sandbox;$('#sandbox-banner').textContent=t('sandboxNote');
- $('#nav').innerHTML=['products','keys','checks'].map(v=>`<button class="nav-button ${view===v?'active':''}" data-view="${v}" ${view===v?'aria-current="page"':''}><span class="nav-icon">${icons[v]}</span>${esc(t(v))}<span class="nav-count">${v==='products'?state.products.length:v==='keys'?M.keyEntries(state.logistics,{status:'active'}).length:dataIssues().length}</span></button>`).join('');
+ $('#nav').innerHTML=views.map(v=>`<button class="nav-button ${view===v?'active':''}" data-view="${v}" ${view===v?'aria-current="page"':''}><span class="nav-icon">${icons[v]}</span>${esc(t(v))}<span class="nav-count">${v==='products'?state.products.length:v==='keys'?M.keyEntries(state.logistics,{status:'active'}).length:v==='projects'?projects.count():dataIssues().length}</span></button>`).join('');
  $$('[data-view]').forEach(b=>b.onclick=()=>changeView(b.dataset.view));
  $('#data-button').innerHTML=`<span class="nav-icon">↔</span>${esc(t(sandbox?'sandboxData':'data'))}`;
  $('#crumb').textContent=t(view);$('#page-title').textContent=t(view);
  $('#undo').textContent=icons.undo;$('#undo').title=t('undo');$('#undo').setAttribute('aria-label',t('undo'));$('#undo').disabled=!history.length;
  $('#redo').textContent=icons.redo;$('#redo').title=t('redo');$('#redo').setAttribute('aria-label',t('redo'));$('#redo').disabled=!future.length;
  $('#export').textContent=`↓ ${t('export')}`;$('#create').textContent=`+ ${t(view==='keys'?'addKey':'addProduct')}`;$('#create').hidden=view==='checks';$('#create').disabled=refreshing||(JASON_CONFIG.sharedOnly&&JASON_CONFIG.autoConnect&&!state.connected);
+ for(const id of ['undo','redo','export'])$('#'+id).hidden=view==='projects';
+ if(view==='projects'){projects.render(lang);renderStatus();return;}
  renderToolbar();renderContent();renderStatus();
 }
-function changeView(next){view=next;page=1;selected.clear();filters={search:'',brand:'',type:'',key:'',status:'active',keyStatus:'active',new:'',flag:'',scope:''};location.hash=next;render();}
+function changeView(next,updateHash=true){view=next;page=1;selected.clear();filters={search:'',brand:'',type:'',key:'',status:'active',keyStatus:'active',new:'',flag:'',scope:''};if(updateHash)location.hash=next;render();}
 function renderToolbar(){
  const searchPlaceholder=t(view==='products'?'search':view==='keys'?'keySearch':'issueSearch');
  let html=`<label class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="${esc(searchPlaceholder)}" aria-label="${esc(searchPlaceholder)}" value="${esc(filters.search)}"></label>`;
@@ -576,14 +586,22 @@ async function exportLogistics(entries,includeProducts=false){
  const wb=JasonExport.logistics({entries,sections:M.sections,count:M.count,labels:JasonText.en,products:state.products,includeProducts});
  await JasonExport.download(wb,`logistics-${today()}.xlsx`);
 }
-$('#editor-close').onclick=closeEditor;$('#editor').oncancel=e=>{e.preventDefault();void closeEditor();};$('#photo-close').onclick=()=>$('#photo-dialog').close();$('#data-button').onclick=openData;$('#export').onclick=openExport;$('#create').onclick=()=>view==='keys'?openKey():openProduct();$('#undo').onclick=()=>undo();$('#redo').onclick=()=>undo(true);$('#retry').onclick=()=>syncRemote();$$('[data-lang]').forEach(b=>b.onclick=async()=>{if($('#editor').open)await closeEditor();if($('#editor').open)return;lang=b.dataset.lang;await persist();render();});
-window.addEventListener('beforeunload',e=>{if(syncing||storageError||editorDirty||editorReturn?.dirty||hasPending()){e.preventDefault();e.returnValue='';}});
+$('#editor-close').onclick=closeEditor;$('#editor').oncancel=e=>{e.preventDefault();void closeEditor();};$('#photo-close').onclick=()=>$('#photo-dialog').close();$('#data-button').onclick=openData;$('#export').onclick=openExport;$('#create').onclick=()=>view==='projects'?projects.create():view==='keys'?openKey():openProduct();$('#undo').onclick=()=>undo();$('#redo').onclick=()=>undo(true);$('#retry').onclick=()=>syncRemote();$$('[data-lang]').forEach(b=>b.onclick=async()=>{if($('#editor').open)await closeEditor();if($('#editor').open)return;lang=b.dataset.lang;await persist();render();});
+window.addEventListener('beforeunload',e=>{if(syncing||storageError||editorDirty||editorReturn?.dirty||hasPending()||projects?.hasDrafts()){e.preventDefault();e.returnValue='';}});
 document.addEventListener('keydown',e=>{
  const mod=e.ctrlKey||e.metaKey;if($('#ppwr-products-dialog')?.open){if(mod&&['s','z'].includes(e.key.toLowerCase()))e.preventDefault();return;}if($('#single-key-export-dialog').open){if(mod&&['s','z'].includes(e.key.toLowerCase()))e.preventDefault();return;}if(!mod||$('#confirm-dialog').open)return;
+ if(view==='projects'&&!$('#editor').open){
+  if(e.key.toLowerCase()==='s'){e.preventDefault();void projects.save();}
+  return;
+ }
  if(e.key.toLowerCase()==='s'){e.preventDefault();if(editorSave)void editorSave();else if(!$('#editor').open)backup();}
  if(e.key.toLowerCase()==='z'&&!e.target.closest('input,textarea,[contenteditable]')){e.preventDefault();if(!$('#editor').open)void undo(e.shiftKey);}
 });
-window.addEventListener('hashchange',()=>{const v=location.hash.slice(1);if(['products','keys','checks'].includes(v)&&v!==view)changeView(v);});
+window.addEventListener('hashchange',()=>{
+ const next=viewFromHash();
+ if(next&&next!==view)changeView(next,false);
+ else if(next==='projects')render();
+});
 // First visit: display the existing published catalog while the API verifies it.
 // Preview data cannot be edited or sent back before the authoritative read completes.
 async function previewShared(){
@@ -687,8 +705,8 @@ async function boot(){
  if(sandbox&&!hasSavedState){try{state=sandboxSeed();await persist();}catch(e){error(e);}}
  if(sandbox&&hasSavedState){try{await upgradeSandboxNames();await upgradeSandboxInci();await upgradeSandboxStatuses();}catch(e){storageError=true;toast(t('localError'),true);}}
  if(JASON_CONFIG.sharedOnly){state.api=JASON_CONFIG.apiBase;state.imageBase=JASON_CONFIG.imageBase;}
- view=['products','keys','checks'].includes(location.hash.slice(1))?location.hash.slice(1):'products';render();
- if(sandbox)return;
+ view=viewFromHash()||'products';render();
+ if(sandbox){if(projects&&view!=='projects')void projects.load();return;}
  if(JASON_CONFIG.autoConnect||state.connected){if(!hasPending()){const refresh=refreshShared(true);if(JASON_CONFIG.autoConnect&&!hasSavedState)void previewShared();await refresh;}}
  else if(location.protocol!=='file:'&&['localhost','127.0.0.1'].includes(location.hostname)){
   try{const [pr,lr]=await Promise.all([fetch(JASON_CONFIG.legacyProducts),fetch(JASON_CONFIG.logisticsFile)]);if(pr.ok&&lr.ok){const p=await pr.json(),l=await lr.json();M.validateProducts(p);M.validateLogistics(l);state.products=p;state.logistics=l;await persist();render();}}catch{}

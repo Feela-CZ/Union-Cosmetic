@@ -1,6 +1,6 @@
 # Projektový přehled / Project status
 
-Poslední aktualizace: 2026-11-24  
+Poslední aktualizace: 2026-11-25
 Zdroj výchozího přehledu: soubory a dokumentace ve větvi `main`.  
 Tento soubor je společný předávací bod pro Codex, ChatGPT a lidi pracující na repozitáři. Není náhradou za zdrojový kód, testy ani historii Git.
 
@@ -28,11 +28,12 @@ Podrobná dokumentace: [Jason 2.0](Jason2/README.md), [Katalog](Katalog/README.t
 
 ## Rozpracované úkoly
 
-Zatím nezmapováno. Výchozí přehled byl založen z repozitáře; necommitované změny, běžící úlohy a obsah konverzací v Codexu nebyly dostupné. Nevydávat absenci záznamu za důkaz, že žádná práce neprobíhá.
+Další rozpracované úkoly zatím nejsou zmapované. Výchozí přehled byl založen z repozitáře; necommitované změny, běžící úlohy a obsah konverzací v Codexu nebyly dostupné. Nevydávat absenci záznamu za důkaz, že žádná práce neprobíhá.
 
 | Projekt | Úkol / další krok | Stav | Větev, PR nebo commit | Aktualizace |
 | --- | --- | --- | --- | --- |
 | — | Doplnit skutečný stav při prvním předání z Codexu | K ověření | — | 2026-11-24 |
+| Jason 2.0 – pískoviště | Privátní projekty a šablony podle primárního obalu | První verze k vyzkoušení | [Pískoviště](https://feela-cz.github.io/Union-Cosmetic/Jason2/test/#projects) | 2026-11-25 |
 
 ## Otevřené problémy a rozhodnutí
 
@@ -40,6 +41,7 @@ Zaznamenávat pouze doložené technické problémy a rozhodnutí s dopadem na d
 
 ## Poslední předání
 
+- **2026-11-25 – Codex:** Privátní projekty mají vlastní seznam, detail v češtině a angličtině, tisk a stažitelný HTML přehled. Projekty zůstávají v místní IndexedDB pískoviště. Automatické testy ověřují uložení, přepínání šablon a izolaci od katalogu a API.
 - **2026-11-24 – ChatGPT:** Založen společný projektový přehled podle aktuálně dostupné dokumentace v `main`. Žádná změna aplikací ani produkčních dat. Prvotní stav rozpracovaných úloh musí doplnit Codex nebo osoba, která k nim má přístup.
 
 ## Jak udržovat přehled

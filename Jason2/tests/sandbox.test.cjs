@@ -9,12 +9,12 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function wait(fn){for(let i=0;i<150;i++){if(await fn())return;await sleep(10);}throw Error('Wait timed out');}
 async function setup(real=false,cached=null){
  const dom=new JSDOM(fs.readFileSync(path.join(__dirname,'../test/index.html'),'utf8'),{url:'https://feela-cz.github.io/Union-Cosmetic/Jason2/test/',runScripts:'outside-only',pretendToBeVisual:true}),w=dom.window;
- w.indexedDB=real?new IDBFactory():database;w.TextEncoder=TextEncoder;w.TextDecoder=TextDecoder;
+ w.indexedDB=real?new IDBFactory():database;w.TextEncoder=TextEncoder;w.TextDecoder=TextDecoder;w.structuredClone=structuredClone;
  w.HTMLElement.prototype.scrollIntoView=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};w.HTMLAnchorElement.prototype.click=function(){};w.URL.createObjectURL=()=>'blob:test';w.URL.revokeObjectURL=()=>{};
  w.fetch=async(url,args={})=>{network.push({url,method:args.method||'GET'});throw Error('Sandbox must not access network');};
  w.eval(fs.readFileSync(path.join(__dirname,'../test/config.js'),'utf8'));w.eval(fs.readFileSync(path.join(__dirname,'../test/seed.js'),'utf8'));if(!real)w.JASON_SANDBOX_SEED=clone(seed);
  w.eval(fs.readFileSync(path.join(__dirname,'../../shared/packaging.js'),'utf8'));
- for(const file of ['model.js','storage.js','i18n.js','vendor/exceljs.min.js','export.js','app.js']){
+ for(const file of ['model.js','storage.js','i18n.js','vendor/exceljs.min.js','export.js','test/project-fields.js','test/private-projects.js','app.js']){
   if(file==='app.js'&&cached){await w.JasonStorage.put('state',{state:clone(cached.state),lang:cached.lang||'cs'});await w.JasonStorage.put('recovery',cached.recovery?clone(cached.recovery):null);}
   w.eval(fs.readFileSync(path.join(__dirname,'..',file),'utf8'));
  }
@@ -35,6 +35,44 @@ async function setup(real=false,cached=null){
  await test('sandbox blocks API reads, writes and photo uploads before fetch',async()=>{
   assert.equal(Object.isFrozen(c.w.JASON_CONFIG),true);
   for(const [name,method] of [['products','GET'],['products','PUT'],['logistics','PUT'],['upload-image','PUT']])await assert.rejects(c.w.JasonStorage.request('https://union-cosmetic.filipluchesi.workers.dev',name,method,{}),/SANDBOX_OFFLINE/);assert.deepEqual(network,[]);
+ });
+ await test('private projects keep separate packaging drafts, localized labels and sandbox-only records',async()=>{
+  const catalogue=await c.saved();
+  const choose=(key,value)=>{
+   const field=c.$('#project-'+key);
+   field.value=value;
+   field.dispatchEvent(new c.w.Event('change',{bubbles:true}));
+  };
+  c.click('[data-view=projects]');await wait(()=>!c.$('#create').disabled);
+  c.click('#create');await wait(()=>c.$('#project-name'));
+  c.input('#project-name','Sandbox test');c.input('#project-customer','Example customer');
+  c.click('#project-tab-product');
+  choose('category','cosmetics');choose('packaging','dpak');
+  c.input('[data-project-field=blank]','D-PAK TEST');
+  c.click('[data-project-field=sample][value=na]');
+  choose('packaging','doypack');
+  assert.equal(c.$('[data-project-field=blank]'),null);
+  c.input('[data-project-field=laminate]','TEST LAMINATE');
+  choose('packaging','dpak');
+  assert.equal(c.$('[data-project-field=blank]').value,'D-PAK TEST');
+  c.click('#project-save');
+  await wait(()=>c.$('#project-save-feedback')?.textContent==='Uloženo');
+  const [project]=await c.w.JasonStorage.get('private-projects-v1');
+  assert.equal(project.values.packaging,'dpak');
+  assert.equal(project.values.sample,'na');
+  assert.equal(project.packagingValues.doypack.laminate,'TEST LAMINATE');
+  assert.deepEqual(await c.saved(),catalogue);
+  c.dom.window.close();c=await setup();
+  c.click('[data-view=projects]');await wait(()=>c.$('.project-list a'));
+  c.w.location.hash=new URL(c.$('.project-list a').href).hash;await wait(()=>c.$('#project-customer'));
+  assert.equal(c.$('#project-customer').value,'Example customer');
+  c.click('[data-lang=en]');await wait(()=>c.$('#project-tab-product').textContent==='Product');
+  c.click('#project-tab-product');
+  assert.equal(c.$('[data-project-field=blank]').value,'D-PAK TEST');
+  assert.equal(c.$('[data-project-field=sample][value=na]').checked,true);
+  c.click('[data-lang=cs]');await wait(()=>c.$('#project-tab-product').textContent==='Výrobek');
+  c.click('[data-view=products]');
+  assert.deepEqual(network,[]);assert.deepEqual(await liveState(),{sentinel:'LIVE DATA'});
  });
  await test('sandbox product, logistics and photo edits stay local',async()=>{
   c.click('[data-edit="0"]');c.input('#field-price','9.99');c.submit('#product-form');await wait(()=>!c.$('#editor').open);assert.equal((await c.saved()).products[0].price,9.99);
