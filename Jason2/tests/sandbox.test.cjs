@@ -46,8 +46,14 @@ async function setup(real=false,cached=null){
   c.click('[data-view=projects]');await wait(()=>!c.$('#create').disabled);
   c.click('#create');await wait(()=>c.$('#project-name'));
   c.input('#project-name','Sandbox test');c.input('#project-customer','Example customer');
+  c.input('#project-market','DE');c.input('#project-price','0,85');c.input('#project-currency','EUR');
+  assert.equal(c.$('#project-stage'),null);assert.ok(c.$('#project-taxId'));
   c.click('#project-tab-product');
   choose('category','cosmetics');choose('packaging','dpak');
+  choose('cooperation','existing');choose('fillUnit','ml');choose('responsiblePerson','union');
+  c.input('#project-productName','Test product');c.input('#project-fill','1000');c.input('#project-formula','TEST-001');
+  assert.equal(c.$('[data-project-field=productEan]').getAttribute('aria-required'),'true');
+  c.input('[data-project-field=productEan]','0123456789012');
   c.input('[data-project-field=blank]','D-PAK TEST');
   c.click('[data-project-field=sample][value=na]');
   choose('packaging','doypack');
@@ -55,6 +61,8 @@ async function setup(real=false,cached=null){
   c.input('[data-project-field=laminate]','TEST LAMINATE');
   choose('packaging','dpak');
   assert.equal(c.$('[data-project-field=blank]').value,'D-PAK TEST');
+  c.click('#project-tab-attachments');assert.ok(c.$('[data-add-attachment=front]'));
+  assert.ok(c.$('[data-add-attachment=back]'));assert.ok(c.$('[data-add-attachment=carton]'));
   c.click('#project-save');
   await wait(()=>c.$('#project-save-feedback')?.textContent==='Uloženo');
   const [project]=await c.w.JasonStorage.get('private-projects-v1');
@@ -64,6 +72,8 @@ async function setup(real=false,cached=null){
   assert.deepEqual(await c.saved(),catalogue);
   c.dom.window.close();c=await setup();
   c.click('[data-view=projects]');await wait(()=>c.$('.project-list a'));
+  assert.equal(c.$('.project-list .completeness').textContent,'100%');
+  assert.equal(c.$('#project-filter-stage'),null);
   c.w.location.hash=new URL(c.$('.project-list a').href).hash;await wait(()=>c.$('#project-customer'));
   assert.equal(c.$('#project-customer').value,'Example customer');
   c.click('[data-lang=en]');await wait(()=>c.$('#project-tab-product').textContent==='Product');

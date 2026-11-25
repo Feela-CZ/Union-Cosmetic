@@ -33,7 +33,7 @@ Další rozpracované úkoly zatím nejsou zmapované. Výchozí přehled byl za
 | Projekt | Úkol / další krok | Stav | Větev, PR nebo commit | Aktualizace |
 | --- | --- | --- | --- | --- |
 | — | Doplnit skutečný stav při prvním předání z Codexu | K ověření | — | 2026-11-24 |
-| Jason 2.0 – pískoviště | Privátní projekty a šablony podle primárního obalu | První verze k vyzkoušení | [Pískoviště](https://feela-cz.github.io/Union-Cosmetic/Jason2/test/#projects) | 2026-11-25 |
+| Jason 2.0 – pískoviště | Privátní projekty, šablony obalů a přílohy | Druhá verze k vyzkoušení | [Pískoviště](https://feela-cz.github.io/Union-Cosmetic/Jason2/test/#projects) | 2026-11-25 |
 
 ## Otevřené problémy a rozhodnutí
 
@@ -41,6 +41,7 @@ Zaznamenávat pouze doložené technické problémy a rozhodnutí s dopadem na d
 
 ## Poslední předání
 
+- **2026-11-25 – Codex:** Privátní projekty mají místo fáze procento vyplnění podle povinných údajů. Detail obsahuje zákazníka, výrobek a místní přílohy. Vlastní kategorie jsou dostupné v dalších projektech stejného prohlížeče. Ověřeno v automatických testech i v Chromium včetně starších záznamů a stažení původních souborů.
 - **2026-11-25 – Codex:** Privátní projekty mají vlastní seznam, detail v češtině a angličtině, tisk a stažitelný HTML přehled. Projekty zůstávají v místní IndexedDB pískoviště. Automatické testy ověřují uložení, přepínání šablon a izolaci od katalogu a API.
 - **2026-11-24 – ChatGPT:** Založen společný projektový přehled podle aktuálně dostupné dokumentace v `main`. Žádná změna aplikací ani produkčních dat. Prvotní stav rozpracovaných úloh musí doplnit Codex nebo osoba, která k nim má přístup.
 
