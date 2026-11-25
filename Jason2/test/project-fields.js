@@ -11,10 +11,6 @@ const packaging=[
 const categories=[
  ['cosmetics','Kosmetika','Cosmetics'],['detergent','Detergent','Detergent']
 ];
-const stages=[
- ['brief','Zadání','Brief'],['approval','Schvalování','Approval'],
- ['production','Výroba','Production'],['closed','Uzavřeno','Closed']
-];
 const cooperation=[
  ['existing','Stávající receptura','Existing formula'],['modified','Úprava receptury','Formula modification'],
  ['development','Vývoj receptury','Formula development'],['customer','Receptura zákazníka','Customer formula'],
@@ -25,6 +21,8 @@ const marking=[
 ];
 const sample=[['','TBD','TBD'],['approved','Schválen','Approved'],['na','N/A','N/A']];
 const check=[['','TBD','TBD'],['ok','Potvrzeno','Confirmed'],['na','N/A','N/A']];
+const bulkPacks=new Set(['ibc','drum','bag']);
+const responsibleParties=[['union','Union Cosmetic','Union Cosmetic'],['customer','Zákazník','Customer']];
 const quantityUnit=[['ml','ml','ml'],['l','l','l'],['g','g','g'],['kg','kg','kg']];
 const field=(key,cs,en,kind='text',options)=>({key,label:[cs,en],kind,options});
 const choice=(key,cs,en,options)=>field(key,cs,en,'select',options);
@@ -32,18 +30,17 @@ const confirm=(key,cs,en)=>field(key,cs,en,'check',check);
 const group=(cs,en,fields)=>({label:[cs,en],fields});
 const packGroup=(cs,en,fields)=>({...group(cs,en,fields),packaging:true});
 const product=[
- field('productName','Název výrobku','Product name'),
+ field('productName','Oficiální název výrobku','Official product name'),
  choice('category','Kategorie výrobku','Product category',categories),
  choice('packaging','Primární obal','Primary packaging',packaging),
  choice('cooperation','Typ spolupráce','Cooperation',cooperation),
- field('fill','Náplň','Fill quantity','decimal'),
- choice('fillUnit','Jednotka náplně','Fill unit',quantityUnit)
+ field('fill','Objem/Obsah','Volume/Content','decimal'),
+ choice('fillUnit','Jednotka','Unit',quantityUnit)
 ];
 const project=[
  field('name','Název projektu','Project name'),
  field('customer','Zákazník','Customer'),
  field('market','Cílový trh','Target market'),
- choice('stage','Fáze','Stage',stages),
  field('brand','Značka','Brand')
 ];
 const closure=field('closure','Uzávěr','Closure');
@@ -102,24 +99,21 @@ function groups(tab,values,packagingValues){
    field('contact','Kontaktní osoba','Contact person'),field('email','E-mail','Email','email'),
    field('phone','Telefon','Phone','tel'),field('registrationCountry','Země registrace','Country of registration'),
    field('companyNumber','Company Registration No.','Company Registration No.','optional'),
-   field('vat','VAT ID','VAT ID','optional'),field('tin','Tax ID / TIN','Tax ID / TIN','optional'),
+   field('taxId','DIČ / VAT ID','VAT ID','optional'),
    field('invoiceAddress','Fakturační adresa','Billing address','address'),
    field('deliveryAddress','Dodací adresa','Shipping address','address')
   ]),
   group('Obchodní podmínky','Commercial terms',[
    field('price','Cena za kus','Unit price','decimal'),field('currency','Měna','Currency'),
    field('moq','MOQ','MOQ','number'),field('incoterm','Incoterm','Incoterm'),field('deliveryPlace','Místo dodání','Place of delivery'),
-   field('advance','Záloha (%)','Advance (%)','decimal'),field('balanceDue','Splatnost doplatku','Balance due'),
-   field('quotation','Odkaz na nabídku','Quotation reference')
+   field('advance','Záloha (%)','Advance (%)','decimal'),field('balanceDue','Splatnost doplatku','Balance due')
   ])
  ];
  if(tab==='product')return [
   group('Výrobek','Product',product),
   group('Hmota','Formula',[
    field('formula','ID hmoty','Formula ID'),field('sample','Vzorek','Sample','check',sample),
-   ...(values.sample==='approved'?[field('sampleReference','Odkaz na vzorek','Sample reference')]:[]),
-   field('criticalMaterial','Kritická surovina','Critical ingredient','optional'),
-   field('criticalSupplier','Dodavatel suroviny','Ingredient supplier')
+   ...(values.sample==='approved'?[field('sampleReference','Odkaz na vzorek','Sample reference')]:[])
   ]),
   ...(Object.hasOwn(profiles,values.packaging)?profiles[values.packaging]:[]).map(section=>({
    ...section,packaging:true,
@@ -134,7 +128,7 @@ function groups(tab,values,packagingValues){
   ...(values.packaging?[packGroup('Značení','Marking',[
    field('marking','Značení primárního obalu','Primary pack marking','check',marking),
    ...(packagingValues?.marking!=='na'?[field('artwork','Odkaz na tisková data','Artwork reference')]:[]),
-   field('productEan','EAN výrobku','Product EAN','optional'),
+   field('productEan','EAN výrobku','Product EAN',bulkPacks.has(values.packaging)?'optional':'text'),
    field('batchFormat','Formát šarže','Batch format','optional'),
    field('productionDateFormat','Formát data výroby','Production date format','optional'),
    field('expiryDateFormat','Formát data použitelnosti','Expiry date format','optional'),
@@ -142,58 +136,57 @@ function groups(tab,values,packagingValues){
    confirm('artworkApproved','Tisková data schválena','Artwork approved'),
    confirm('packApproved','Primární obal schválen','Primary pack approved')
   ])]:[]),
-  ...((values.packaging&&!['ibc','drum','bag'].includes(values.packaging))?[packGroup('Karton a paleta','Carton and pallet',[
+  ...((values.packaging&&!bulkPacks.has(values.packaging))?[packGroup('Karton a paleta','Carton and pallet',[
    field('carton','Specifikace kartonu','Carton specification','optional'),field('caseUnits','Kusů v kartonu','Units per carton','number'),
    field('cartonEan','EAN kartonu','Carton EAN','optional'),field('cartonLabel','Kartonový štítek','Carton label','optional'),
    field('palletUnits','Kusů na paletě','Units per pallet','number'),
    field('palletLabel','Paletový štítek','Pallet label','optional'),
    confirm('cartonApproved','Karton schválen','Carton approved'),confirm('cartonLabelApproved','Kartonový štítek schválen','Carton label approved')
   ])]:[]),
-  group('Odpovědnost a registrace','Responsibility and registration',[
-   field('responsiblePerson','Odpovědná osoba za výrobek','Responsible person','optional'),
-   field('registrationOwner','Kdo zajistí registraci','Registration owner','optional')
+  group('Odpovědnost','Responsibility',[
+   choice('responsiblePerson','Odpovědná osoba za výrobek','Responsible person',responsibleParties)
   ])
  ];
- return [
-  group('Objednávka','Order',[
-   field('order','Číslo objednávky','Order number'),field('ordered','Objednáno (ks)','Ordered (pcs)','number'),
-   field('finishedStock','Hotové ks skladem','Finished units in stock','number'),field('toProduce','K výrobě (ks)','To produce (pcs)','number'),
-   confirm('printAdvancePaid','Záloha na tisk přijata','Print advance received'),
-   confirm('productionAdvancePaid','Záloha na výrobu přijata','Production advance received')
-  ]),
-  group('Před výrobou','Before production',[
-   confirm('formulaVerified','ID hmoty ověřeno','Formula ID verified'),confirm('materialsReady','Suroviny k dispozici','Ingredients available'),
-   field('materialsArrival','Termín příjmu surovin','Ingredient delivery date','date'),
-   field('productionDate','Termín výroby','Production date','date')
-  ]),
-  ...(values.packaging?[packGroup('Dostupnost obalů','Packaging availability',[
-   confirm('packsReady','Obaly k dispozici','Packaging available'),
-   ...(values.packaging&&!['ibc','drum','bag'].includes(values.packaging)?[
-    confirm('cartonsReady','Kartony k dispozici','Cartons available'),confirm('labelsReady','Kartonové štítky k dispozici','Carton labels available')
-   ]:[]),
-   confirm('eanVerified','EAN výrobku ověřen','Product EAN verified'),
-   ...(!['ibc','drum','bag'].includes(values.packaging)?[confirm('cartonEanVerified','EAN kartonu ověřen','Carton EAN verified')]:[])
-  ])]:[]),
-  group('Expedice','Dispatch',[
-   field('dispatchDate','Termín nakládky','Loading date','date'),field('actuallyDispatched','Expedováno (ks)','Dispatched (pcs)','number'),
-   field('balancePaidAt','Datum úhrady doplatku','Balance payment date','date'),
-   confirm('codingVerified','Dotisk ověřen na výrobku','Batch/date code verified'),
-   confirm('invoice','Faktura vystavena','Invoice issued'),confirm('packingList','Packing list ověřen','Packing list checked'),
-   confirm('registrationDone','Registrace dokončena','Registration completed')
-  ])
- ];
+ return [];
 }
+
+function requiredFields(values){
+ const fields=['name','customer','market','category','cooperation','productName','packaging','fill','fillUnit','price','currency'];
+ if(values.cooperation!=='cofilling')fields.push('formula');
+ if(!bulkPacks.has(values.packaging))fields.push('productEan');
+ if(values.category==='cosmetics')fields.push('responsiblePerson');
+ return fields;
+}
+
+function completeField(key,value){
+ const raw=typeof value==='object'?value?.na?'':value?.text:value;
+ const text=String(raw??'').trim();
+ if(!text)return false;
+ if(key==='price'||key==='fill')return /^\d+(?:[.,]\d+)?$/.test(text)&&Number(text.replace(',','.'))>0;
+ if(key==='productEan')return /^(?:\d{8}|\d{12,14})$/.test(text);
+ return true;
+}
+
+const attachmentSections=[
+ {key:'front',label:['Přední etiketa','Front label']},
+ {key:'back',label:['Zadní etiketa','Back label']},
+ {key:'carton',label:['Schválený kartonový štítek','Approved carton label']},
+ {key:'print',label:['Tisková data','Artwork'],multiple:true},
+ {key:'specification',label:['Specifikace obalu','Packaging specification'],multiple:true},
+ {key:'trial',label:['Protokoly o zkouškách','Trial reports'],multiple:true},
+ {key:'other',label:['Ostatní','Other files'],multiple:true}
+];
 
 const ui={
  projects:['Privátní projekty','Private projects'],add:['Nový projekt','New project'],
- customer:['Zákazník','Customer'],product:['Výrobek','Product'],production:['Výroba a expedice','Production and dispatch'],
+ customer:['Zákazník','Customer'],product:['Výrobek','Product'],attachments:['Přílohy','Attachments'],
  back:['Všechny projekty','All projects'],save:['Uložit','Save'],saving:['Ukládám…','Saving…'],
  saved:['Uloženo','Saved'],unsaved:['Neuložené změny','Unsaved changes'],
  project:['Projekt','Project'],category:['Kategorie','Category'],packaging:['Obal','Packaging'],
- market:['Trh','Market'],stage:['Fáze','Stage'],updated:['Upraveno','Updated'],
+ market:['Trh','Market'],complete:['Vyplnění','Completeness'],updated:['Upraveno','Updated'],
  search:['Hledat projekt nebo zákazníka','Search projects or customers'],
  allCategories:['Všechny kategorie','All categories'],allPacks:['Všechny obaly','All packaging'],
- allStages:['Všechny fáze','All stages'],empty:['Zatím žádné projekty.','No projects yet.'],
+ empty:['Zatím žádné projekty.','No projects yet.'],
  noMatches:['Žádné projekty neodpovídají filtrům.','No projects match the filters.'],
  loading:['Načítám projekty…','Loading projects…'],
  notFound:['Projekt nebyl nalezen v tomto prohlížeči.','The project was not found in this browser.'],
@@ -205,7 +198,12 @@ const ui={
  reloadConfirm:['Nahradit neuložené změny uloženou verzí?','Replace unsaved changes with the saved version?'],
  required:['Vyplňte název projektu.','Enter the project name.'],
  tabLabel:['Části projektu','Project sections'],
+ requiredField:['Nutné pro vyplnění na 100 %','Required for 100% completion'],
+ otherCategory:['Jiné…','Other…'],newCategory:['Nová kategorie','New category'],categoryName:['Název kategorie','Category name'],
+ categoryError:['Kategorii se nepodařilo uložit.','The category could not be saved.'],
+ cancel:['Zrušit','Cancel'],addFile:['Přidat soubor','Add file'],replaceFile:['Nahradit soubor','Replace file'],
+ getFile:['Stáhnout','Download'],removeFile:['Odebrat','Remove'],
  print:['Tisk','Print'],download:['Stáhnout přehled','Download summary'],next:['Další','Next']
 };
-root.JasonProjectFields={ui,packaging,categories,stages,groups};
+root.JasonProjectFields={ui,packaging,categories,groups,requiredFields,completeField,attachmentSections};
 })(window);

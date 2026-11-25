@@ -3,16 +3,18 @@
 'use strict';
 if(root.JASON_CONFIG?.sandbox!==true)return;
 
-const {ui,packaging,categories,stages,groups}=root.JasonProjectFields;
+const {ui,packaging,categories,groups,requiredFields,completeField,attachmentSections}=root.JasonProjectFields;
 const storage=root.JasonStorage;
 const key='private-projects-v1';
-const tabs=['customer','product','production'];
+const categoryKey='private-project-categories-v1';
+const tabs=['customer','product','attachments'];
+const newCategory='__new_category';
 const $=selector=>document.querySelector(selector);
 const escape=value=>String(value??'').replace(/[&<>"']/g,char=>(
  {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
-let language='cs',records,loading=false,loadError=false;
+let language='cs',records,customCategories=[],loading=false,loadError=false;
 const drafts=new Map();
-const filters={search:'',category:'',packaging:'',stage:''};
+const filters={search:'',category:'',packaging:''};
 
 const local=pair=>pair[language==='en'?1:0];
 const t=id=>local(ui[id]);
@@ -24,6 +26,7 @@ const active=()=>location.hash==='#projects'||location.hash.startsWith('#project
 const route=()=>location.hash.slice('#projects/'.length);
 const keyFor=(spec,scope)=>scope?scope+':'+spec.key:spec.key;
 const display=value=>value||'—';
+const categoryOptions=()=>[...categories,...customCategories.map(({id,name})=>[id,name,name])];
 
 function sections(tab,record){
  const {values,packagingValues}=record;
@@ -34,7 +37,29 @@ function sections(tab,record){
 }
 
 function getValue(record,field,scope){
- return (scope?record.packagingValues?.[scope]:record.values)?.[field.key];
+ const values=scope?record.packagingValues?.[scope]:record.values;
+ const value=values?.[field.key];
+ if(field.key==='taxId'&&value===undefined){
+  return values.vat?.text&&!values.vat.na?values.vat:values.tin??values.vat;
+ }
+ if(field.key==='responsiblePerson'){
+  const name=searchable(value?.text??value).trim();
+  if(['union','union cosmetic','union cosmetic s.r.o.'].includes(name))return 'union';
+  if(['customer','zakaznik'].includes(name)||name&&name===searchable(record.values.customer).trim())return 'customer';
+  return '';
+ }
+ if(field.key==='productEan'&&field.kind!=='optional'&&typeof value==='object')return value?.na?'':value?.text;
+ return value;
+}
+
+function completeness(record){
+ const required=requiredFields(record.values);
+ const filled=required.filter(key=>{
+  const scope=key==='productEan'?record.values.packaging:'';
+  const value=key==='productEan'&&!scope?'':getValue(record,{key},scope);
+  return completeField(key,value);
+ }).length;
+ return Math.round(filled/required.length*100);
 }
 
 function draftFor(id){
@@ -42,8 +67,8 @@ function draftFor(id){
  const project=records.find(record=>record.id===id);
  if(!project&&id!=='new')return null;
  const draft={
-  record:project?structuredClone(project):{id:crypto.randomUUID(),revision:0,values:{stage:'brief'},packagingValues:{}},
-  tab:'customer',dirty:false,busy:false,message:''
+  record:project?structuredClone(project):{id:crypto.randomUUID(),revision:0,values:{},packagingValues:{}},
+  tab:'customer',dirty:false,editCount:0,busy:false,message:''
  };
  drafts.set(id,draft);
  return draft;
@@ -60,7 +85,9 @@ async function load(){
  loading=true;
  loadError=false;
  try{
-  records=(await storage.get(key))??[];
+  const [items,taxonomy]=await Promise.all([storage.get(key),storage.get(categoryKey)]);
+  records=items??[];
+  customCategories=taxonomy??[];
   if(!Array.isArray(records))throw Error('Invalid projects');
  }catch{
   records=undefined;
@@ -86,9 +113,9 @@ function button(label,attrs='',className=''){
 
 function list(){
  $('#toolbar').innerHTML='<label class="search-box"><span aria-hidden="true">⌕</span><input id="project-search" type="search" placeholder="'+escape(t('search'))+'" aria-label="'+escape(t('search'))+'" value="'+escape(filters.search)+'"></label>'+
-  filterOptions('allCategories',categories,'category')+filterOptions('allPacks',packaging,'packaging')+filterOptions('allStages',stages,'stage');
+  filterOptions('allCategories',categoryOptions(),'category')+filterOptions('allPacks',packaging,'packaging');
  $('#project-search').oninput=event=>{filters.search=event.target.value;listRows();};
- for(const id of ['category','packaging','stage']){
+ for(const id of ['category','packaging']){
   $('#project-filter-'+id).onchange=event=>{filters[id]=event.target.value;listRows();};
  }
  listRows();
@@ -101,23 +128,24 @@ const searchable=value=>String(value??'').normalize('NFD').replace(/\p{Diacritic
 function listRows(){
  const query=searchable(filters.search).trim();
  const filtered=records.filter(({values:v})=>
-  ['category','packaging','stage'].every(id=>!filters[id]||v[id]===filters[id])&&
+  ['category','packaging'].every(id=>!filters[id]||v[id]===filters[id])&&
   [v.name,v.customer,v.productName,v.market].some(item=>searchable(item).includes(query)))
   .sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));
  if(!filtered.length){
   $('#content').innerHTML='<p class="project-empty">'+escape(t(records.length?'noMatches':'empty'))+'</p>';
   return;
  }
- const headings=['project','category','customer','packaging','market','stage','updated'];
+ const headings=['project','category','customer','packaging','market','complete','updated'];
  $('#content').innerHTML='<div class="table-wrap project-list"><table><thead><tr>'+
   headings.map(label=>'<th scope="col">'+escape(t(label))+'</th>').join('')+
   '</tr></thead><tbody>'+filtered.map(record=>{
    const v=record.values,href='#projects/'+encodeURIComponent(record.id);
    const link='<a class="product-link" href="'+href+'">'+escape(v.name)+'</a>';
-   const cells=[optionText(categories,v.category),v.customer,optionText(packaging,v.packaging),v.market];
+   const cells=[optionText(categoryOptions(),v.category),v.customer,optionText(packaging,v.packaging),v.market];
+   const percent=completeness(record);
    return '<tr data-project-id="'+escape(record.id)+'"><td>'+link+(v.productName?'<div class="cell-sub">'+escape(v.productName)+'</div>':'')+'</td>'+
     cells.map((value,index)=>'<td data-label="'+escape(t(headings[index+1]))+'">'+escape(display(value))+'</td>').join('')+
-    '<td data-label="'+escape(t('stage'))+'"><span class="badge project-stage stage-'+escape(v.stage)+'">'+escape(display(optionText(stages,v.stage)))+'</span></td>'+
+    '<td data-label="'+escape(t('complete'))+'"><span class="completeness"><span aria-hidden="true"><i style="width:'+percent+'%"></i></span>'+percent+'%</span></td>'+
     '<td data-label="'+escape(t('updated'))+'">'+escape(dateText(record.updatedAt))+'</td></tr>';
   }).join('')+'</tbody></table></div>';
  $('#content').querySelectorAll('[data-project-id]').forEach(row=>{
@@ -127,6 +155,8 @@ function listRows(){
 
 function fieldHTML(record,field,scope){
  const value=getValue(record,field,scope);
+ const required=requiredFields(record.values).includes(field.key);
+ const mark=required?'<span class="project-required" title="'+escape(t('requiredField'))+'" aria-label="'+escape(t('requiredField'))+'"> *</span>':'';
  const label=escape(local(field.label)),id='project-'+keyFor(field,scope);
  const attributes=' data-project-field="'+field.key+'" data-scope="'+escape(scope)+'"';
  if(field.kind==='check'){
@@ -136,10 +166,13 @@ function fieldHTML(record,field,scope){
  }
  const optional=field.kind==='optional';
  const current=optional?value?.text:value;
- const common=' id="'+id+'"'+attributes;
+ const common=' id="'+id+'"'+attributes+(required?' aria-required="true"':'');
  let control;
- if(field.kind==='select')control='<select'+common+'>'+options(field.options,current)+'</select>';
- else if(field.kind==='address')control='<textarea rows="3"'+common+'>'+escape(current)+'</textarea>';
+ if(field.kind==='select'){
+  const items=field.key==='category'?[...categoryOptions(),[newCategory,...ui.otherCategory]]:field.options;
+  control='<select'+common+'>'+options(items,current)+'</select>';
+ }
+ else if(field.kind==='address')control='<textarea rows="6"'+common+'>'+escape(current)+'</textarea>';
  else{
   const kind=['date','email','tel','number'].includes(field.kind)?field.kind:'text';
   const extra=(field.kind==='decimal'?' inputmode="decimal"':field.kind==='number'?' min="0" step="1"':'')+
@@ -148,7 +181,7 @@ function fieldHTML(record,field,scope){
  }
  const na=optional?'<label class="project-na"><input type="checkbox" data-na="'+field.key+'" data-scope="'+escape(scope)+'"'+(value?.na?' checked':'')+
   ' aria-label="'+label+' · N/A"> N/A</label>':'';
- return '<div class="field project-field'+(field.kind==='address'?' project-address':'')+'"><label for="'+id+'">'+label+'</label>'+
+ return '<div class="field project-field'+(field.kind==='address'?' project-address':'')+'"><label for="'+id+'">'+label+mark+'</label>'+
   '<div class="project-input">'+control+na+'</div></div>';
 }
 function status(draft){
@@ -167,17 +200,20 @@ function status(draft){
 }
 function updateField(draft,target,isNA=false){
  const field=isNA?target.dataset.na:target.dataset.projectField;
+ if(field==='category'&&target.value===newCategory){
+  target.value=draft.record.values.category??'';
+  createCategory(draft);
+  return;
+ }
  const scope=target.dataset.scope;
  const values=scope?(draft.record.packagingValues[scope]??={}):draft.record.values;
  if(isNA||target.hasAttribute('data-project-optional')){
-  const previous=values[field]||{};
+  const previous=getValue(draft.record,{key:field,kind:'optional'},scope)||{};
   values[field]=isNA?{...previous,na:target.checked}:{...previous,text:target.value};
   if(isNA)$('#project-'+keyFor({key:field},scope)).disabled=target.checked;
  }else values[field]=target.value;
- draft.dirty=true;
- draft.message='';
- status(draft);
- if(['packaging','cooperation','sample','marking','pouchClosure'].includes(field)){
+ markEdited(draft);
+ if(['packaging','cooperation','category','sample','marking','pouchClosure'].includes(field)){
   const checked=target.type==='radio'?target:null;
   const control=target.id;
   detail(route(),draft);
@@ -185,6 +221,101 @@ function updateField(draft,target,isNA=false){
    [...document.getElementsByName(checked.name)].find(input=>input.value===checked.value)?.focus({preventScroll:true});
   }else document.getElementById(control)?.focus({preventScroll:true});
  }
+}
+
+
+function markEdited(draft){
+ draft.dirty=true;
+ draft.editCount++;
+ draft.message='';
+ status(draft);
+}
+
+function createCategory(draft){
+ const dialog=document.createElement('dialog');
+ dialog.className='small project-category-dialog';
+ dialog.setAttribute('aria-labelledby','project-category-title');
+ dialog.innerHTML='<form><h2 id="project-category-title">'+escape(t('newCategory'))+'</h2>'+
+  '<label class="field"><span>'+escape(t('categoryName'))+'</span><input name="name" required maxlength="80"></label>'+
+  '<p class="project-error" role="alert" hidden></p><div class="dialog-actions">'+
+  button('cancel','data-category-cancel')+'<button type="submit" class="primary">'+escape(t('save'))+'</button></div></form>';
+ document.body.append(dialog);
+ const form=dialog.querySelector('form'),input=form.elements.namedItem('name');
+ dialog.onclose=()=>{dialog.remove();$('#project-category')?.focus({preventScroll:true});};
+ const cancel=dialog.querySelector('[data-category-cancel]');
+ cancel.onclick=()=>dialog.close();
+ dialog.oncancel=event=>{if(cancel.disabled)event.preventDefault();};
+ form.onsubmit=async event=>{
+  event.preventDefault();
+  const name=input.value.trim();
+  if(!name){input.value='';input.reportValidity();return;}
+  const submit=dialog.querySelector('[type="submit"]');
+  submit.disabled=cancel.disabled=true;
+  const existing=categories.find(item=>item.slice(1).some(label=>searchable(label)===searchable(name)));
+  try{
+   if(existing)draft.record.values.category=existing[0];
+   else{
+    customCategories=await storage.update(categoryKey,stored=>{
+     const known=stored??[];
+     return known.some(item=>searchable(item.name)===searchable(name))?known:[...known,{id:crypto.randomUUID(),name}];
+    });
+    draft.record.values.category=customCategories.find(item=>searchable(item.name)===searchable(name)).id;
+   }
+   markEdited(draft);
+   dialog.close();
+   if(active())detail(route(),draft);
+   $('#project-category')?.focus({preventScroll:true});
+  }catch{
+   const error=dialog.querySelector('[role="alert"]');
+   error.textContent=t('categoryError');
+   error.hidden=false;
+  }finally{submit.disabled=cancel.disabled=false;}
+ };
+ dialog.showModal();
+ input.focus();
+}
+
+function attachmentsHTML(record){
+ return attachmentSections.map(({key,label,multiple})=>{
+  const files=record.attachments?.[key]??[];
+  return '<section class="project-section project-attachment-section"><div class="project-attachment-heading"><h2>'+escape(local(label))+
+   '</h2>'+button(!multiple&&files.length?'replaceFile':'addFile','data-add-attachment="'+key+'"')+
+   '<input data-attachment-input="'+key+'" type="file"'+(multiple?' multiple':'')+' hidden></div>'+
+   (files.length?'<ul class="project-attachment-list">'+files.map(file=>'<li><span>'+escape(file.name)+'</span><div>'+
+    button('getFile','data-download-attachment="'+file.id+'"')+
+    button('removeFile','data-remove-attachment="'+file.id+'"')+'</div></li>').join('')+'</ul>':
+    '<p class="project-attachment-empty">'+(key==='back'?'N/A':'TBD')+'</p>')+'</section>';
+ }).join('');
+}
+function bindAttachments(panel,draft){
+ panel.onclick=event=>{
+  const control=event.target.closest('button');
+  if(!control)return;
+  const {addAttachment,downloadAttachment,removeAttachment}=control.dataset;
+  if(addAttachment){panel.querySelector('[data-attachment-input="'+addAttachment+'"]').click();return;}
+  if(downloadAttachment){
+   const files=Object.values(draft.record.attachments??{}).flat();
+   const file=files.find(item=>item.id===downloadAttachment);
+   if(file)downloadFile(new Blob([file.blob],{type:'application/octet-stream'}),file.name);
+  }
+  if(removeAttachment){
+   const slots=draft.record.attachments??{};
+   for(const key of Object.keys(slots))slots[key]=slots[key].filter(item=>item.id!==removeAttachment);
+   markEdited(draft);
+   detail(route(),draft);
+  }
+ };
+ panel.onchange=event=>{
+  const key=event.target.dataset.attachmentInput;
+  const section=attachmentSections.find(item=>item.key===key);
+  const files=Array.from(event.target.files??[]);
+  if(!section||!files.length)return;
+  const slots=draft.record.attachments??={};
+  const selected=files.map(file=>({id:crypto.randomUUID(),name:file.name,blob:file}));
+  slots[key]=section.multiple?[...(slots[key]??[]),...selected]:selected.slice(0,1);
+  markEdited(draft);
+  detail(route(),draft);
+ };
 }
 
 function detail(id,draft){
@@ -198,8 +329,8 @@ function detail(id,draft){
   tabs.map(name=>'<button type="button" role="tab" id="project-tab-'+name+'" data-project-tab="'+name+'" aria-controls="project-tab-panel" aria-selected="'+(tab===name)+'" tabindex="'+(tab===name?0:-1)+'">'+escape(t(name))+'</button>').join('')+
   '</div><div class="project-feedback" hidden><span id="project-save-feedback" role="status"></span>'+
   button('reload','id="project-reload" hidden')+'</div><div class="project-detail-body" id="project-tab-panel" role="tabpanel" aria-labelledby="project-tab-'+tab+'">'+
-  sections(tab,record).map(section=>'<section class="project-section"><h2>'+escape(local(section.label))+
-   '</h2><div class="project-fields">'+section.fields.map(field=>fieldHTML(record,field,section.scope)).join('')+'</div></section>').join('')+
+  (tab==='attachments'?attachmentsHTML(record):sections(tab,record).map(section=>'<section class="project-section"><h2>'+escape(local(section.label))+
+   '</h2><div class="project-fields">'+section.fields.map(field=>fieldHTML(record,field,section.scope)).join('')+'</div></section>').join(''))+
   (next?'<div class="project-bottom">'+'<button id="project-next" type="button" class="primary">'+escape(t('next')+' · '+t(next))+'</button>'+'</div>':'')+'</div></div>';
 
  const panel=$('#project-tab-panel'),tablist=$('.project-tabs');
@@ -226,6 +357,7 @@ function detail(id,draft){
   if(target.dataset.na)updateField(draft,target,true);
   else if(target.dataset.projectField&&target.matches('select, input[type="radio"]'))updateField(draft,target);
  };
+ if(tab==='attachments')bindAttachments(panel,draft);
  if(next)$('#project-next').onclick=()=>showTab(next);
  $('#project-reload').onclick=async()=>{
   if(!confirm(t('reloadConfirm')))return;
@@ -257,6 +389,7 @@ async function save(){
  next.updatedAt=new Date().toISOString();
  next.revision++;
  const snapshot=draft.record;
+ const editCount=draft.editCount;
  status(draft);
  try{
   records=await storage.update(key,current=>{
@@ -266,8 +399,7 @@ async function save(){
    return saved?projects.map(project=>project.id===next.id?next:project):[...projects,next];
   });
   // Preserve any typing that happened while IndexedDB was writing.
-  const changed=JSON.stringify(snapshot.values)!==JSON.stringify(next.values)||
-   JSON.stringify(snapshot.packagingValues)!==JSON.stringify(next.packagingValues);
+  const changed=draft.editCount!==editCount;
   draft.record=changed?{...snapshot,revision:next.revision,updatedAt:next.updatedAt}:structuredClone(next);
   draft.dirty=changed;
   draft.message=changed?'':'saved';
@@ -291,10 +423,14 @@ async function save(){
 function summary(record){
  const title=escape(record.values.name?.trim()||t('add'));
  const content=tabs.map(tab=>{
+  if(tab==='attachments')return '<article><h2>'+escape(t('attachments'))+'</h2><dl>'+attachmentSections.map(section=>{
+   const files=record.attachments?.[section.key]??[];
+   return '<div><dt>'+escape(local(section.label))+'</dt><dd>'+escape(files.length?files.map(file=>file.name).join('\n'):section.key==='back'?'N/A':'TBD')+'</dd></div>';
+  }).join('')+'</dl></article>';
   const sectionsHTML=sections(tab,record).map(section=>'<section><h3>'+escape(local(section.label))+'</h3><dl>'+
    section.fields.map(field=>{
     const value=getValue(record,field,section.scope);
-    const description=field.options?optionText(field.options,value):field.kind==='optional'?(value?.na?'N/A':value?.text):value;
+    const description=field.options?optionText(field.key==='category'?categoryOptions():field.options,value):field.kind==='optional'?(value?.na?'N/A':value?.text):value;
     return '<div><dt>'+escape(local(field.label))+'</dt><dd>'+escape(display(description))+'</dd></div>';
    }).join('')+'</dl></section>').join('');
   return '<article><h2>'+escape(t(tab))+'</h2>'+sectionsHTML+'</article>';
@@ -320,10 +456,14 @@ function download(record){
  const page=summary(record);
  const style='body{font:14px system-ui,sans-serif;max-width:1050px;margin:2rem auto;padding:0 1rem;color:#182438}h1{font-size:2rem}h2{margin-top:1.4em;border-bottom:1px solid #8f9db1;padding-bottom:.3em}h3{margin-bottom:0}dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.6rem;margin:.5rem 0 1rem}dl div{border:1px solid #cad1db;padding:.45rem;break-inside:avoid}dt{font-size:.8em;font-weight:600}dd{margin:.2em 0 0;white-space:pre-wrap;overflow-wrap:anywhere}@page{size:A4;margin:12mm}@media print{body{margin:0;padding:0;font-size:10pt}h2,h3{break-after:avoid}dl{grid-template-columns:repeat(3,minmax(0,1fr))}}';
  const data='<!doctype html><html lang="'+language+'"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+page.title+'</title><style>'+style+'</style><body>'+page.html+'</body></html>';
- const url=URL.createObjectURL(new Blob([data],{type:'text/html;charset=utf-8'}));
+ const filename=(record.values.name?.trim().replace(/[^\p{L}\p{N}._-]+/gu,'-').slice(0,90)||'private-project')+'.html';
+ downloadFile(new Blob([data],{type:'text/html;charset=utf-8'}),filename);
+}
+function downloadFile(blob,filename){
+ const url=URL.createObjectURL(blob);
  const link=document.createElement('a');
  link.href=url;
- link.download=(record.values.name?.trim().replace(/[^\p{L}\p{N}._-]+/gu,'-').slice(0,90)||'private-project')+'.html';
+ link.download=filename;
  document.body.append(link);
  link.click();
  link.remove();

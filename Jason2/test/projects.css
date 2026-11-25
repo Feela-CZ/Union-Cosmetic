@@ -5,9 +5,6 @@
 .project-list .product-link { font-weight:650; color:var(--accent); text-decoration:none }
 .project-list .product-link:hover { text-decoration:underline }
 .table-footer:empty { display:none }
-.project-stage.stage-approval { background:#fff3d9; color:#6c500f }
-.project-stage.stage-production { background:#eaf1fb; color:#284e7b }
-.project-stage.stage-closed { background:#e5f3e8; color:#2e673a }
 .project-empty { padding:28px 22px; color:var(--muted) }
 
 .toolbar:has(.project-actions) { justify-content:space-between }
@@ -25,8 +22,19 @@
 .project-field label { font-size:.77rem; font-weight:650; line-height:1.35 }
 .project-field .project-input { display:flex; gap:8px; align-items:center; min-width:0 }
 .project-input input:not([type="checkbox"]), .project-input textarea, .project-input select { width:100%; min-width:0 }
-.project-input textarea { resize:vertical }
-.project-address { grid-column:span 2 }
+.project-input textarea { resize:vertical; min-height:9rem }
+.project-required { color:var(--accent) }
+.project-category-dialog { width:min(420px,calc(100% - 24px)); padding:20px }
+.project-category-dialog h2 { margin:0 0 16px; font-size:1.2rem }
+.project-category-dialog .dialog-actions { padding:12px 0 0 }
+.project-attachment-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap }
+.project-attachment-heading h2 { margin:0 }
+.project-attachment-empty { color:var(--muted); margin:8px 0 0 }
+.project-attachment-list { list-style:none; padding:0; margin:8px 0 0 }
+.project-attachment-list li { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; flex-wrap:wrap }
+.project-attachment-list li + li { border-top:1px solid var(--line) }
+.project-attachment-list span { overflow-wrap:anywhere; min-width:0 }
+.project-attachment-list li div { display:flex; flex-wrap:wrap; gap:8px }
 .project-na { display:inline-flex; gap:3px; align-items:center; white-space:nowrap }
 .project-na input, .project-check input { min-height:0; width:15px; height:15px; margin:0; accent-color:var(--accent) }
 .project-check { margin:0; min-width:0; padding:0; border:0; align-self:start }
@@ -62,7 +70,6 @@
  .project-tabs button { padding-inline:8px }
  .project-detail-body { padding-inline:12px }
  .project-fields { grid-template-columns:1fr }
- .project-address { grid-column:auto }
 }
 @media print {
  body.project-printing > :not(#project-print-sheet) { display:none !important }
