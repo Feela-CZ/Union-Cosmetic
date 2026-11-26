@@ -493,7 +493,8 @@ function findFile(record,id){
 }
 
 function downloadAttachment(record,id){
- const file=findFile(record,id);
+ const saved=records?.find(project=>project.id===record.id);
+ const file=findFile(record,id)??(saved&&findFile(saved,id));
  if(file)downloadFile(new Blob([file.blob],{type:'application/octet-stream'}),file.name);
 }
 
