@@ -1,6 +1,6 @@
 # Projektový přehled / Project status
 
-Poslední aktualizace: 2026-11-25
+Poslední aktualizace: 2026-11-26
 Zdroj výchozího přehledu: soubory a dokumentace ve větvi `main`.  
 Tento soubor je společný předávací bod pro Codex, ChatGPT a lidi pracující na repozitáři. Není náhradou za zdrojový kód, testy ani historii Git.
 
@@ -33,13 +33,15 @@ Další rozpracované úkoly zatím nejsou zmapované. Výchozí přehled byl za
 | Projekt | Úkol / další krok | Stav | Větev, PR nebo commit | Aktualizace |
 | --- | --- | --- | --- | --- |
 | — | Doplnit skutečný stav při prvním předání z Codexu | K ověření | — | 2026-11-24 |
-| Jason 2.0 – pískoviště | Privátní projekty, šablony obalů a přílohy | Druhá verze k vyzkoušení | [Pískoviště](https://feela-cz.github.io/Union-Cosmetic/Jason2/test/#projects) | 2026-11-25 |
+| Jason 2.0 – pískoviště | Privátní projekty, šablony obalů a přílohy | Formulář po připomínkách k dalšímu vyzkoušení | [Pískoviště](https://feela-cz.github.io/Union-Cosmetic/Jason2/test/#projects) | 2026-11-26 |
 
 ## Otevřené problémy a rozhodnutí
 
 Zaznamenávat pouze doložené technické problémy a rozhodnutí s dopadem na další práci. Výchozí seznam nebyl ověřen jako úplný.
 
 ## Poslední předání
+
+- **2026-11-26 – Codex:** Přehled vychází ze zákazníka, výrobku a obalu. Formulář podporuje poznámky, historii změn a výměn souborů, dvojí schválení tiskových dat, vlastní sekce příloh a zkoušky pouze pro D-PAK. Ověřeno automatickými testy a v Chromium. Projekty zůstávají v místní databázi pískoviště.
 
 - **2026-11-25 – Codex:** Privátní projekty mají místo fáze procento vyplnění podle povinných údajů. Detail obsahuje zákazníka, výrobek a místní přílohy. Vlastní kategorie jsou dostupné v dalších projektech stejného prohlížeče. Ověřeno v automatických testech i v Chromium včetně starších záznamů a stažení původních souborů.
 - **2026-11-25 – Codex:** Privátní projekty mají vlastní seznam, detail v češtině a angličtině, tisk a stažitelný HTML přehled. Projekty zůstávají v místní IndexedDB pískoviště. Automatické testy ověřují uložení, přepínání šablon a izolaci od katalogu a API.
