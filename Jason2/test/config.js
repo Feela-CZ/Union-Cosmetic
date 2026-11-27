@@ -1,4 +1,4 @@
-/* Independent local sandbox: no API endpoint, no automatic connection.
+/* Independent sandbox: data lives in page memory.
    The frozen settings and request guard prevent shared-data access. */
 window.JASON_CONFIG = Object.freeze({
  sandbox: true,
@@ -6,7 +6,6 @@ window.JASON_CONFIG = Object.freeze({
  imageBase: '../../OrderSheet/img',
  autoConnect: false,
  sharedOnly: false,
- workspaceName: 'union-cosmetic-jason2-sandbox',
  legacyProducts: '',
  logisticsFile: ''
 });

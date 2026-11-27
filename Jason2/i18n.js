@@ -16,26 +16,26 @@ Object.assign(window.JasonText.cs,{
  liveVersion:'Ostrá verze',sandboxVersion:'Testovací verze',
  readonlyNote:'Ostrá verze · Uložené změny se projeví také v původním Jasonovi.',
  sharedOnly:'Jason 2.0 používá stejná společná data jako původní Jason. Uložené úpravy mění skutečná data.',
- sandboxLocal:'Testovací verze · Pouze v tomto prohlížeči',sandboxData:'Testovací data',
- sandboxNote:'Bezpečné pískoviště · Kopie dat z {date}. Změny zůstávají pouze v tomto prohlížeči a neovlivní ostrá data ani ostatní kolegy.',
+ sandboxLocal:'Testovací verze · Dočasné změny',sandboxData:'Testovací data',
+ sandboxNote:'Pískoviště · Kopie dat z {date}. Při obnovení nebo zavření stránky se změny zahodí.',
  sandboxResetTitle:'Vrátit výchozí testovací data',sandboxReset:'Vrátit výchozí data',
- sandboxResetHint:'Všechny vaše testovací úpravy a fotografie budou nahrazeny výchozí kopií z {date}. Případně si nejprve stáhněte zálohu.',
- sandboxPhotoHint:'Fotografie se uloží pouze do testovací kopie v tomto prohlížeči.',
+ sandboxResetHint:'Katalog, logistika a fotografie se vrátí k výchozí kopii z {date}.',
+ sandboxPhotoHint:'Fotografie je dostupná do obnovení nebo zavření stránky.',
  SANDBOX_OFFLINE:'Testovací verze nemá přístup ke společnému API.',SANDBOX_SEED_MISSING:'Výchozí testovací data se nepodařilo načíst. Obnovte stránku.'
 });
 Object.assign(window.JasonText.en,{
  liveVersion:'Live version',sandboxVersion:'Test version',
  readonlyNote:'Live version · Saved changes also appear in the original Jason.',
  sharedOnly:'Jason 2.0 uses the same shared data as the original Jason. Saved edits change real data.',
- sandboxLocal:'Test version · This browser only',sandboxData:'Test data',
- sandboxNote:'Safe sandbox · Data snapshot from {date}. Changes stay in this browser and do not affect live data or other colleagues.',
+ sandboxLocal:'Test version · Temporary changes',sandboxData:'Test data',
+ sandboxNote:'Sandbox · Data snapshot from {date}. Reloading or closing the page discards changes.',
  sandboxResetTitle:'Restore initial test data',sandboxReset:'Restore initial data',
- sandboxResetHint:'All your test edits and photos will be replaced by the initial snapshot from {date}. Download a backup first if needed.',
- sandboxPhotoHint:'Photos are saved only in this browser’s test copy.',
+ sandboxResetHint:'The catalog, logistics and photos return to the initial snapshot from {date}.',
+ sandboxPhotoHint:'The photo is available until you reload or close the page.',
  SANDBOX_OFFLINE:'The test version cannot access the shared API.',SANDBOX_SEED_MISSING:'Initial test data could not be loaded. Reload the page.'
 });
-Object.assign(window.JasonText.cs,{sandboxFooter:'Testovací verze · Změny se ukládají pouze v tomto prohlížeči.'});
-Object.assign(window.JasonText.en,{sandboxFooter:'Test version · Changes are saved only in this browser.'});
+Object.assign(window.JasonText.cs,{sandboxFooter:'Testovací verze'});
+Object.assign(window.JasonText.en,{sandboxFooter:'Test version'});
 
 Object.assign(window.JasonText.cs,{exportSelectedScope:'vybrané položky',exportFilteredScope:'podle aktuálních filtrů'});
 Object.assign(window.JasonText.en,{exportSelectedScope:'selected items',exportFilteredScope:'current filters'});

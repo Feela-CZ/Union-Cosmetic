@@ -3,7 +3,7 @@
 'use strict';
 const M=JasonModel,S=JasonStorage,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const sandbox=JASON_CONFIG.sandbox===true;
-const projects=sandbox?window.JasonPrivateProjects:null;
+const projects=window.JasonPrivateProjects;
 const views=projects?['products','projects','keys','checks']:['products','keys','checks'];
 const viewFromHash=()=>{
  const hash=location.hash.slice(1);
@@ -635,78 +635,22 @@ function sandboxSeed(){
  M.validateProducts(seed.products);M.validateLogistics(seed.logistics);
  return isolate({...M.clone(state),products:M.clone(seed.products),logistics:M.clone(seed.logistics),photos:{},labelFiles:{},pendingLabels:[],updated:seed.snapshotAt,sandboxNameRevision:seed.nameRevision,sandboxInciRevision:seed.inciRevision,sandboxStatusRevision:seed.statusRevision});
 }
-async function upgradeSandboxNames(){
- const seed=window.JASON_SANDBOX_SEED;
- if(!sandbox||!seed?.nameRevision||state.sandboxNameRevision===seed.nameRevision)return;
- const repair=snapshot=>{
-  for(const p of snapshot.products)for(const c of seed.nameCorrections||[]){
-   if(String(p.id)===c.id&&p[c.field]===c.before)p[c.field]=c.after;
-  }
-  snapshot.sandboxNameRevision=seed.nameRevision;
- };
- repair(state);history.forEach(repair);
- if(history.length)await S.put('recovery',M.clone(history.at(-1)));
- await persist();
-}
-async function upgradeSandboxInci(){
- const seed=window.JASON_SANDBOX_SEED;
- if(!sandbox||!seed?.inciRevision||state.sandboxInciRevision===seed.inciRevision)return;
- // Keep ID types: a retired and a replacement product can share the same EAN.
- const identity=p=>JSON.stringify([p.id,p.volume?.number,p.volume?.unit]);
- const groups=new Map();
- for(const p of seed.products){const k=identity(p);groups.set(k,[...(groups.get(k)||[]),p]);}
- const fields=['inci','inciStatus','inciSource'];
- const repair=snapshot=>{
-  for(const p of snapshot.products){
-   const matches=groups.get(identity(p))||[],source=matches.length===1?matches[0]:matches.find(s=>s.name===p.name);
-   if(!source)continue;
-   // Replace only an exact previously supplied INCI; keep every local edit.
-   const correction=(seed.inciCorrections||[]).find(c=>identity(c)===identity(p)&&fields.every(k=>Object.hasOwn(p,k)===Object.hasOwn(c.before,k)&&JSON.stringify(p[k])===JSON.stringify(c.before[k])));
-   if(!correction&&fields.some(k=>Object.hasOwn(p,k)))continue;
-   for(const k of fields){if(Object.hasOwn(source,k))p[k]=M.clone(source[k]);else if(correction)delete p[k];}
-  }
-  snapshot.sandboxInciRevision=seed.inciRevision;
- };
- repair(state);history.forEach(repair);
- if(history.length)await S.put('recovery',M.clone(history.at(-1)));
- await persist();
-}
-async function upgradeSandboxStatuses(){
- const seed=window.JASON_SANDBOX_SEED;
- if(!sandbox||!seed?.statusRevision||state.sandboxStatusRevision===seed.statusRevision)return;
- const identity=p=>JSON.stringify([p.brand,p.id,p.volume?.number,p.volume?.unit]);
- const repair=snapshot=>{
-  for(const c of seed.statusCorrections?.products||[]){
-   const matches=snapshot.products.filter(p=>identity(p)===identity(c));if(matches.length!==1)continue;const p=matches[0];
-   // Missing/false and an empty date both represent the original active state.
-   if((p.discontinued===true)!==(c.before.discontinued===true)||String(p.discontinued_date||'')!==String(c.before.discontinued_date||''))continue;
-   for(const field of ['discontinued','discontinued_date']){if(Object.hasOwn(c.after,field))p[field]=M.clone(c.after[field]);else delete p[field];}
-  }
-  for(const c of seed.statusCorrections?.keys||[]){
-   const data=snapshot.logistics?.[c.brand]?.[c.key];if(!data||M.keyIsActive(data)!==M.keyIsActive(c.before))continue;
-   // A locally added/reassigned active product still needs its key in the sandbox.
-   if(c.after.active===false&&snapshot.products.some(p=>p.brand===c.brand&&M.key(p.key)===c.key&&p.discontinued!==true))continue;
-   data.active=c.after.active;
-  }
-  snapshot.sandboxStatusRevision=seed.statusRevision;
- };
- repair(state);history.forEach(repair);
- if(history.length)await S.put('recovery',M.clone(history.at(-1)));
- await persist();
-}
 async function resetSandbox(){
  if(!sandbox||busy||!await confirm('sandboxResetTitle',t('sandboxResetHint'),'sandboxReset'))return;
  try{const next=sandboxSeed();await S.put('recovery',null);state=next;history=[];future=[];selected.clear();await persist();formClose();render();toast(t('loaded'));}catch(e){error(e);}
 }
 async function boot(){
  let hasSavedState=false;
- try{const saved=await S.get('state');if(saved?.state){M.validateProducts(saved.state.products);M.validateLogistics(saved.state.logistics);state=isolate({...state,...saved.state});hasSavedState=true;lang=saved.lang==='en'?'en':'cs';const recovery=await S.get('recovery');if(recovery)history=[recovery];}}
- catch(e){storageError=true;toast(t('localError'),true);}
- if(sandbox&&!hasSavedState){try{state=sandboxSeed();await persist();}catch(e){error(e);}}
- if(sandbox&&hasSavedState){try{await upgradeSandboxNames();await upgradeSandboxInci();await upgradeSandboxStatuses();}catch(e){storageError=true;toast(t('localError'),true);}}
+ if(sandbox){
+  try{state=sandboxSeed();await persist();}catch(e){error(e);}
+ }else{
+  try{const saved=await S.get('state');if(saved?.state){M.validateProducts(saved.state.products);M.validateLogistics(saved.state.logistics);state=isolate({...state,...saved.state});hasSavedState=true;lang=saved.lang==='en'?'en':'cs';const recovery=await S.get('recovery');if(recovery)history=[recovery];}}
+  catch(e){storageError=true;toast(t('localError'),true);}
+ }
  if(JASON_CONFIG.sharedOnly){state.api=JASON_CONFIG.apiBase;state.imageBase=JASON_CONFIG.imageBase;}
  view=viewFromHash()||'products';render();
- if(sandbox){if(projects&&view!=='projects')void projects.load();return;}
+ if(projects&&view!=='projects')void projects.load();
+ if(sandbox)return;
  if(JASON_CONFIG.autoConnect||state.connected){if(!hasPending()){const refresh=refreshShared(true);if(JASON_CONFIG.autoConnect&&!hasSavedState)void previewShared();await refresh;}}
  else if(location.protocol!=='file:'&&['localhost','127.0.0.1'].includes(location.hostname)){
   try{const [pr,lr]=await Promise.all([fetch(JASON_CONFIG.legacyProducts),fetch(JASON_CONFIG.logisticsFile)]);if(pr.ok&&lr.ok){const p=await pr.json(),l=await lr.json();M.validateProducts(p);M.validateLogistics(l);state.products=p;state.logistics=l;await persist();render();}}catch{}

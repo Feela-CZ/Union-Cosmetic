@@ -1,7 +1,6 @@
-/* Private projects are loaded only by the sandbox entry point. */
+/* Private projects share the interface across both Jason entry points. */
 (function(root){
 'use strict';
-if(root.JASON_CONFIG?.sandbox!==true)return;
 
 const {ui,packaging,categories,currencies,dpakSizes,groups,note,requiredFields,completeField,numericKind,validNumber,attachmentSections,usesDirectPrint}=root.JasonProjectFields;
 const storage=root.JasonStorage;
@@ -13,7 +12,7 @@ const newCategory='__new_category';
 const $=selector=>document.querySelector(selector);
 const escape=value=>String(value??'').replace(/[&<>"']/g,char=>(
  {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
-let language='cs',records,customCategories=[],loading=false,loadError=false;
+let language='cs',records,customCategories=[],legacy,loading=false,loadError=false,importing=false;
 let notify=()=>{},sort={field:'updated',asc:false};
 const drafts=new Map();
 const filters={search:'',customer:'',category:'',packaging:''};
@@ -161,9 +160,12 @@ async function load(){
  loading=true;
  loadError=false;
  try{
-  const [items,taxonomy]=await Promise.all([storage.get(key),storage.get(categoryKey)]);
+  const [items,taxonomy,previousSandbox]=await Promise.all([
+   storage.get(key),storage.get(categoryKey),storage.legacyProjects().catch(()=>null)
+  ]);
   records=items??[];
   customCategories=taxonomy??[];
+  legacy=Array.isArray(previousSandbox?.records)&&Array.isArray(previousSandbox?.categories)?previousSandbox:null;
   if(!Array.isArray(records))throw Error('Invalid projects');
  }catch{
   records=undefined;
@@ -188,13 +190,37 @@ function button(label,attrs='',className=''){
 }
 
 function list(){
+ const savedIds=new Set(records.map(({id})=>id));
+ const canImport=legacy?.records.some(({id})=>!savedIds.has(id));
  $('#toolbar').innerHTML='<label class="search-box"><span aria-hidden="true">⌕</span><input id="project-search" type="search" placeholder="'+escape(t('search'))+'" aria-label="'+escape(t('search'))+'" value="'+escape(filters.search)+'"></label>'+
-  filterOptions('allCustomers',customerOptions(),'customer')+filterOptions('allCategories',categoryOptions(),'category')+filterOptions('allPacks',packaging,'packaging');
+  filterOptions('allCustomers',customerOptions(),'customer')+filterOptions('allCategories',categoryOptions(),'category')+filterOptions('allPacks',packaging,'packaging')+
+  (canImport?button('importLegacy','id="project-import"'+(importing?' disabled':'')):'')+
+  (root.JASON_CONFIG?.sandbox?'':'<p class="project-storage">'+escape(t('localStorageNote'))+'</p>');
+ if(canImport)$('#project-import').onclick=importProjects;
  $('#project-search').oninput=event=>{filters.search=event.target.value;listRows();};
  for(const id of ['customer','category','packaging']){
   $('#project-filter-'+id).onchange=event=>{filters[id]=event.target.value;listRows();};
  }
  listRows();
+}
+
+async function importProjects(){
+ if(!legacy||importing||!await projectConfirm('importLegacy',t('importLegacyHint'),'importLegacy'))return;
+ importing=true;
+ const control=$('#project-import');
+ if(control)control.disabled=true;
+ try{
+  const imported=await storage.importLegacyProjects(legacy);
+  records=imported.records;
+  customCategories=imported.categories;
+  updateCount();
+  notify(t('imported'));
+ }catch{
+  notify(t('importError'),true);
+ }finally{
+  importing=false;
+  if(active()&&!route())list();
+ }
 }
 function dateText(value,options={dateStyle:'medium'}){
  const date=new Date(value);

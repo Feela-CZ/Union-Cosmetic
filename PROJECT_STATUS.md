@@ -8,8 +8,8 @@ Tento soubor je společný předávací bod pro Codex, ChatGPT a lidi pracujíc�
 
 | Projekt | Umístění | Stav podle dostupné dokumentace |
 | --- | --- | --- |
-| Jason 2.0 | [Jason2/](Jason2/) | Ostrá aplikace pro správu produktů a logistiky; produktové informace, etikety, PPWR, fotografie, kontroly, zálohy a XLSX export. |
-| Jason 2.0 – pískoviště | [Jason2/test/](Jason2/test/) | Izolovaná testovací verze, lokální IndexedDB, bez přístupu k produkčnímu API. |
+| Jason 2.0 | [Jason2/](Jason2/) | Ostrá aplikace pro správu produktů a logistiky; produktové informace, etikety, PPWR, fotografie, kontroly, zálohy, XLSX export a privátní projekty. |
+| Jason 2.0 – pískoviště | [Jason2/test/](Jason2/test/) | Izolovaná testovací verze s dočasnou pamětí otevřené stránky. |
 | Původní Jason / JSON editor | [JSON edit GUI/](JSON%20edit%20GUI/) | Původní rozhraní ponechané na existující adrese; součást sdíleného datového modelu. |
 | Order Sheet | [OrderSheet/](OrderSheet/) | Samostatná aplikace pro objednávkové formuláře, sdílený produktový katalog. |
 | Katalog 2026 | [Katalog/](Katalog/) | Statický listovací katalog; desktopové dvojstrany, mobilní jednotlivé strany a produktové odkazy. |
@@ -33,13 +33,15 @@ Další rozpracované úkoly zatím nejsou zmapované. Výchozí přehled byl za
 | Projekt | Úkol / další krok | Stav | Větev, PR nebo commit | Aktualizace |
 | --- | --- | --- | --- | --- |
 | — | Doplnit skutečný stav při prvním předání z Codexu | K ověření | — | 2026-11-24 |
-| Jason 2.0 – pískoviště | Privátní projekty, šablony obalů a přílohy | Zjednodušené přílohy a řazení přehledu k vyzkoušení | [Pískoviště](https://feela-cz.github.io/Union-Cosmetic/Jason2/test/#projects) | 2026-11-27 |
+| Jason 2.0 | Privátní projekty | Ostrá verze ukládá projekty v prohlížeči. Pískoviště funguje v paměti stránky. | [Privátní projekty](https://feela-cz.github.io/Union-Cosmetic/Jason2/#projects) | 2026-11-27 |
 
 ## Otevřené problémy a rozhodnutí
 
 Zaznamenávat pouze doložené technické problémy a rozhodnutí s dopadem na další práci. Výchozí seznam nebyl ověřen jako úplný.
 
 ## Poslední předání
+
+- **2026-11-27 – Codex:** Privátní projekty jsou dostupné v ostré verzi. Dříve uložené testovací projekty lze převzít včetně historie a souborů. Nové testovací změny žijí jen v paměti stránky.
 
 - **2026-11-27 – Codex:** Privátní projekty mají řazení všech sloupců, návrat na přehled v liště a potvrzení uložení stejným oznámením jako výrobky. Přílohy se nabízejí podle způsobu značení. Dříve nahrané soubory zůstávají dostupné a poznámky přebírají původní specifikaci etikety a odkaz na vzorek.
 

@@ -15,15 +15,18 @@
 
 - `Jason2/test/` používá stejný kód rozhraní a vlastní konfiguraci, bez adresy API a bez automatického připojení.
 - Výchozí snapshot `test/seed.js` obsahuje **317 produktů a 78 logistických klíčů**. Přesné datum a zdrojový commit určují `snapshotAt` a `sourceCommit`; informační pruh i dialog obnovení používají toto datum.
-- Při každé změně katalogu, logistiky nebo funkcí udržujte aktuální ostrou i testovací verzi. Produkty a logistiku pro testovací snapshot převezměte z jednoho zdrojového commitu. Při změně výchozích dat aktualizujte také uložené testovací kopie cílenou migrací a ověřte čerstvé i existující pískoviště; samotná výměna `seed.js` stávající pracovní kopie neaktualizuje.
-- Stavová migrace `statusRevision` doplňuje konkrétní změny produktů a klíčů z `statusCorrections`, zachovává ostatní místní údaje i bod obnovy a běží pouze jednou. Vlastní změněné datum ukončení se nepřepisuje; klíč s místně přidaným aktivním produktem se neuspí. Pozdější testovací úpravy se při obnovení stránky nevracejí na výchozí hodnoty.
-- Změny jsou pouze v samostatné IndexedDB `union-cosmetic-jason2-sandbox`. Ostrá pracovní kopie zůstává v `union-cosmetic-jason2`. Každý prohlížeč má vlastní pískoviště a testovací úpravy zůstanou i po obnovení stránky.
+- Testovací změny jsou v paměti otevřené stránky. Obnovení nebo zavření stránky zahodí testovací projekty, přílohy, úpravy katalogu a historii vrácení. Nová stránka vždy načte výchozí snapshot.
 - Testovací konfigurace je neměnná. API adaptér odmítá všechny požadavky včetně GET a uploadu fotografií. Připojení, synchronizace a obnovení společných dat mají další ochranu přímo v aplikaci; nastavení ze záloh či staré pracovní kopie se nemohou přenést do připojení.
 - Stránka má CSP omezující síť na vlastní statické soubory; společný Worker není povolen. Původní fotografie se jen zobrazují ze statických souborů stejného webu, nové fotografie jsou pouze v místní testovací kopii.
 - Importy, obnova záloh, fotografie, vrácení změn a Excel export fungují místně. V dialogu **Testovací data** je návrat k výchozímu snapshotu po potvrzení, který vyčistí testovací úpravy, fotografie i historii vrácení.
-- Ostrá a testovací verze jsou viditelně označené. Pískoviště má i informační pruh vysvětlující místní ukládání.
+- Ostrá a testovací verze jsou viditelně označené. Pískoviště má informační pruh k dočasným změnám.
 
 ## Funkce
+
+### Privátní projekty
+
+- Ostrá verze ukládá projekty, přílohy a historii do IndexedDB v daném prohlížeči. Projektová data se neposílají do sdíleného katalogu.
+- Aktuální testovací verze drží projekty v paměti. Starší projekty uložené testovací verzí lze v ostrém přehledu zkopírovat tlačítkem **Převzít testovací projekty**. Kopírování zahrnuje přílohy, historii a používané vlastní kategorie. Při shodném ID má přednost existující ostrý projekt.
 
 ### PPWR
 
@@ -35,7 +38,7 @@ PPWR soubory se pouze stahují; náhled ani otevírání dokumentů aplikace nen
 - Tlačítko **Produkty (N)** zobrazí všechny uložené produkty používající tentýž soubor, včetně těch, které jej mají v archivu; seznam uvádí EAN, značku a Aktuální / Archiv. Obsah souboru se nekopíruje do jednotlivých produktů ani do seznamu.
 - Přílohy používají stávající `/api/upload-image` a jedinečné cesty `OrderSheet/img/labels/ppwr-UUID.ext`. Nejdříve se odešlou soubory, potom společný katalog. Při chybě zůstávají data v IndexedDB a lze je znovu odeslat. Produkty i soubory zahrnuje ruční záloha; denní archiv obsahuje metadata a soubory jsou dostupné ze zdrojového Git commitu.
 - **Smazat** odstraní aktuální nebo archivní záznam u daného produktu; ostatní produkty se stejným dokumentem se nezmění. Nepoužívané místní bajty se odstraní z pracovní kopie. Výslovné smazání zaznamená pouze cestu a čas do `ppwr.deleted`. Workflow `ppwr-cleanup.yml` po změně produktů odstraní takto označený fyzický soubor z aktuálního repozitáře, pokud jej již žádný produkt nepoužívá jako aktuální dokument, archiv ani etiketu. Nikdy nesbírá neoznačené osiřelé soubory, takže neodstraní právě probíhající upload. Při souběžném zápisu přepočítá seznam z čerstvého main; zachovává Git historii i historické zálohy. Publikovaná statická kopie může zůstat v cache do další aktualizace webu. Nejde o vymazání z historie Git.
-- Pískoviště ukládá vše pouze místně a nevolá API. Při nasazení nebyly změněny živé produkty, logistika ani přílohy a nebyly přidány demonstrační dokumenty. Pro demonstraci lze nahrát vlastní zkušební PDF v testovací verzi.
+- Pískoviště drží vše v paměti stránky. Při nasazení nebyly změněny živé produkty, logistika ani přílohy a nebyly přidány demonstrační dokumenty. Pro demonstraci lze nahrát vlastní zkušební PDF v testovací verzi.
 
 ### Produktové informace a etikety
 
@@ -43,7 +46,7 @@ PPWR soubory se pouze stahují; náhled ani otevírání dokumentů aplikace nen
 - `labelLanguages` je pole kódů jazyků. Karta produktu zobrazuje pouze velké kódy oddělené čárkami (např. `CS, EN, DE`) s možností kopírování. Tlačítko Upravit, u nového produktu Vybrat jazyky, otevře kompaktní dialog s názvy jazyků a hledáním dalších jazyků; kódy se přiřazují automaticky. Použít změní pouze rozepsaný produkt, Zrušit nic nemění. Do společných dat se jazyky odešlou až s uložením produktu. `labels.front` a `labels.back` obsahují cestu, původní název, MIME typ, velikost a čas nahrání. Ostatní metadata produktu i etiket zůstávají zachovaná. Chybějící přední etiketa má TBD, chybějící zadní N/A; oba sloty dovolují nahrát nebo přetáhnout soubor.
 - JPG, PNG, WebP a PDF do 15 MB se kontrolují podle obsahu a ukládají beze změny bajtů či rozlišení. Každé nahrání vytvoří jedinečný neměnný soubor v `OrderSheet/img/labels/` prostřednictvím stávajícího `/api/upload-image` (`path` + base64 `content`). Katalog nese jen odkaz, nikdy vložené obrázky. Výměna ani odebrání etikety nemažou původní soubor; zůstává dostupný pro historii a další produkty používající stejný soubor.
 - IndexedDB uchovává `labelFiles` (cesta → data URL) a `pendingLabels`. Nejprve se odešlou všechny soubory, teprve potom produkty s odkazy; při chybě zůstane změna v pracovní kopii a funguje Odeslat znovu i po obnovení stránky. Duplikace nebo změna EAN zachovává fungující odkazy bez přejmenování souborů. Návrat z editoru logistického klíče zachovává i rozepsané informace a právě vybrané etikety.
-- Úplná ruční záloha obsahuje i místní soubory etiket; obnova načte staré zálohy bez těchto polí a ověřuje nové cesty i datové typy. Denní Git záloha drží metadata v produktech a soubory etiket jsou obnovitelné ze složky `OrderSheet/img` v uloženém zdrojovém commitu. Testovací verze uchovává etikety pouze ve své místní databázi a její API ochrana blokuje všechny uploady.
+- Úplná ruční záloha obsahuje i místní soubory etiket; obnova načte staré zálohy bez těchto polí a ověřuje nové cesty i datové typy. Denní Git záloha drží metadata v produktech a soubory etiket jsou obnovitelné ze složky `OrderSheet/img` v uloženém zdrojovém commitu. Testovací verze uchovává etikety pouze v paměti stránky a její API ochrana blokuje všechny uploady.
 
 Hledání bez diakritiky, filtry, řazení, stránkování, detail produktu, kopírování, logistické klíče se sdílenými počty balení, původní příznaky i vlastní příznaky, hromadné změny, kontroly dat, fotografie, JSON zálohy, XLSX export, čeština/angličtina a vrácení změn. Neznámá pole JSON a původní typy nezměněných hodnot se zachovávají. Kontroly existující nesoulady automaticky neopravují. Duplicitní EAN se hlásí pouze mezi aktivními produkty (`discontinued !== true`); ukončená varianta může mít stejný EAN jako její náhrada. Odlišná cena není výjimkou z kontroly.
 

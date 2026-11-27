@@ -1,10 +1,18 @@
 (function(root){
 'use strict';
 let dbPromise;
+const sessionData=new Map();
+const projectsKey='private-projects-v1';
+const categoriesKey='private-project-categories-v1';
 function db(){return dbPromise||(dbPromise=new Promise((resolve,reject)=>{const req=indexedDB.open(window.JASON_CONFIG?.workspaceName||'jason-workspace-v2',1);req.onupgradeneeded=()=>req.result.createObjectStore('workspace');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);}));}
-async function get(name){const d=await db();return new Promise((resolve,reject)=>{const tx=d.transaction('workspace');const r=tx.objectStore('workspace').get(name);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
-async function put(name,value){const d=await db();return new Promise((resolve,reject)=>{const tx=d.transaction('workspace','readwrite');tx.objectStore('workspace').put(value,name);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);});}
+async function get(name){if(root.JASON_CONFIG?.sandbox)return structuredClone(sessionData.get(name));const d=await db();return new Promise((resolve,reject)=>{const tx=d.transaction('workspace');const r=tx.objectStore('workspace').get(name);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
+async function put(name,value){if(root.JASON_CONFIG?.sandbox){sessionData.set(name,structuredClone(value));return;}const d=await db();return new Promise((resolve,reject)=>{const tx=d.transaction('workspace','readwrite');tx.objectStore('workspace').put(value,name);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);});}
 async function update(name, change){
+ if(root.JASON_CONFIG?.sandbox){
+  const value=change(structuredClone(sessionData.get(name)));
+  sessionData.set(name,structuredClone(value));
+  return value;
+ }
  const d=await db();
  return new Promise((resolve,reject)=>{
   const tx=d.transaction('workspace','readwrite'), store=tx.objectStore('workspace');
@@ -15,6 +23,53 @@ async function update(name, change){
    catch(err){failure=err;tx.abort();}
   };
   tx.oncomplete=()=>resolve(value);
+  tx.onabort=()=>reject(failure||tx.error);
+ });
+}
+function readProjects(store,callback){
+ const records=store.get(projectsKey),categories=store.get(categoriesKey);
+ categories.onsuccess=()=>callback({records:records.result??[],categories:categories.result??[]});
+}
+
+async function legacyProjects(){
+ if(root.JASON_CONFIG?.sandbox)return null;
+ return new Promise((resolve,reject)=>{
+  const request=indexedDB.open('union-cosmetic-jason2-sandbox');
+  let missing=false;
+  request.onupgradeneeded=()=>{missing=true;request.transaction.abort();};
+  request.onerror=()=>{if(missing)resolve(null);else reject(request.error);};
+  request.onsuccess=()=>{
+   const legacy=request.result;
+   if(!legacy.objectStoreNames.contains('workspace')){legacy.close();resolve(null);return;}
+   const tx=legacy.transaction('workspace');
+   let data;
+   readProjects(tx.objectStore('workspace'),value=>{data=value;});
+   tx.oncomplete=()=>{legacy.close();resolve(data);};
+   tx.onabort=()=>{legacy.close();reject(tx.error);};
+  };
+ });
+}
+
+async function importLegacyProjects(source){
+ if(root.JASON_CONFIG?.sandbox)throw Error('SANDBOX_OFFLINE');
+ const database=await db();
+ return new Promise((resolve,reject)=>{
+  const tx=database.transaction('workspace','readwrite'),store=tx.objectStore('workspace');
+  let result,failure;
+  readProjects(store,current=>{
+   try{
+    const ids=new Set(current.records.map(record=>record.id));
+    const additions=source.records.filter(record=>!ids.has(record.id));
+    const categoryIds=new Set(current.categories.map(category=>category.id));
+    const usedCategories=new Set(additions.map(record=>record.values.category));
+    const categories=[...current.categories,...source.categories.filter(category=>
+     usedCategories.has(category.id)&&!categoryIds.has(category.id))];
+    const records=[...current.records,...additions];
+    if(additions.length){store.put(records,projectsKey);store.put(categories,categoriesKey);}
+    result={records,categories};
+   }catch(error){failure=error;tx.abort();}
+  });
+  tx.oncomplete=()=>resolve(result);
   tx.onabort=()=>reject(failure||tx.error);
  });
 }
@@ -68,5 +123,5 @@ async function ppwr(file){
  return {dataUrl:`data:${mimeType};base64,${content}`,name:file.name,mimeType,extension,size:file.size};
 }
 function ppwrPath(extension){return `OrderSheet/img/labels/ppwr-${crypto.randomUUID()}.${extension}`;}
-root.JasonStorage={get,put,update,request,jpeg,label,labelPath,ppwr,ppwrPath};
+root.JasonStorage={get,put,update,request,jpeg,label,labelPath,ppwr,ppwrPath,legacyProjects,importLegacyProjects};
 })(window);

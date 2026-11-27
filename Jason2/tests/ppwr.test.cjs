@@ -7,7 +7,7 @@ const clone=x=>JSON.parse(JSON.stringify(x)),sleep=ms=>new Promise(r=>setTimeout
 async function wait(fn){for(let i=0;i<250;i++){if(await fn())return;await sleep(10);}throw Error('Wait timed out');}
 async function setup({database=new IDBFactory(),shared=false,remote={products:clone(fixtures),logistics:{}},failUpload=false}={}){
  const dom=new JSDOM(fs.readFileSync(path.join(__dirname,'../index.html'),'utf8'),{url:'https://local.test/Jason2/',runScripts:'outside-only',pretendToBeVisual:true}),w=dom.window,errors=[],calls=[];
- w.indexedDB=database;w.TextEncoder=TextEncoder;w.TextDecoder=TextDecoder;w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};w.HTMLElement.prototype.scrollIntoView=()=>{};w.HTMLAnchorElement.prototype.click=function(){};w.URL.createObjectURL=()=>'blob:ppwr';w.URL.revokeObjectURL=()=>{};w.open=()=>{};w.console.error=e=>errors.push(e.message);
+ w.indexedDB=database;w.structuredClone=structuredClone;w.TextEncoder=TextEncoder;w.TextDecoder=TextDecoder;w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};w.HTMLElement.prototype.scrollIntoView=()=>{};w.HTMLAnchorElement.prototype.click=function(){};w.URL.createObjectURL=()=>'blob:ppwr';w.URL.revokeObjectURL=()=>{};w.open=()=>{};w.console.error=e=>errors.push(e.message);
  w.JASON_CONFIG={sandbox:!shared,apiBase:shared?'https://mock.test':'',imageBase:'../../OrderSheet/img',autoConnect:shared,sharedOnly:shared,workspaceName:'ppwr-test',legacyProducts:'',logisticsFile:''};
  w.JASON_SANDBOX_SEED={snapshotAt:'2026-10-22',products:clone(fixtures),logistics:{}};
  w.fetch=async(url,args={})=>{calls.push({url,method:args.method||'GET',body:args.body&&JSON.parse(args.body)});if(!shared)throw Error('Unexpected network');const name=new URL(url).pathname.split('/').pop();if(args.method==='PUT'){if(name==='upload-image'&&failUpload)return {ok:false,status:503,text:async()=>'test upload failed'};if(name!=='upload-image')remote[name]=JSON.parse(args.body);return {ok:true};}return {ok:true,json:async()=>clone(remote[name])};};
@@ -51,9 +51,15 @@ test('replacement archives, cancel rolls back, deletions keep other products and
  n.click('[data-edit="0"]');n.click('#tab-ppwr');n.click('.ppwr-current [data-ppwr-delete]');n.click('#confirm-yes');await wait(()=>!n.$('.ppwr-current [data-ppwr-delete]'));n.submit('#product-form');await wait(()=>!n.$('#editor').open);state=await n.saved();assert.equal(state.products[0].ppwr.current,null);assert.equal(Object.keys(state.labelFiles).length,1);assert.equal(state.products[0].custom.keep,true);assert.deepEqual(n.calls,[]);
 });
 
-test('PPWR survives reload and manual backup roundtrip, and queued files use one upload before product references',async t=>{
+test('PPWR can be restored from a manual backup after a new test session, and queued files use one upload before product references',async t=>{
  const n=await setup();n.click('[data-edit="0"]');n.click('#tab-ppwr');await n.select('#ppwr-input','Persist.pdf');n.submit('#product-form');await wait(()=>!n.$('#editor').open);
- const stored=await n.saved(),database=n.database;n.dom.window.close();const reload=await setup({database});t.after(()=>reload.dom.window.close());assert.deepEqual((await reload.saved()).products,stored.products);assert.deepEqual((await reload.saved()).labelFiles,stored.labelFiles);
+ const stored=await n.saved(),database=n.database;n.dom.window.close();const reload=await setup({database});t.after(()=>reload.dom.window.close());assert.equal((await reload.saved()).products[0].ppwr,undefined);assert.deepEqual((await reload.saved()).labelFiles,{});
+ const backup=JSON.stringify({format:'jason-backup',version:1,products:stored.products,logistics:stored.logistics,labelFiles:stored.labelFiles});
+ reload.click('#data-button');reload.click('#restore-backup');
+ Object.defineProperty(reload.$('#import-file'),'files',{value:[{size:backup.length,text:async()=>backup}]});
+ reload.$('#import-file').dispatchEvent(new reload.w.Event('change'));await wait(()=>reload.$('#confirm-dialog').open);
+ reload.click('#confirm-yes');await wait(()=>!reload.$('#editor').open);
+ assert.deepEqual((await reload.saved()).products,stored.products);assert.deepEqual((await reload.saved()).labelFiles,stored.labelFiles);
  const live=await setup({shared:true});t.after(()=>live.dom.window.close());live.click('[data-select="0"]');live.click('[data-select="1"]');live.click('#bulk-ppwr');await live.select('#ppwr-bulk-input','Shared.pdf');live.submit('#bulk-ppwr-form');await wait(async()=>!(await live.saved()).pendingLabels.length&&live.calls.some(c=>c.method==='PUT'&&c.url.endsWith('/products')));
  const writes=live.calls.filter(c=>c.method==='PUT');assert.deepEqual(writes.map(c=>c.url.split('/').pop()),['upload-image','products']);assert.equal(writes[0].body.path,live.remote.products[0].ppwr.current.path);assert.equal(live.remote.products[0].ppwr.current.path,live.remote.products[1].ppwr.current.path);assert.equal(live.remote.products[2].ppwr,undefined);
 });
