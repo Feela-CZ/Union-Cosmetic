@@ -38,8 +38,8 @@ const attachmentNotes={...note(),key:'attachmentNotes'};
 const approvalStates=new Set(['ok','approved']);
 const evidenceSlots=field=>[].concat(field.attachment??[]);
 const hasEvidence=(record,field)=>evidenceSlots(field).some(key=>record.attachments?.[key]?.length);
-const sectionLabel=key=>local(attachmentSections.find(section=>section.key===key).label);
-const fieldsThatRebuild=new Set(['packaging','cooperation','category','sample','pouchClosure','batchMode','barrier','compatibility']);
+const fieldsThatRebuild=new Set(['packaging','cooperation','category','sample','batchMode','barrier','compatibility']);
+const legacyDoypackAttachments=new Set(['front','back','specification']);
 
 function sections(tab,record){
  const {values,packagingValues}=record;
@@ -103,6 +103,13 @@ function normalizeProject(project){
   if(data.cartonLabelApproved==='ok')data.cartonLabelApproved='approved';
   if(data.artworkCustomer===undefined&&data.artworkApproved==='na')data.artworkCustomer='na';
   if(data.artworkUnion===undefined&&data.artworkApproved==='na')data.artworkUnion='na';
+ }
+ const doypack=record.packagingValues.doypack;
+ if(doypack?.primaryNotes){
+  if(doypack.primaryNotes!==doypack.markingNotes){
+   doypack.markingNotes=[doypack.markingNotes,doypack.primaryNotes].filter(Boolean).join('\n\n');
+  }
+  delete doypack.primaryNotes;
  }
  const slots=record.attachments??={};
  for(const key of ['other','trial']){
@@ -302,7 +309,10 @@ async function updateField(draft,target,isNA=false){
  const values=scope?(record.packagingValues[scope]??={}):record.values;
  const spec=sections(draft.tab,record).flatMap(section=>section.fields).find(spec=>spec.key===field);
  if(spec?.attachment&&approvalStates.has(target.value)&&!hasEvidence(record,spec)){
-  const labels=evidenceSlots(spec).map(sectionLabel);
+  const labels=evidenceSlots(spec).map(key=>{
+   const section=attachmentSections.find(section=>section.key===key);
+   return local(attachmentLabel(record.values.packaging,section));
+  });
   const names=new Intl.ListFormat(language==='cs'?'cs':'en',{type:'disjunction'}).format(labels);
   const message=language==='cs'?'Přidej přílohu ('+names+'), nebo potvrď bez ní.':'Add an attachment ('+names+'), or confirm without it.';
   if(!await projectConfirm('attachmentMissing',message,'approveAnyway')){
@@ -412,29 +422,34 @@ function createCategory(draft){
  input.focus();
 }
 
+function attachmentLabel(pack,section){
+ return pack==='doypack'&&section.key==='print'?['Tisková data','Artwork']:section.label;
+}
+
 function visibleAttachments(record){
  const {packaging:pack,cooperation}=record.values;
  const fields=sections('product',record).flatMap(section=>section.fields);
  return [
-  ...attachmentSections.filter(section=>{
-   const key=section.key;
+  ...attachmentSections.filter(({key})=>{
    if(record.attachments?.[key]?.length)return true;
+   if(pack==='doypack'&&legacyDoypackAttachments.has(key))return false;
    if(key==='batch')return fields.some(field=>field.upload===key);
    if(key==='bulkCoa'||key==='bulkProcessing')return cooperation==='cofilling';
    if(key==='carton'||key==='cartonSpecification')return !['ibc','drum','bag'].includes(pack);
    return true;
-  }),
+  }).map(section=>({...section,label:attachmentLabel(pack,section),
+   hideUpload:pack==='doypack'&&legacyDoypackAttachments.has(section.key)})),
   ...Object.entries(record.attachmentNames??{}).map(([key,name])=>({key,label:[name,name],multiple:true}))
  ];
 }
 
-function attachmentHTML({key,label,multiple},record){
+function attachmentHTML({key,label,multiple,hideUpload},record){
  const files=record.attachments?.[key]??[];
  const action=multiple?'dropFiles':files.length?'dropReplacement':'dropFile';
  const id='project-attachment-'+escape(key);
  return '<section class="project-attachment-section"><h3 id="'+id+'">'+escape(local(label))+'</h3>'+
-  button(action,'data-add-attachment="'+escape(key)+'" aria-describedby="'+id+'"','ppwr-drop project-attachment-drop')+
-  '<input data-attachment-input="'+escape(key)+'" type="file"'+(multiple?' multiple':'')+' hidden>'+
+  (hideUpload?'':button(action,'data-add-attachment="'+escape(key)+'" aria-describedby="'+id+'"','ppwr-drop project-attachment-drop')+
+  '<input data-attachment-input="'+escape(key)+'" type="file"'+(multiple?' multiple':'')+' hidden>')+
   (files.length?'<ul class="project-attachment-list">'+files.map(file=>'<li><span>'+escape(file.name)+'</span><div>'+
    button('getFile','data-download-attachment="'+escape(file.id)+'"')+
    button('removeFile','data-remove-attachment="'+escape(file.id)+'"')+'</div></li>').join('')+'</ul>':

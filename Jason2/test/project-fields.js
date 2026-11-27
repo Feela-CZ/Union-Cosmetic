@@ -64,9 +64,6 @@ const profiles={
    trial('compatibility','Zkouška hmoty u Elopaku','Formula test at Elopak'),
    trial('lineTrial','Zkouška plnění u nás včetně těsnosti','In-house filling test including leak check')])
  ],
- doypack:[group('primary','Doypack','Doypack',[packagingSpec,closure,pouchSize,field('laminate','Laminát','Laminate'),
-  choice('pouchClosure','Uzavírání','Closure method',[['spout','Výpusť','Spout'],['weld','Svar','Heat seal'],['zip','Zip','Zip']]),
-  field('spout','Specifikace výpusti','Spout specification','multiline')])],
  bottle:[group('primary','Lahev','Bottle',[packagingSpec,closure,bodyMaterial])],
  canister:[group('primary','Kanystr','Canister',[packagingSpec,closure,bodyMaterial])],
  tube:[group('primary','Tuba','Tube',[packagingSpec,closure,bodyMaterial,field('seal','Způsob svaření tuby','Tube sealing method')])],
@@ -110,27 +107,14 @@ function groups(tab,values,packagingValues){
    field('formula','ID hmoty','Formula ID'),{...field('sample','Vzorek','Sample','check',sample),attachment:'sample'},
    ...(values.sample==='approved'?[field('sampleReference','Odkaz na vzorek','Sample reference')]:[])
   ]),
-  ...(Object.hasOwn(profiles,values.packaging)?profiles[values.packaging]:[]).map(section=>({
-   ...section,packaging:true,
-   fields:section.fields.filter(field=>field.key!=='spout'||packagingValues?.pouchClosure==='spout')
-  })),
+  ...(Object.hasOwn(profiles,values.packaging)?profiles[values.packaging]:[]).map(section=>({...section,packaging:true})),
   ...((values.packaging&&values.cooperation==='cofilling')?[packGroup('cofilling','Co-filling','Co-filling',[
    field('bulkSupplier','Dodavatel hmoty','Bulk supplier'),field('bulkContainer','Příchozí obal hmoty','Incoming bulk container'),
    field('bulkBatch','Šarže dodané hmoty','Incoming bulk batch'),field('bulkProcessing','Postup přípravy hmoty','Bulk preparation procedure'),
    approval('bulkCoa','CoA dodané hmoty převzato','Bulk CoA received','bulkCoa'),
    approval('bulkProcessingApproved','Postup plnění potvrzen','Filling method confirmed','bulkProcessing')
   ])]:[]),
-  ...(values.packaging?[packGroup('marking','Značení','Marking',[
-   field('marking','Značení primárního obalu','Primary pack marking','check',marking),labelSpec,
-   field('productEan','EAN výrobku','Product EAN',bulkPacks.has(values.packaging)?'optional':'text'),
-   field('batchMode','Formát šarže','Batch format','check',batchFormats),
-   ...(packagingValues?.batchMode==='other'?[{...field('batchFormat','Vlastní formát šarže','Custom batch format'),upload:'batch'}]:[]),
-   field('productionDateFormat','Formát data výroby','Production date format','optional'),
-   field('expiryDateFormat','Formát data použitelnosti','Expiry date format','optional'),
-   {...approval('artworkCustomer','Tisková data – zákazník','Artwork – customer',printAttachments),row:true},
-   {...approval('artworkUnion','Tisková data – Union Cosmetic','Artwork – Union Cosmetic',printAttachments),row:true},
-   approval('packApproved','Primární obal schválen','Primary pack approved','specification')
-  ])]:[]),
+  ...(values.packaging?[markingSection(values.packaging,packagingValues)]:[]),
   ...((values.packaging&&!bulkPacks.has(values.packaging))?[packGroup('carton','Karton a paleta','Carton and pallet',[
    field('carton','Specifikace kartonu','Carton specification','optionalMultiline'),
    field('caseUnits','Kusů v kartonu','Units per carton','number'),
@@ -145,6 +129,23 @@ function groups(tab,values,packagingValues){
   ])
  ];
  return [];
+}
+
+function markingSection(pack,data){
+ const isDoypack=pack==='doypack';
+ const artwork=isDoypack?'print':printAttachments;
+ return packGroup('marking','Značení','Marking',[
+  ...(isDoypack?[]:[field('marking','Značení primárního obalu','Primary pack marking','check',marking),labelSpec]),
+  field('productEan','EAN výrobku','Product EAN',bulkPacks.has(pack)?'optional':'text'),
+  field('batchMode','Formát šarže','Batch format','check',batchFormats),
+  ...(data?.batchMode==='other'?[{...field('batchFormat','Vlastní formát šarže','Custom batch format'),upload:'batch'}]:[]),
+  ...(isDoypack?[]:[
+   field('productionDateFormat','Formát data výroby','Production date format','optional'),
+   field('expiryDateFormat','Formát data použitelnosti','Expiry date format','optional')]),
+  {...approval('artworkCustomer','Tisková data – zákazník','Artwork – customer',artwork),row:true},
+  {...approval('artworkUnion','Tisková data – Union Cosmetic','Artwork – Union Cosmetic',artwork),row:true},
+  ...(isDoypack?[]:[approval('packApproved','Primární obal schválen','Primary pack approved','specification')])
+ ]);
 }
 
 function requiredFields(values){

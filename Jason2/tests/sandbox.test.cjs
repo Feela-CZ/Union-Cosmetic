@@ -58,7 +58,7 @@ async function setup(real=false,cached=null){
   c.click('[data-project-field=sample][value=na]');
   choose('packaging','doypack');
   assert.equal(c.$('[data-project-field=blank]'),null);
-  c.input('[data-project-field=laminate]','TEST LAMINATE');
+  c.click('[data-project-field=batchMode][value=standard]');
   choose('packaging','dpak');
   assert.equal(c.$('[data-project-field=blank]').value,'D-PAK TEST');
   c.click('#project-tab-attachments');assert.ok(c.$('[data-add-attachment=front]'));
@@ -68,7 +68,7 @@ async function setup(real=false,cached=null){
   const [project]=await c.w.JasonStorage.get('private-projects-v1');
   assert.equal(project.values.packaging,'dpak');
   assert.equal(project.values.sample,'na');
-  assert.equal(project.packagingValues.doypack.laminate,'TEST LAMINATE');
+  assert.equal(project.packagingValues.doypack.batchMode,'standard');
   assert.deepEqual(await c.saved(),catalogue);
   c.dom.window.close();c=await setup();
   c.click('[data-view=projects]');await wait(()=>c.$('.project-list a'));
@@ -157,6 +157,60 @@ async function setup(real=false,cached=null){
   assert.equal((await project()).history.some(entry=>entry.id===price.id),false);
   assert.equal((await project()).historyFiles[design.id].name,'design.pdf');
   c.click('[data-view=products]');
+ });
+ await test('existing Doypack opens the simplified form with saved approvals, notes and files',async()=>{
+  const r=await setup(true);
+  const key='private-projects-v1';
+  const base={
+   id:'existing-doypack',revision:1,updatedAt:'2026-11-26T12:00:00Z',
+   values:{customer:'Test customer',productName:'Test Doypack',packaging:'doypack',fill:'750',fillUnit:'ml'},
+   packagingValues:{doypack:{
+    laminate:'Saved laminate',primaryNotes:'Saved packaging note',markingNotes:'Saved marking note',
+    labelSpec:'Saved label details',batchMode:'other',batchFormat:'YYDDD',artworkCustomer:'ok',packApproved:'ok',
+    productEan:'0123456789012'
+   }},
+   attachments:{front:[{id:'old-front',name:'old-front.pdf',blob:'Old file'}]},
+   history:[{id:'prior',at:'2026-11-26T12:00:00Z',label:['Cena','Price'],before:['1','1'],after:['2','2']}]
+  };
+  await r.w.JasonStorage.put(key,[base]);
+  await r.w.JasonPrivateProjects.load();
+  r.w.location.hash='#projects/'+base.id;
+  await wait(()=>r.$('#project-customer'));
+  r.click('#project-tab-product');
+  for(const key of ['packagingSpec','closure','laminate','marking','labelSpec','productionDateFormat','expiryDateFormat','packApproved']){
+   assert.equal(r.$('[data-project-field='+key+']'),null);
+  }
+  assert.equal(r.$('[data-project-field=markingNotes]').value,'Saved marking note\n\nSaved packaging note');
+  assert.equal(r.$('[data-project-field=productEan]').value,'0123456789012');
+  assert.equal(r.$('[data-project-field=batchFormat]').value,'YYDDD');
+  assert.ok(r.$('[data-project-field=artworkCustomer][value=ok]').checked);
+  r.click('[data-project-field=artworkUnion][value=ok]');
+  await wait(()=>r.$('.project-modal[open]'));
+  assert.match(r.$('.project-modal p').textContent,/Tisková data/);
+  r.click('[data-project-cancel]');
+  await wait(()=>r.$('[data-project-field=artworkUnion][value=""]').checked);
+  r.click('#project-tab-attachments');
+  for(const key of ['front','back','specification'])assert.equal(r.$('[data-add-attachment='+key+']'),null);
+  assert.equal(r.$('#project-attachment-print').textContent,'Tisková data');
+  assert.ok(r.$('[data-download-attachment=old-front]'));
+  const input=r.$('[data-attachment-input=print]');
+  Object.defineProperty(input,'files',{value:[{name:'artwork.pdf',blob:'New artwork'}]});
+  input.dispatchEvent(new r.w.Event('change',{bubbles:true}));
+  r.click('#project-tab-product');
+  r.click('[data-project-field=artworkUnion][value=ok]');
+  assert.equal(r.$('.project-modal[open]'),null);
+  r.click('#project-save');
+  await wait(()=>r.$('#project-save-feedback').textContent==='Uloženo');
+  const [stored]=await r.w.JasonStorage.get(key);
+  assert.equal(stored.id,base.id);
+  assert.deepEqual(stored.values,{...base.values,currency:''});
+  assert.equal(stored.packagingValues.doypack.laminate,base.packagingValues.doypack.laminate);
+  assert.equal(stored.packagingValues.doypack.artworkCustomer,'ok');
+  assert.equal(stored.packagingValues.doypack.artworkUnion,'ok');
+  assert.ok(stored.history.some(entry=>entry.id==='prior'));
+  assert.deepEqual(stored.attachments.front,base.attachments.front);
+  assert.equal(stored.attachments.print[0].name,'artwork.pdf');
+  r.dom.window.close();
  });
  await test('sandbox product, logistics and photo edits stay local',async()=>{
   c.click('[data-edit="0"]');c.input('#field-price','9.99');c.submit('#product-form');await wait(()=>!c.$('#editor').open);assert.equal((await c.saved()).products[0].price,9.99);
