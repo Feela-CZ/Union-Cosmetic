@@ -134,7 +134,7 @@ function render(){
  $('#redo').textContent=icons.redo;$('#redo').title=t('redo');$('#redo').setAttribute('aria-label',t('redo'));$('#redo').disabled=!future.length;
  $('#export').textContent=`↓ ${t('export')}`;$('#create').textContent=`+ ${t(view==='keys'?'addKey':'addProduct')}`;$('#create').hidden=view==='checks';$('#create').disabled=refreshing||(JASON_CONFIG.sharedOnly&&JASON_CONFIG.autoConnect&&!state.connected);
  for(const id of ['undo','redo','export'])$('#'+id).hidden=view==='projects';
- if(view==='projects'){projects.render(lang);renderStatus();return;}
+ if(view==='projects'){projects.render(lang,toast);renderStatus();return;}
  renderToolbar();renderContent();renderStatus();
 }
 function changeView(next,updateHash=true){view=next;page=1;selected.clear();filters={search:'',brand:'',type:'',key:'',status:'active',keyStatus:'active',new:'',flag:'',scope:''};if(updateHash)location.hash=next;render();}

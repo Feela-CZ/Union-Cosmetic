@@ -64,7 +64,7 @@ async function setup(real=false,cached=null){
   c.click('#project-tab-attachments');assert.ok(c.$('[data-add-attachment=front]'));
   assert.ok(c.$('[data-add-attachment=back]'));assert.ok(c.$('[data-add-attachment=carton]'));
   c.click('#project-save');
-  await wait(()=>c.$('#project-save-feedback')?.textContent==='Uloženo');
+  await wait(()=>!c.$('#project-save').disabled&&!c.$('#toast').hidden&&c.$('#toast').textContent==='Uloženo');
   const [project]=await c.w.JasonStorage.get('private-projects-v1');
   assert.equal(project.values.packaging,'dpak');
   assert.equal(project.values.sample,'na');
@@ -96,7 +96,7 @@ async function setup(real=false,cached=null){
    input.dispatchEvent(new c.w.Event('change',{bubbles:true}));
   };
   const project=async()=>(await c.w.JasonStorage.get('private-projects-v1'))[0];
-  const save=async()=>{c.click('#project-save');await wait(()=>c.$('#project-save-feedback').textContent==='Uloženo');};
+  const save=async()=>{c.click('#project-save');await wait(()=>!c.$('#project-save').disabled&&!c.$('#toast').hidden&&c.$('#toast').textContent==='Uloženo');};
   c.click('[data-view=projects]');await wait(()=>c.$('.project-list a'));c.w.location.hash=new URL(c.$('.project-list a').href).hash;
   await wait(()=>c.$('#project-customer'));
   assert.equal(c.$('#project-deliveryPlace'),null);
@@ -180,7 +180,7 @@ async function setup(real=false,cached=null){
   for(const key of ['packagingSpec','closure','laminate','marking','labelSpec','productionDateFormat','expiryDateFormat','packApproved']){
    assert.equal(r.$('[data-project-field='+key+']'),null);
   }
-  assert.equal(r.$('[data-project-field=markingNotes]').value,'Saved marking note\n\nSaved packaging note');
+  assert.equal(r.$('[data-project-field=markingNotes]').value,'Saved marking note\n\nSaved label details\n\nSaved packaging note');
   assert.equal(r.$('[data-project-field=productEan]').value,'0123456789012');
   assert.equal(r.$('[data-project-field=batchFormat]').value,'YYDDD');
   assert.ok(r.$('[data-project-field=artworkCustomer][value=ok]').checked);
@@ -200,7 +200,7 @@ async function setup(real=false,cached=null){
   r.click('[data-project-field=artworkUnion][value=ok]');
   assert.equal(r.$('.project-modal[open]'),null);
   r.click('#project-save');
-  await wait(()=>r.$('#project-save-feedback').textContent==='Uloženo');
+  await wait(()=>!r.$('#project-save').disabled&&!r.$('#toast').hidden&&r.$('#toast').textContent==='Uloženo');
   const [stored]=await r.w.JasonStorage.get(key);
   assert.equal(stored.id,base.id);
   assert.deepEqual(stored.values,{...base.values,currency:''});
@@ -210,6 +210,62 @@ async function setup(real=false,cached=null){
   assert.ok(stored.history.some(entry=>entry.id==='prior'));
   assert.deepEqual(stored.attachments.front,base.attachments.front);
   assert.equal(stored.attachments.print[0].name,'artwork.pdf');
+  r.dom.window.close();
+ });
+ await test('project overview sorts all columns and sample approval needs no attachment',async()=>{
+  const r=await setup(true),key='private-projects-v1';
+  const first={id:'alpha',revision:1,updatedAt:'2026-11-25T12:00:00Z',
+   values:{customer:'Alfa',productName:'Krém 2',market:'DE',packaging:'bottle',category:'cosmetics',
+    sampleReference:'https://example.test/sample',formulaNotes:'Existing note'},
+   packagingValues:{bottle:{labelSpec:'Old label note',marking:'label'}},
+   attachments:{sample:[{id:'old-sample',name:'sample.pdf',blob:'Previous sample file'}]}
+  };
+  const second={id:'zulu',revision:1,updatedAt:'2026-11-26T12:00:00Z',
+   values:{customer:'Žaneta',productName:'Krém 10',market:'PL',packaging:'dpak',category:'detergent',currency:'EUR'},packagingValues:{}};
+  await r.w.JasonStorage.put(key,[first,second]);
+  await r.w.JasonPrivateProjects.load();
+  r.click('[data-view=projects]');await wait(()=>r.$('[data-project-id]'));
+  const ids=()=>[...r.w.document.querySelectorAll('[data-project-id]')].map(row=>row.dataset.projectId);
+  assert.deepEqual(ids(),['zulu','alpha']);
+  for(const [field,ascending] of [
+   ['customer',['alpha','zulu']],['product',['alpha','zulu']],['category',['zulu','alpha']],
+   ['packaging',['zulu','alpha']],['market',['alpha','zulu']],['complete',['alpha','zulu']],['updated',['alpha','zulu']]
+  ]){
+   const target='[data-project-sort='+field+']';
+   r.click(target);
+   assert.deepEqual(ids(),ascending,field);
+   assert.equal(r.$(target).parentElement.getAttribute('aria-sort'),'ascending');
+   r.click(target);
+   assert.deepEqual(ids(),ascending.slice().reverse(),field);
+   assert.equal(r.$(target).parentElement.getAttribute('aria-sort'),'descending');
+  }
+  r.w.location.hash='#projects/alpha';await wait(()=>r.$('#project-customer'));
+  assert.deepEqual([...r.w.document.querySelectorAll('.project-actions button')].map(b=>b.id),
+   ['project-print','project-download','project-back','project-save']);
+  r.click('#project-tab-product');
+  assert.equal(r.$('[data-project-field=sampleReference]'),null);
+  assert.equal(r.$('[data-project-field=labelSpec]'),null);
+  assert.equal(r.$('[data-project-field=formulaNotes]').value,'Existing note\n\nhttps://example.test/sample');
+  assert.equal(r.$('[data-project-field=markingNotes]').value,'Old label note');
+  r.click('[data-project-field=sample][value=approved]');
+  r.click('[data-project-field=packApproved][value=ok]');
+  r.click('[data-project-field=cartonApproved][value=ok]');
+  assert.equal(r.$('.project-modal[open]'),null);
+  r.click('#project-tab-attachments');
+  for(const section of ['sample','specification','cartonSpecification','print']){
+   assert.equal(r.$('[data-add-attachment='+section+']'),null);
+  }
+  assert.ok(r.$('[data-download-attachment=old-sample]'));
+  assert.ok(r.$('[data-add-attachment=front]'));
+  assert.ok(r.$('[data-add-attachment=back]'));
+  r.click('#project-save');
+  await wait(()=>!r.$('#project-save').disabled&&!r.$('#toast').hidden);
+  assert.equal(r.$('#toast').textContent,'Uloženo');
+  const [saved]=await r.w.JasonStorage.get(key);
+  assert.equal(saved.values.sample,'approved');
+  assert.equal(saved.attachments.sample[0].id,'old-sample');
+  r.click('#project-back');await wait(()=>r.$('[data-project-id=alpha]'));
+  assert.equal(r.w.location.hash,'#projects');
   r.dom.window.close();
  });
  await test('sandbox product, logistics and photo edits stay local',async()=>{

@@ -4,12 +4,13 @@
 .project-list tbody tr { cursor:pointer }
 .project-list .product-link { font-weight:650; color:var(--accent); text-decoration:none }
 .project-list .product-link:hover { text-decoration:underline }
+.project-list th[aria-sort] { color:var(--accent) }
 .table-footer:empty { display:none }
 .project-empty { padding:28px 22px; color:var(--muted) }
 
-.toolbar:has(.project-actions) { justify-content:space-between }
-.project-back { font-weight:650; color:var(--accent); text-decoration:none }
-.project-back:hover { text-decoration:underline }
+.toolbar:has(.project-actions) { justify-content:flex-end }
+a.project-back { font-weight:650; color:var(--accent); text-decoration:none }
+a.project-back:hover { text-decoration:underline }
 .project-actions { display:flex; gap:8px; flex-wrap:wrap }
 .project-tabs { display:flex; gap:8px; overflow-x:auto; padding:10px 18px 0; border-bottom:1px solid var(--line) }
 .project-tabs button { border:0; border-radius:6px 6px 0 0; padding:10px 12px; white-space:nowrap; border-bottom:3px solid transparent }
@@ -78,7 +79,10 @@
 }
 @media (max-width:520px) {
  .project-list table { min-width:0; display:block }
- .project-list thead { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%) }
+ .project-list thead { display:block }
+ .project-list thead tr { display:flex; flex-wrap:wrap; gap:0 12px; padding:4px 12px }
+ .project-list thead th { padding:0; border:0 }
+ .project-list .sort-button { min-height:28px }
  .project-list tbody { display:block }
  .project-list tbody tr { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 12px; padding:12px; border-bottom:1px solid var(--line) }
  .project-list tbody td { display:block; padding:0; border:0; min-width:0; white-space:normal; overflow-wrap:anywhere }

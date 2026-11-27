@@ -20,7 +20,7 @@ const marking=[
  ['','TBD','TBD'],['label','Etiketa','Label'],['print','Přímý potisk','Direct print'],['na','N/A','N/A']
 ];
 const sample=[['','TBD','TBD'],['approved','Schválen','Approved'],['na','N/A','N/A']];
-const printAttachments=['front','back','print'];
+const labelAttachments=['front','back'];
 const batchFormats=[['','TBD','TBD'],['standard','Standard','Standard'],['other','Jiný','Custom'],['na','N/A','N/A']];
 const currencies=['EUR','USD','CZK'].map(code=>[code,code,code]);
 const dpakSizes=['500','750','1000','1500','1750','2000'];
@@ -51,7 +51,6 @@ const project=[
 ];
 const closure=field('closure','Specifikace uzávěru','Closure specification','multiline');
 const packagingSpec=field('packagingSpec','Specifikace obalu','Packaging specification','multiline');
-const labelSpec=field('labelSpec','Specifikace etikety','Label specification','multiline');
 const bodyMaterial=field('bodyMaterial','Materiál obalu','Packaging material');
 const pouchSize=field('pouchSize','Rozměr sáčku','Pouch dimensions');
 const profiles={
@@ -104,8 +103,7 @@ function groups(tab,values,packagingValues){
  if(tab==='product')return [
   group('product','Výrobek','Product',product(values.packaging)),
   group('formula','Hmota','Formula',[
-   field('formula','ID hmoty','Formula ID'),{...field('sample','Vzorek','Sample','check',sample),attachment:'sample'},
-   ...(values.sample==='approved'?[field('sampleReference','Odkaz na vzorek','Sample reference')]:[])
+   field('formula','ID hmoty','Formula ID'),field('sample','Vzorek','Sample','check',sample)
   ]),
   ...(Object.hasOwn(profiles,values.packaging)?profiles[values.packaging]:[]).map(section=>({...section,packaging:true})),
   ...((values.packaging&&values.cooperation==='cofilling')?[packGroup('cofilling','Co-filling','Co-filling',[
@@ -121,7 +119,7 @@ function groups(tab,values,packagingValues){
    field('cartonEan','EAN kartonu','Carton EAN','optional'),
    field('palletUnits','Kusů na paletě','Units per pallet','number'),
    field('palletLabel','Paletový štítek','Pallet label','optional'),
-   approval('cartonApproved','Karton schválen','Carton approved','cartonSpecification'),
+   approval('cartonApproved','Karton schválen','Carton approved'),
    {...field('cartonLabelApproved','Kartonový štítek','Carton label','check',sample),attachment:'carton'}
   ])]:[]),
   group('responsibility','Odpovědnost','Responsibility',[
@@ -131,11 +129,13 @@ function groups(tab,values,packagingValues){
  return [];
 }
 
+const usesDirectPrint=(pack,data)=>pack==='doypack'||data?.marking==='print';
+
 function markingSection(pack,data){
  const isDoypack=pack==='doypack';
- const artwork=isDoypack?'print':printAttachments;
+ const artwork=usesDirectPrint(pack,data)?'print':labelAttachments;
  return packGroup('marking','Značení','Marking',[
-  ...(isDoypack?[]:[field('marking','Značení primárního obalu','Primary pack marking','check',marking),labelSpec]),
+  ...(isDoypack?[]:[field('marking','Značení primárního obalu','Primary pack marking','check',marking)]),
   field('productEan','EAN výrobku','Product EAN',bulkPacks.has(pack)?'optional':'text'),
   field('batchMode','Formát šarže','Batch format','check',batchFormats),
   ...(data?.batchMode==='other'?[{...field('batchFormat','Vlastní formát šarže','Custom batch format'),upload:'batch'}]:[]),
@@ -144,7 +144,7 @@ function markingSection(pack,data){
    field('expiryDateFormat','Formát data použitelnosti','Expiry date format','optional')]),
   {...approval('artworkCustomer','Tisková data – zákazník','Artwork – customer',artwork),row:true},
   {...approval('artworkUnion','Tisková data – Union Cosmetic','Artwork – Union Cosmetic',artwork),row:true},
-  ...(isDoypack?[]:[approval('packApproved','Primární obal schválen','Primary pack approved','specification')])
+  ...(isDoypack?[]:[approval('packApproved','Primární obal schválen','Primary pack approved')])
  ]);
 }
 
@@ -182,11 +182,11 @@ function validNumber(kind,value){
 const attachmentSections=[
  {key:'front',label:['Přední etiketa','Front label']},
  {key:'back',label:['Zadní etiketa','Back label']},
- {key:'print',label:['Další tisková data','Other artwork'],multiple:true},
- {key:'specification',label:['Specifikace obalu','Packaging specification'],multiple:true},
+ {key:'print',label:['Tisková data','Artwork'],multiple:true},
+ {key:'specification',label:['Specifikace obalu','Packaging specification'],legacy:true},
  {key:'carton',label:['Kartonový štítek','Carton label']},
- {key:'cartonSpecification',label:['Specifikace kartonu','Carton specification'],multiple:true},
- {key:'sample',label:['Vzorek','Sample'],multiple:true},
+ {key:'cartonSpecification',label:['Specifikace kartonu','Carton specification'],legacy:true},
+ {key:'sample',label:['Vzorek','Sample'],legacy:true},
  {key:'batch',label:['Ukázka formátu šarže','Batch format example']},
  {key:'bulkCoa',label:['CoA dodané hmoty','Bulk CoA']},
  {key:'bulkProcessing',label:['Postup plnění','Filling method'],multiple:true}
@@ -195,7 +195,7 @@ const attachmentSections=[
 const ui={
  projects:['Privátní projekty','Private projects'],add:['Nový projekt','New project'],
  customer:['Zákazník','Customer'],product:['Výrobek','Product'],attachments:['Přílohy','Attachments'],
- back:['Všechny projekty','All projects'],save:['Uložit','Save'],saving:['Ukládám…','Saving…'],
+ back:['Zpět na přehled','Back to overview'],save:['Uložit','Save'],saving:['Ukládám…','Saving…'],
  saved:['Uloženo','Saved'],unsaved:['Neuložené změny','Unsaved changes'],
  history:['Historie','History'],notes:['Poznámka','Note'],category:['Kategorie','Category'],packaging:['Obal','Packaging'],
  market:['Trh','Market'],complete:['Vyplnění','Completeness'],updated:['Upraveno','Updated'],
@@ -240,5 +240,5 @@ const ui={
  getFile:['Stáhnout','Download'],removeFile:['Odebrat','Remove'],
  print:['Tisk','Print'],download:['Stáhnout přehled','Download summary'],next:['Další','Next']
 };
-root.JasonProjectFields={ui,packaging,categories,currencies,dpakSizes,groups,note,requiredFields,completeField,numericKind,validNumber,attachmentSections};
+root.JasonProjectFields={ui,packaging,categories,currencies,dpakSizes,groups,note,requiredFields,completeField,numericKind,validNumber,attachmentSections,usesDirectPrint};
 })(window);

@@ -3,7 +3,7 @@
 'use strict';
 if(root.JASON_CONFIG?.sandbox!==true)return;
 
-const {ui,packaging,categories,currencies,dpakSizes,groups,note,requiredFields,completeField,numericKind,validNumber,attachmentSections}=root.JasonProjectFields;
+const {ui,packaging,categories,currencies,dpakSizes,groups,note,requiredFields,completeField,numericKind,validNumber,attachmentSections,usesDirectPrint}=root.JasonProjectFields;
 const storage=root.JasonStorage;
 const key='private-projects-v1';
 const categoryKey='private-project-categories-v1';
@@ -14,6 +14,7 @@ const $=selector=>document.querySelector(selector);
 const escape=value=>String(value??'').replace(/[&<>"']/g,char=>(
  {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 let language='cs',records,customCategories=[],loading=false,loadError=false;
+let notify=()=>{},sort={field:'updated',asc:false};
 const drafts=new Map();
 const filters={search:'',customer:'',category:'',packaging:''};
 
@@ -38,8 +39,7 @@ const attachmentNotes={...note(),key:'attachmentNotes'};
 const approvalStates=new Set(['ok','approved']);
 const evidenceSlots=field=>[].concat(field.attachment??[]);
 const hasEvidence=(record,field)=>evidenceSlots(field).some(key=>record.attachments?.[key]?.length);
-const fieldsThatRebuild=new Set(['packaging','cooperation','category','sample','batchMode','barrier','compatibility']);
-const legacyDoypackAttachments=new Set(['front','back','specification']);
+const fieldsThatRebuild=new Set(['packaging','cooperation','category','marking','batchMode','barrier','compatibility']);
 
 function sections(tab,record){
  const {values,packagingValues}=record;
@@ -63,7 +63,6 @@ function getValue(record,field,scope){
  }
  if(field.key==='productEan'&&field.kind!=='optional'&&typeof value==='object')return value?.na?'':value?.text;
  if(optionalField(field)&&typeof value==='string')return {text:value,na:false};
- if(field.key==='labelSpec'&&value===undefined)return values?.adhesive;
  return value;
 }
 
@@ -81,9 +80,17 @@ function changePackaging(record,pack){
  v.packaging=pack;
 }
 
+function moveToNotes(values,field,notes){
+ const text=values?.[field];
+ if(!text)return;
+ if(values[notes]!==text)values[notes]=[values[notes],text].filter(Boolean).join('\n\n');
+ delete values[field];
+}
+
 function normalizeProject(project){
  const record=structuredClone(project),v=record.values;
  v.currency=String(v.currency??'').trim().toUpperCase();
+ moveToNotes(v,'sampleReference','formulaNotes');
  if(v.packaging==='dpak'){
   if(v.fill&&!dpakSizes.includes(String(v.fill))){
    record.legacyDpakFill={fill:v.fill,fillUnit:v.fillUnit};
@@ -103,14 +110,9 @@ function normalizeProject(project){
   if(data.cartonLabelApproved==='ok')data.cartonLabelApproved='approved';
   if(data.artworkCustomer===undefined&&data.artworkApproved==='na')data.artworkCustomer='na';
   if(data.artworkUnion===undefined&&data.artworkApproved==='na')data.artworkUnion='na';
+  moveToNotes(data,'labelSpec','markingNotes');
  }
- const doypack=record.packagingValues.doypack;
- if(doypack?.primaryNotes){
-  if(doypack.primaryNotes!==doypack.markingNotes){
-   doypack.markingNotes=[doypack.markingNotes,doypack.primaryNotes].filter(Boolean).join('\n\n');
-  }
-  delete doypack.primaryNotes;
- }
+ moveToNotes(record.packagingValues.doypack,'primaryNotes','markingNotes');
  const slots=record.attachments??={};
  for(const key of ['other','trial']){
   for(const file of slots[key]??[]){
@@ -201,29 +203,57 @@ function dateText(value,options={dateStyle:'medium'}){
 const searchable=value=>String(value??'').normalize('NFD').replace(/\p{Diacritic}/gu,'').toLowerCase();
 function listRows(){
  const query=searchable(filters.search).trim();
- const filtered=records.filter(({values:v})=>
-  (!filters.customer||customerName(v.customer)===filters.customer)&&
-  ['category','packaging'].every(id=>!filters[id]||v[id]===filters[id])&&
-  [v.customer,v.productName,v.market,optionText(categoryOptions(),v.category),optionText(packaging,v.packaging)]
-   .some(item=>searchable(item).includes(query)))
-  .sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));
+ const headings=['customer','product','category','packaging','market','complete','updated'];
+ const categories=categoryOptions();
+ const filtered=records.map(record=>{
+  const {values:v}=record;
+  return {record,cells:{customer:customerName(v.customer),product:v.productName??'',
+   category:optionText(categories,v.category),packaging:optionText(packaging,v.packaging),market:v.market??''}};
+ }).filter(({record,cells})=>
+  (!filters.customer||cells.customer===filters.customer)&&
+  ['category','packaging'].every(id=>!filters[id]||record.values[id]===filters[id])&&
+  Object.values(cells).some(item=>searchable(item).includes(query)));
  if(!filtered.length){
   $('#content').innerHTML='<p class="project-empty">'+escape(t(records.length?'noMatches':'empty'))+'</p>';
   return;
  }
- const headings=['customer','product','category','packaging','market','complete','updated'];
+ for(const {record,cells} of filtered){
+  cells.complete=completeness(record);
+  cells.updated=Date.parse(record.updatedAt);
+ }
+ const collator=new Intl.Collator(language,{numeric:true});
+ const missing=value=>value===''||Number.isNaN(value);
+ filtered.sort((a,b)=>{
+  const av=a.cells[sort.field],bv=b.cells[sort.field];
+  if(missing(av)!==missing(bv))return missing(av)?1:-1;
+  if(missing(av))return 0;
+  const order=typeof av==='number'?av-bv:collator.compare(av,bv);
+  return sort.asc?order:-order;
+ });
  $('#content').innerHTML='<div class="table-wrap project-list"><table><thead><tr>'+
-  headings.map(label=>'<th scope="col">'+escape(t(label))+'</th>').join('')+
-  '</tr></thead><tbody>'+filtered.map(record=>{
-   const v=record.values,href='#projects/'+encodeURIComponent(record.id);
-   const link='<a class="product-link" href="'+href+'">'+escape(customerName(v.customer)||t('unnamedProject'))+'</a>';
-   const cells=[v.productName,optionText(categoryOptions(),v.category),optionText(packaging,v.packaging),v.market];
-   const percent=completeness(record);
+  headings.map(field=>{
+   const active=sort.field===field;
+   return '<th scope="col"'+(active?' aria-sort="'+(sort.asc?'ascending':'descending')+'"':'')+'>'+
+    '<button type="button" class="sort-button" data-project-sort="'+field+'">'+escape(t(field))+
+    (active?'<span aria-hidden="true"> '+(sort.asc?'↑':'↓')+'</span>':'')+'</button></th>';
+  }).join('')+
+  '</tr></thead><tbody>'+filtered.map(({record,cells})=>{
+   const href='#projects/'+encodeURIComponent(record.id);
+   const link='<a class="product-link" href="'+href+'">'+escape(cells.customer||t('unnamedProject'))+'</a>';
+   const percent=cells.complete;
    return '<tr data-project-id="'+escape(record.id)+'"><td>'+link+'</td>'+
-    cells.map((value,index)=>'<td data-label="'+escape(t(headings[index+1]))+'">'+escape(display(value))+'</td>').join('')+
+    headings.slice(1,5).map(field=>'<td data-label="'+escape(t(field))+'">'+escape(display(cells[field]))+'</td>').join('')+
     '<td data-label="'+escape(t('complete'))+'"><span class="completeness"><span aria-hidden="true"><i style="width:'+percent+'%"></i></span>'+percent+'%</span></td>'+
     '<td data-label="'+escape(t('updated'))+'">'+escape(dateText(record.updatedAt))+'</td></tr>';
   }).join('')+'</tbody></table></div>';
+ for(const control of document.querySelectorAll('[data-project-sort]')){
+  control.onclick=()=>{
+   const field=control.dataset.projectSort;
+   sort={field,asc:sort.field===field?!sort.asc:true};
+   listRows();
+   $('[data-project-sort="'+field+'"]').focus({preventScroll:true});
+  };
+ }
  $('#content').querySelectorAll('[data-project-id]').forEach(row=>{
   row.onclick=event=>{if(!event.target.closest('a')&&!getSelection()?.toString())open(row.dataset.projectId);};
  });
@@ -288,7 +318,7 @@ function status(draft){
  if(!statusElement)return;
  statusElement.textContent=draft.busy?t('saving'):draft.message?t(draft.message):draft.dirty?t('unsaved'):'';
  statusElement.parentElement.hidden=!statusElement.textContent;
- statusElement.classList.toggle('project-error',Boolean(draft.message&&draft.message!=='saved'));
+ statusElement.classList.toggle('project-error',Boolean(draft.message));
  const saveButton=$('#project-save');
  if(saveButton){
   saveButton.disabled=draft.busy;
@@ -309,10 +339,7 @@ async function updateField(draft,target,isNA=false){
  const values=scope?(record.packagingValues[scope]??={}):record.values;
  const spec=sections(draft.tab,record).flatMap(section=>section.fields).find(spec=>spec.key===field);
  if(spec?.attachment&&approvalStates.has(target.value)&&!hasEvidence(record,spec)){
-  const labels=evidenceSlots(spec).map(key=>{
-   const section=attachmentSections.find(section=>section.key===key);
-   return local(attachmentLabel(record.values.packaging,section));
-  });
+  const labels=evidenceSlots(spec).map(key=>local(attachmentSections.find(section=>section.key===key).label));
   const names=new Intl.ListFormat(language==='cs'?'cs':'en',{type:'disjunction'}).format(labels);
   const message=language==='cs'?'Přidej přílohu ('+names+'), nebo potvrď bez ní.':'Add an attachment ('+names+'), or confirm without it.';
   if(!await projectConfirm('attachmentMissing',message,'approveAnyway')){
@@ -333,6 +360,10 @@ async function updateField(draft,target,isNA=false){
   values[field]=target.checked?'ok':'';
   if(field==='compatibility'&&!target.checked)values.lineTrial='';
  }else{
+  if(field==='marking'&&(values.marking==='print')!==(target.value==='print')){
+   values.artworkCustomer='';
+   values.artworkUnion='';
+  }
   if(field==='barrier'&&values.barrier&&values.barrier!==target.value){
    values.compatibility='';
    values.lineTrial='';
@@ -422,23 +453,20 @@ function createCategory(draft){
  input.focus();
 }
 
-function attachmentLabel(pack,section){
- return pack==='doypack'&&section.key==='print'?['Tisková data','Artwork']:section.label;
-}
-
 function visibleAttachments(record){
  const {packaging:pack,cooperation}=record.values;
  const fields=sections('product',record).flatMap(section=>section.fields);
+ const directPrint=usesDirectPrint(pack,record.packagingValues[pack]);
  return [
-  ...attachmentSections.filter(({key})=>{
+  ...attachmentSections.map(section=>({...section,hideUpload:section.legacy||
+   (section.key==='print'&&!directPrint)||(directPrint&&['front','back'].includes(section.key))})).filter(({key,hideUpload})=>{
    if(record.attachments?.[key]?.length)return true;
-   if(pack==='doypack'&&legacyDoypackAttachments.has(key))return false;
+   if(hideUpload)return false;
    if(key==='batch')return fields.some(field=>field.upload===key);
    if(key==='bulkCoa'||key==='bulkProcessing')return cooperation==='cofilling';
-   if(key==='carton'||key==='cartonSpecification')return !['ibc','drum','bag'].includes(pack);
+   if(key==='carton')return !['ibc','drum','bag'].includes(pack);
    return true;
-  }).map(section=>({...section,label:attachmentLabel(pack,section),
-   hideUpload:pack==='doypack'&&legacyDoypackAttachments.has(section.key)})),
+  }),
   ...Object.entries(record.attachmentNames??{}).map(([key,name])=>({key,label:[name,name],multiple:true}))
  ];
 }
@@ -682,8 +710,8 @@ function bindHistory(panel,draft){
 
 function detail(id,draft){
  const record=draft.record,tab=draft.tab,next=formTabs[formTabs.indexOf(tab)+1];
- $('#toolbar').innerHTML='<a class="project-back" href="#projects">‹ '+escape(t('back'))+'</a>'+
-  '<div class="project-actions">'+button('print','id="project-print"')+button('download','id="project-download"')+
+ $('#toolbar').innerHTML='<div class="project-actions">'+button('print','id="project-print"')+button('download','id="project-download"')+
+  button('back','id="project-back"','project-back')+
   button('save','id="project-save"','primary')+'</div>';
  $('#page-title').textContent=projectTitle(record);
  $('#crumb').textContent=t('projects');
@@ -730,6 +758,7 @@ function detail(id,draft){
   render(language);
  };
  $('#project-save').onclick=save;
+ $('#project-back').onclick=()=>open();
  $('#project-print').onclick=()=>print(record);
  $('#project-download').onclick=()=>download(record);
  status(draft);
@@ -781,7 +810,7 @@ async function save(){
   draft.record=changed?{...record,revision:next.revision,updatedAt:next.updatedAt,
    history:[...entries,...(record.history??[])],historyFiles:next.historyFiles}:structuredClone(next);
   draft.dirty=changed;
-  draft.message=changed?'':'saved';
+  draft.message='';
   drafts.delete(id);
   drafts.set(next.id,draft);
   if(active()&&route()===id){
@@ -790,7 +819,9 @@ async function save(){
    // Keep focus and text entry intact if a change arrived during the save.
    if(!changed){detail(next.id,draft);if(focused)document.getElementById(focused)?.focus({preventScroll:true});}
   }
+  if(active()&&!route())list();
   updateCount();
+  if(!changed)notify(t('saved'));
  }catch(error){
   draft.message=error.message==='CONFLICT'?'conflict':'saveError';
  }finally{
@@ -868,8 +899,9 @@ function updateCount(){
  const badge=$('[data-view="projects"] .nav-count');
  if(badge)badge.textContent=count();
 }
-function render(lang){
+function render(lang,showToast=notify){
  language=lang;
+ notify=showToast;
  const id=route();
  const create=$('#create'),toolbar=$('#toolbar');
  create.textContent='+ '+t('add');

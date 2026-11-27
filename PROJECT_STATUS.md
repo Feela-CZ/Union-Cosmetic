@@ -33,13 +33,15 @@ Další rozpracované úkoly zatím nejsou zmapované. Výchozí přehled byl za
 | Projekt | Úkol / další krok | Stav | Větev, PR nebo commit | Aktualizace |
 | --- | --- | --- | --- | --- |
 | — | Doplnit skutečný stav při prvním předání z Codexu | K ověření | — | 2026-11-24 |
-| Jason 2.0 – pískoviště | Privátní projekty, šablony obalů a přílohy | Zjednodušený formulář Doypacku k vyzkoušení | [Pískoviště](https://feela-cz.github.io/Union-Cosmetic/Jason2/test/#projects) | 2026-11-27 |
+| Jason 2.0 – pískoviště | Privátní projekty, šablony obalů a přílohy | Zjednodušené přílohy a řazení přehledu k vyzkoušení | [Pískoviště](https://feela-cz.github.io/Union-Cosmetic/Jason2/test/#projects) | 2026-11-27 |
 
 ## Otevřené problémy a rozhodnutí
 
 Zaznamenávat pouze doložené technické problémy a rozhodnutí s dopadem na další práci. Výchozí seznam nebyl ověřen jako úplný.
 
 ## Poslední předání
+
+- **2026-11-27 – Codex:** Privátní projekty mají řazení všech sloupců, návrat na přehled v liště a potvrzení uložení stejným oznámením jako výrobky. Přílohy se nabízejí podle způsobu značení. Dříve nahrané soubory zůstávají dostupné a poznámky přebírají původní specifikaci etikety a odkaz na vzorek.
 
 - **2026-11-27 – Codex:** Doypack používá pro značení EAN, formát šarže a dvě schválení tiskových dat. Dříve uložené poznámky z obalu se zobrazí ve značení. Původní údaje mimo formulář a dříve nahrané soubory jsou zachované. Ověřeno pro nové i uložené projekty.
 
